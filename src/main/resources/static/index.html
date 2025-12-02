@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Kiratracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #101622;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: #181f2e;
+            padding: 24px 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            max-width: 420px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 20px;
+            margin: 0 0 16px;
+            text-align: center;
+        }
+        .layout {
+            display: flex;
+            gap: 16px;
+        }
+        .left {
+            flex: 2;
+        }
+        .right {
+            flex: 1;
+            background: #121828;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        .right h2 {
+            font-size: 16px;
+            margin: 0 0 8px;
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        button {
+            flex: 1 1 45%;
+            min-width: 120px;
+            padding: 10px 0;
+            border-radius: 999px;
+            border: none;
+            background: #2b87ff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.05s;
+        }
+        button:active {
+            transform: scale(0.97);
+            background: #1b5fd1;
+        }
+        #info {
+            font-size: 14px;
+            color: #cfd8ff;
+            min-height: 1.4em;
+            white-space: pre-line;
+        }
+        #lastWalks {
+            font-size: 13px;
+            color: #b5c0ff;
+            white-space: pre-line;
+            margin-top: 6px;
+        }
+        #leaderboard {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #leaderboard li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        @media (max-width: 600px) {
+            .layout {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Wer war mit Kira draußen?</h1>
+
+    <div class="layout">
+        <div class="left">
+            <div class="buttons">
+                <button onclick="sendWalk('Ilja')">Ilja</button>
+                <button onclick="sendWalk('Wlad')">Wlad</button>
+                <button onclick="sendWalk('Wika')">Wika</button>
+                <button onclick="sendWalk('Aaron')">Aaron</button>
+                <button onclick="sendWalk('Dajen')">Dajen</button>
+            </div>
+
+            <p id="info"></p>
+            <p id="lastWalks"></p>
+        </div>
+
+        <div class="right">
+            <h2>Letzte 7 Tage</h2>
+            <ul id="leaderboard"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sendWalk(person) {
+        fetch('/walk?person=' + encodeURIComponent(person), {method: 'POST'})
+            .then(() => loadStatus())
+            .catch(() => {
+                document.getElementById('info').innerText = 'Fehler beim Speichern.';
+            });
+    }
+
+    function loadStatus() {
+        fetch('/status')
+            .then(r => r.json())
+            .then(data => {
+                const info = document.getElementById('info');
+
+                if (!data.morning && !data.evening) {
+                    info.innerText = 'Kira war heute noch nicht draußen.';
+                } else if (data.morning && !data.evening) {
+                    info.innerText = 'Kira war heute morgens draußen.';
+                } else if (!data.morning && data.evening) {
+                    info.innerText = 'Kira war heute abends draußen.';
+                } else {
+                    info.innerText = 'Kira war heute morgens und abends draußen.';
+                }
+
+                const last = data.entries.slice(-5).reverse();
+                document.getElementById('lastWalks').innerText =
+                    last.map(e => e.person + ' – ' + e.time).join('\n');
+
+                const lb = document.getElementById('leaderboard');
+                lb.innerHTML = '';
+                Object.entries(data.leaderboard)
+                    .sort((a, b) => b[1] - a[1])
+                    .forEach(([name, count]) => {
+                        const li = document.createElement('li');
+                        li.textContent = name + ': ' + count;
+                        lb.appendChild(li);
+                    });
+            })
+            .catch(() => {
+                document.getElementById('info').innerText = 'Fehler beim Laden des Status.';
+            });
+    }
+
+    window.onload = loadStatus;
+</script>
+</body>
+</html>

@@ -93,6 +93,27 @@
             justify-content: space-between;
             margin-bottom: 4px;
         }
+        .reset-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+            transition: background 0.15s, transform 0.05s;
+        }
+        .reset-btn:hover {
+            background: #c82333;
+        }
+        .reset-btn:active {
+            transform: scale(0.95);
+        }
         @media (max-width: 600px) {
             .layout {
                 flex-direction: column;
@@ -124,6 +145,10 @@
         </div>
     </div>
 </div>
+
+<form action="/admin/reset" method="post" style="display: inline;">
+    <button type="submit" class="reset-btn">Restart</button>
+</form>
 
 <script>
     function sendWalk(person) {
@@ -173,3 +198,4 @@
 </script>
 </body>
 </html>
+

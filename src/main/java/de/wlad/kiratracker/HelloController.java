@@ -1,11 +1,14 @@
 package de.wlad.kiratracker;
 
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 public class HelloController {
 
     private final WalkService walkService;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
 
     public HelloController(WalkService walkService) {
         this.walkService = walkService;
@@ -38,9 +41,10 @@ public class HelloController {
     }
 
     // löscht ALLE Einträge
-    @GetMapping("/admin/reset")
+    @PostMapping("/admin/reset")
     public String reset() {
         walkService.deleteAll();
-        return "Alle Einträge wurden gelöscht.";
+        return "redirect:/";
     }
 }
+

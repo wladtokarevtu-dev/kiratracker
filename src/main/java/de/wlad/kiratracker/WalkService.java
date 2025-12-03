@@ -1,10 +1,9 @@
 package de.wlad.kiratracker;
 
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,21 +11,29 @@ import java.util.stream.Collectors;
 @Service
 public class WalkService {
 
-    private final List<WalkEntry> entries = new ArrayList<>();
+    private final WalkRepository repository;
 
+    public WalkService(WalkRepository repository) {
+        this.repository = repository;
+    }
+
+    @Transactional
     public void addEntry(String person) {
-        entries.add(new WalkEntry(person, LocalDateTime.now()));
+        if (person == null || person.trim().isEmpty()) {
+            throw new IllegalArgumentException("Person darf nicht leer sein");
+        }
+        repository.save(new WalkEntry(person.trim(), LocalDateTime.now()));
         cleanup();
     }
 
     public List<WalkEntry> getEntries() {
-        return new ArrayList<>(entries);
+        return repository.findAll();
     }
 
     // war Kira heute morgens (0–11 Uhr) draußen?
     public boolean wasMorning() {
         LocalDate today = LocalDate.now();
-        return entries.stream()
+        return repository.findAll().stream()
                 .filter(e -> e.getTime().toLocalDate().isEqual(today))
                 .anyMatch(e -> e.getTime().getHour() < 12);
     }
@@ -34,7 +41,7 @@ public class WalkService {
     // war Kira heute abends (12–23 Uhr) draußen?
     public boolean wasEvening() {
         LocalDate today = LocalDate.now();
-        return entries.stream()
+        return repository.findAll().stream()
                 .filter(e -> e.getTime().toLocalDate().isEqual(today))
                 .anyMatch(e -> e.getTime().getHour() >= 12);
     }
@@ -42,29 +49,28 @@ public class WalkService {
     // Leaderboard letzte 7 Tage
     public Map<String, Long> getLeaderboardLast7Days() {
         LocalDateTime weekAgo = LocalDateTime.now().minusDays(7);
-        return entries.stream()
-                .filter(e -> e.getTime().isAfter(weekAgo))
+        return repository.findByTimeAfter(weekAgo).stream()
                 .collect(Collectors.groupingBy(
                         WalkEntry::getPerson,
                         Collectors.counting()
                 ));
     }
 
-    // alles löschen, was älter als 7 Tage ist (Standard: 7 Tage)
+    // alles löschen, was älter als 7 Tage ist
+    @Transactional
     private void cleanup() {
         deleteOlderThanDays(7);
     }
 
     // ==== Admin-Funktionen ====
-
-    // ALLE Einträge löschen
+    @Transactional
     public void deleteAll() {
-        entries.clear();
+        repository.deleteAll();
     }
 
-    // Nur Einträge löschen, die älter als X Tage sind
+    @Transactional
     public void deleteOlderThanDays(int days) {
         LocalDateTime limit = LocalDateTime.now().minusDays(days);
-        entries.removeIf(e -> e.getTime().isBefore(limit));
+        repository.deleteByTimeBefore(limit);
     }
 }

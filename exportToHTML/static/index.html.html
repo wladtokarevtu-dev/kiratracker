@@ -1,0 +1,224 @@
+<html>
+<head>
+<title>index.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #d5b778;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bababa;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+.s5 { color: #56a8f5;}
+.s6 { color: #cf8e6d;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+index.html</font>
+</center></td></tr></table>
+<pre><span class="s0">&lt;!DOCTYPE </span><span class="s2">html</span><span class="s0">&gt;</span>
+<span class="s0">&lt;html </span><span class="s2">lang</span><span class="s3">=&quot;de&quot;</span><span class="s0">&gt;</span>
+<span class="s0">&lt;head&gt;</span>
+    <span class="s0">&lt;meta </span><span class="s2">charset</span><span class="s3">=&quot;UTF-8&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;title&gt;</span><span class="s1">Kiratracker</span><span class="s0">&lt;/title&gt;</span>
+    <span class="s0">&lt;meta </span><span class="s2">name</span><span class="s3">=&quot;viewport&quot; </span><span class="s2">content</span><span class="s3">=&quot;width=device-width, initial-scale=1&quot;</span><span class="s0">&gt;</span>
+
+    <span class="s0">&lt;style&gt;</span>
+        <span class="s0">body </span><span class="s1">{</span>
+            <span class="s2">margin</span><span class="s1">: </span><span class="s4">0</span><span class="s1">;</span>
+            <span class="s2">font-family</span><span class="s1">: </span><span class="s3">system-ui</span><span class="s1">, </span><span class="s3">-apple-system</span><span class="s1">, </span><span class="s3">BlinkMacSystemFont</span><span class="s1">, </span><span class="s3">sans-serif</span><span class="s1">;</span>
+            <span class="s2">background</span><span class="s1">: </span><span class="s5">#101622</span><span class="s1">;</span>
+            <span class="s2">color</span><span class="s1">: </span><span class="s5">#f5f5f5</span><span class="s1">;</span>
+            <span class="s2">display</span><span class="s1">: </span><span class="s3">flex</span><span class="s1">;</span>
+            <span class="s2">justify-content</span><span class="s1">: </span><span class="s3">center</span><span class="s1">;</span>
+            <span class="s2">align-items</span><span class="s1">: </span><span class="s3">center</span><span class="s1">;</span>
+            <span class="s2">min-height</span><span class="s1">: </span><span class="s4">100</span><span class="s3">vh</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">card </span><span class="s1">{</span>
+            <span class="s2">background</span><span class="s1">: </span><span class="s5">#181f2e</span><span class="s1">;</span>
+            <span class="s2">padding</span><span class="s1">: </span><span class="s4">24</span><span class="s3">px </span><span class="s4">20</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">border-radius</span><span class="s1">: </span><span class="s4">16</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">box-shadow</span><span class="s1">: </span><span class="s4">0 8</span><span class="s3">px </span><span class="s4">20</span><span class="s3">px </span><span class="s0">rgba</span><span class="s1">(</span><span class="s4">0</span><span class="s1">,</span><span class="s4">0</span><span class="s1">,</span><span class="s4">0</span><span class="s1">,</span><span class="s4">0.4</span><span class="s1">);</span>
+            <span class="s2">max-width</span><span class="s1">: </span><span class="s4">420</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">width</span><span class="s1">: </span><span class="s4">100</span><span class="s1">%;</span>
+        <span class="s1">}</span>
+        <span class="s0">h1 </span><span class="s1">{</span>
+            <span class="s2">font-size</span><span class="s1">: </span><span class="s4">20</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">margin</span><span class="s1">: </span><span class="s4">0 0 16</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">text-align</span><span class="s1">: </span><span class="s3">center</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">layout </span><span class="s1">{</span>
+            <span class="s2">display</span><span class="s1">: </span><span class="s3">flex</span><span class="s1">;</span>
+            <span class="s2">gap</span><span class="s1">: </span><span class="s4">16</span><span class="s3">px</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">left </span><span class="s1">{</span>
+            <span class="s2">flex</span><span class="s1">: </span><span class="s4">2</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">right </span><span class="s1">{</span>
+            <span class="s2">flex</span><span class="s1">: </span><span class="s4">1</span><span class="s1">;</span>
+            <span class="s2">background</span><span class="s1">: </span><span class="s5">#121828</span><span class="s1">;</span>
+            <span class="s2">padding</span><span class="s1">: </span><span class="s4">12</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">border-radius</span><span class="s1">: </span><span class="s4">12</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">font-size</span><span class="s1">: </span><span class="s4">14</span><span class="s3">px</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">right h2 </span><span class="s1">{</span>
+            <span class="s2">font-size</span><span class="s1">: </span><span class="s4">16</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">margin</span><span class="s1">: </span><span class="s4">0 0 8</span><span class="s3">px</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">buttons </span><span class="s1">{</span>
+            <span class="s2">display</span><span class="s1">: </span><span class="s3">flex</span><span class="s1">;</span>
+            <span class="s2">flex-wrap</span><span class="s1">: </span><span class="s3">wrap</span><span class="s1">;</span>
+            <span class="s2">gap</span><span class="s1">: </span><span class="s4">10</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">justify-content</span><span class="s1">: </span><span class="s3">center</span><span class="s1">;</span>
+            <span class="s2">margin-bottom</span><span class="s1">: </span><span class="s4">12</span><span class="s3">px</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s0">button </span><span class="s1">{</span>
+            <span class="s2">flex</span><span class="s1">: </span><span class="s4">1 1 45</span><span class="s1">%;</span>
+            <span class="s2">min-width</span><span class="s1">: </span><span class="s4">120</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">padding</span><span class="s1">: </span><span class="s4">10</span><span class="s3">px </span><span class="s4">0</span><span class="s1">;</span>
+            <span class="s2">border-radius</span><span class="s1">: </span><span class="s4">999</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">border</span><span class="s1">: </span><span class="s3">none</span><span class="s1">;</span>
+            <span class="s2">background</span><span class="s1">: </span><span class="s5">#2b87ff</span><span class="s1">;</span>
+            <span class="s2">color</span><span class="s1">: </span><span class="s5">#fff</span><span class="s1">;</span>
+            <span class="s2">font-size</span><span class="s1">: </span><span class="s4">16</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">font-weight</span><span class="s1">: </span><span class="s4">600</span><span class="s1">;</span>
+            <span class="s2">cursor</span><span class="s1">: </span><span class="s3">pointer</span><span class="s1">;</span>
+            <span class="s2">transition</span><span class="s1">: </span><span class="s3">background </span><span class="s4">0.15</span><span class="s3">s</span><span class="s1">, </span><span class="s3">transform </span><span class="s4">0.05</span><span class="s3">s</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s0">button</span><span class="s1">:</span><span class="s0">active </span><span class="s1">{</span>
+            <span class="s2">transform</span><span class="s1">: </span><span class="s0">scale</span><span class="s1">(</span><span class="s4">0.97</span><span class="s1">);</span>
+            <span class="s2">background</span><span class="s1">: </span><span class="s5">#1b5fd1</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s0">#info </span><span class="s1">{</span>
+            <span class="s2">font-size</span><span class="s1">: </span><span class="s4">14</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">color</span><span class="s1">: </span><span class="s5">#cfd8ff</span><span class="s1">;</span>
+            <span class="s2">min-height</span><span class="s1">: </span><span class="s4">1.4</span><span class="s3">em</span><span class="s1">;</span>
+            <span class="s2">white-space</span><span class="s1">: </span><span class="s3">pre-line</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s0">#lastWalks </span><span class="s1">{</span>
+            <span class="s2">font-size</span><span class="s1">: </span><span class="s4">13</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">color</span><span class="s1">: </span><span class="s5">#b5c0ff</span><span class="s1">;</span>
+            <span class="s2">white-space</span><span class="s1">: </span><span class="s3">pre-line</span><span class="s1">;</span>
+            <span class="s2">margin-top</span><span class="s1">: </span><span class="s4">6</span><span class="s3">px</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s0">#leaderboard </span><span class="s1">{</span>
+            <span class="s2">list-style</span><span class="s1">: </span><span class="s3">none</span><span class="s1">;</span>
+            <span class="s2">padding</span><span class="s1">: </span><span class="s4">0</span><span class="s1">;</span>
+            <span class="s2">margin</span><span class="s1">: </span><span class="s4">0</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s0">#leaderboard li </span><span class="s1">{</span>
+            <span class="s2">display</span><span class="s1">: </span><span class="s3">flex</span><span class="s1">;</span>
+            <span class="s2">justify-content</span><span class="s1">: </span><span class="s3">space-between</span><span class="s1">;</span>
+            <span class="s2">margin-bottom</span><span class="s1">: </span><span class="s4">4</span><span class="s3">px</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">reset-btn </span><span class="s1">{</span>
+            <span class="s2">position</span><span class="s1">: </span><span class="s3">fixed</span><span class="s1">;</span>
+            <span class="s2">bottom</span><span class="s1">: </span><span class="s4">20</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">right</span><span class="s1">: </span><span class="s4">20</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">background</span><span class="s1">: </span><span class="s5">#dc3545</span><span class="s1">;</span>
+            <span class="s2">color</span><span class="s1">: </span><span class="s3">white</span><span class="s1">;</span>
+            <span class="s2">border</span><span class="s1">: </span><span class="s3">none</span><span class="s1">;</span>
+            <span class="s2">padding</span><span class="s1">: </span><span class="s4">10</span><span class="s3">px </span><span class="s4">20</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">border-radius</span><span class="s1">: </span><span class="s4">8</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">font-size</span><span class="s1">: </span><span class="s4">14</span><span class="s3">px</span><span class="s1">;</span>
+            <span class="s2">font-weight</span><span class="s1">: </span><span class="s4">600</span><span class="s1">;</span>
+            <span class="s2">cursor</span><span class="s1">: </span><span class="s3">pointer</span><span class="s1">;</span>
+            <span class="s2">box-shadow</span><span class="s1">: </span><span class="s4">0 4</span><span class="s3">px </span><span class="s4">12</span><span class="s3">px </span><span class="s0">rgba</span><span class="s1">(</span><span class="s4">220</span><span class="s1">, </span><span class="s4">53</span><span class="s1">, </span><span class="s4">69</span><span class="s1">, </span><span class="s4">0.4</span><span class="s1">);</span>
+            <span class="s2">transition</span><span class="s1">: </span><span class="s3">background </span><span class="s4">0.15</span><span class="s3">s</span><span class="s1">, </span><span class="s3">transform </span><span class="s4">0.05</span><span class="s3">s</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">reset-btn</span><span class="s1">:</span><span class="s0">hover </span><span class="s1">{</span>
+            <span class="s2">background</span><span class="s1">: </span><span class="s5">#c82333</span><span class="s1">;</span>
+        <span class="s1">}</span>
+        <span class="s1">.</span><span class="s0">reset-btn</span><span class="s1">:</span><span class="s0">active </span><span class="s1">{</span>
+            <span class="s2">transform</span><span class="s1">: </span><span class="s0">scale</span><span class="s1">(</span><span class="s4">0.95</span><span class="s1">);</span>
+        <span class="s1">}</span>
+        <span class="s6">@media </span><span class="s1">(</span><span class="s2">max-width</span><span class="s1">: </span><span class="s4">600</span><span class="s3">px</span><span class="s1">) {</span>
+            <span class="s1">.</span><span class="s0">layout </span><span class="s1">{</span>
+                <span class="s2">flex-direction</span><span class="s1">: </span><span class="s3">column</span><span class="s1">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s0">&lt;/style&gt;</span>
+<span class="s0">&lt;/head&gt;</span>
+<span class="s0">&lt;body&gt;</span>
+<span class="s0">&lt;div </span><span class="s2">class</span><span class="s3">=&quot;card&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;h1&gt;</span><span class="s1">Wer war mit Kira draußen?</span><span class="s0">&lt;/h1&gt;</span>
+
+    <span class="s0">&lt;div </span><span class="s2">class</span><span class="s3">=&quot;layout&quot;</span><span class="s0">&gt;</span>
+        <span class="s0">&lt;div </span><span class="s2">class</span><span class="s3">=&quot;left&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;div </span><span class="s2">class</span><span class="s3">=&quot;buttons&quot;</span><span class="s0">&gt;</span>
+                <span class="s0">&lt;button </span><span class="s2">onclick</span><span class="s3">=&quot;</span><span class="s1">sendWalk(</span><span class="s3">'Ilja'</span><span class="s1">)</span><span class="s3">&quot;</span><span class="s0">&gt;</span><span class="s1">Ilja</span><span class="s0">&lt;/button&gt;</span>
+                <span class="s0">&lt;button </span><span class="s2">onclick</span><span class="s3">=&quot;</span><span class="s1">sendWalk(</span><span class="s3">'Wlad'</span><span class="s1">)</span><span class="s3">&quot;</span><span class="s0">&gt;</span><span class="s1">Wlad</span><span class="s0">&lt;/button&gt;</span>
+                <span class="s0">&lt;button </span><span class="s2">onclick</span><span class="s3">=&quot;</span><span class="s1">sendWalk(</span><span class="s3">'Wika'</span><span class="s1">)</span><span class="s3">&quot;</span><span class="s0">&gt;</span><span class="s1">Wika</span><span class="s0">&lt;/button&gt;</span>
+                <span class="s0">&lt;button </span><span class="s2">onclick</span><span class="s3">=&quot;</span><span class="s1">sendWalk(</span><span class="s3">'Aaron'</span><span class="s1">)</span><span class="s3">&quot;</span><span class="s0">&gt;</span><span class="s1">Aaron</span><span class="s0">&lt;/button&gt;</span>
+                <span class="s0">&lt;button </span><span class="s2">onclick</span><span class="s3">=&quot;</span><span class="s1">sendWalk(</span><span class="s3">'Dajen'</span><span class="s1">)</span><span class="s3">&quot;</span><span class="s0">&gt;</span><span class="s1">Dajen</span><span class="s0">&lt;/button&gt;</span>
+            <span class="s0">&lt;/div&gt;</span>
+
+            <span class="s0">&lt;p </span><span class="s2">id</span><span class="s3">=&quot;info&quot;</span><span class="s0">&gt;&lt;/p&gt;</span>
+            <span class="s0">&lt;p </span><span class="s2">id</span><span class="s3">=&quot;lastWalks&quot;</span><span class="s0">&gt;&lt;/p&gt;</span>
+        <span class="s0">&lt;/div&gt;</span>
+
+        <span class="s0">&lt;div </span><span class="s2">class</span><span class="s3">=&quot;right&quot;</span><span class="s0">&gt;</span>
+            <span class="s0">&lt;h2&gt;</span><span class="s1">Letzte 7 Tage</span><span class="s0">&lt;/h2&gt;</span>
+            <span class="s0">&lt;ul </span><span class="s2">id</span><span class="s3">=&quot;leaderboard&quot;</span><span class="s0">&gt;&lt;/ul&gt;</span>
+        <span class="s0">&lt;/div&gt;</span>
+    <span class="s0">&lt;/div&gt;</span>
+<span class="s0">&lt;/div&gt;</span>
+
+<span class="s0">&lt;form </span><span class="s2">action</span><span class="s3">=&quot;/admin/reset&quot; </span><span class="s2">method</span><span class="s3">=&quot;post&quot; </span><span class="s2">style</span><span class="s3">=&quot;</span><span class="s2">display</span><span class="s1">: </span><span class="s3">inline</span><span class="s1">;</span><span class="s3">&quot;</span><span class="s0">&gt;</span>
+    <span class="s0">&lt;button </span><span class="s2">type</span><span class="s3">=&quot;submit&quot; </span><span class="s2">class</span><span class="s3">=&quot;reset-btn&quot;</span><span class="s0">&gt;</span><span class="s1">Restart</span><span class="s0">&lt;/button&gt;</span>
+<span class="s0">&lt;/form&gt;</span>
+
+<span class="s0">&lt;script&gt;</span>
+    <span class="s6">function </span><span class="s1">sendWalk(person) {</span>
+        <span class="s1">fetch(</span><span class="s3">'/walk?person=' </span><span class="s1">+ encodeURIComponent(person), {method: </span><span class="s3">'POST'</span><span class="s1">})</span>
+            <span class="s1">.then(() =&gt; loadStatus())</span>
+            <span class="s1">.catch(() =&gt; {</span>
+                <span class="s1">document.getElementById(</span><span class="s3">'info'</span><span class="s1">).innerText = </span><span class="s3">'Fehler beim Speichern.'</span><span class="s1">;</span>
+            <span class="s1">});</span>
+    <span class="s1">}</span>
+
+    <span class="s6">function </span><span class="s1">loadStatus() {</span>
+        <span class="s1">fetch(</span><span class="s3">'/status'</span><span class="s1">)</span>
+            <span class="s1">.then(r =&gt; r.json())</span>
+            <span class="s1">.then(data =&gt; {</span>
+                <span class="s6">const </span><span class="s1">info = document.getElementById(</span><span class="s3">'info'</span><span class="s1">);</span>
+
+                <span class="s6">if </span><span class="s1">(!data.morning &amp;&amp; !data.evening) {</span>
+                    <span class="s1">info.innerText = </span><span class="s3">'Kira war heute noch nicht draußen.'</span><span class="s1">;</span>
+                <span class="s1">} </span><span class="s6">else if </span><span class="s1">(data.morning &amp;&amp; !data.evening) {</span>
+                    <span class="s1">info.innerText = </span><span class="s3">'Kira war heute morgens draußen.'</span><span class="s1">;</span>
+                <span class="s1">} </span><span class="s6">else if </span><span class="s1">(!data.morning &amp;&amp; data.evening) {</span>
+                    <span class="s1">info.innerText = </span><span class="s3">'Kira war heute abends draußen.'</span><span class="s1">;</span>
+                <span class="s1">} </span><span class="s6">else </span><span class="s1">{</span>
+                    <span class="s1">info.innerText = </span><span class="s3">'Kira war heute morgens und abends draußen.'</span><span class="s1">;</span>
+                <span class="s1">}</span>
+
+                <span class="s6">const </span><span class="s1">last = data.entries.slice(-</span><span class="s4">5</span><span class="s1">).reverse();</span>
+                <span class="s1">document.getElementById(</span><span class="s3">'lastWalks'</span><span class="s1">).innerText =</span>
+                    <span class="s1">last.map(e =&gt; e.person + </span><span class="s3">' – ' </span><span class="s1">+ e.time).join(</span><span class="s3">'</span><span class="s6">\n</span><span class="s3">'</span><span class="s1">);</span>
+
+                <span class="s6">const </span><span class="s1">lb = document.getElementById(</span><span class="s3">'leaderboard'</span><span class="s1">);</span>
+                <span class="s1">lb.innerHTML = </span><span class="s3">''</span><span class="s1">;</span>
+                <span class="s1">Object.entries(data.leaderboard)</span>
+                    <span class="s1">.sort((a, b) =&gt; b[</span><span class="s4">1</span><span class="s1">] - a[</span><span class="s4">1</span><span class="s1">])</span>
+                    <span class="s1">.forEach(([name, count]) =&gt; {</span>
+                        <span class="s6">const </span><span class="s1">li = document.createElement(</span><span class="s3">'li'</span><span class="s1">);</span>
+                        <span class="s1">li.textContent = name + </span><span class="s3">': ' </span><span class="s1">+ count;</span>
+                        <span class="s1">lb.appendChild(li);</span>
+                    <span class="s1">});</span>
+            <span class="s1">})</span>
+            <span class="s1">.catch(() =&gt; {</span>
+                <span class="s1">document.getElementById(</span><span class="s3">'info'</span><span class="s1">).innerText = </span><span class="s3">'Fehler beim Laden des Status.'</span><span class="s1">;</span>
+            <span class="s1">});</span>
+    <span class="s1">}</span>
+
+    <span class="s1">window.onload = loadStatus;</span>
+<span class="s0">&lt;/script&gt;</span>
+<span class="s0">&lt;/body&gt;</span>
+<span class="s0">&lt;/html&gt;</span>
+
+</pre>
+</body>
+</html>

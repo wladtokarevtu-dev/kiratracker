@@ -97,7 +97,7 @@
             margin-bottom: 15px;
         }
 
-        input[type="text"] {
+        input[type="text"], input[type="password"], input[type="number"] {
             flex: 1;
             padding: 15px;
             border: 2px solid #e0e0e0;
@@ -106,7 +106,7 @@
             transition: border-color 0.3s ease;
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -130,6 +130,12 @@
 
         button:active {
             transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .quick-buttons {
@@ -222,6 +228,50 @@
             font-style: italic;
         }
 
+        .admin-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            border: 2px solid #dc3545;
+        }
+
+        .admin-section h2 {
+            margin-bottom: 20px;
+            color: #dc3545;
+        }
+
+        .admin-logged-out, .admin-logged-in {
+            display: none;
+        }
+
+        .admin-logged-out.active, .admin-logged-in.active {
+            display: block;
+        }
+
+        .danger-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .danger-btn:hover {
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .admin-actions {
+            display: grid;
+            gap: 15px;
+        }
+
+        .admin-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+            color: #856404;
+        }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 2em;
@@ -276,6 +326,35 @@
     <div class="history">
         <h2>📜 Letzte Spaziergänge</h2>
         <div id="historyContent"></div>
+    </div>
+
+    <div class="admin-section">
+        <h2>⚙️ Admin-Bereich</h2>
+
+        <div class="admin-logged-out active" id="adminLoginForm">
+            <div class="input-group">
+                <input type="text" id="adminUsername" placeholder="Benutzername" />
+                <input type="password" id="adminPassword" placeholder="Passwort" />
+                <button onclick="adminLogin()">Login</button>
+            </div>
+        </div>
+
+        <div class="admin-logged-in" id="adminPanel">
+            <div class="admin-info">
+                ⚠️ <strong>Achtung:</strong> Diese Aktionen können nicht rückgängig gemacht werden!
+            </div>
+
+            <div class="admin-actions">
+                <div class="input-group">
+                    <input type="number" id="cleanupDays" placeholder="Tage (z.B. 30)" value="30" min="1" />
+                    <button onclick="adminCleanup()">Alte Einträge löschen</button>
+                </div>
+
+                <button class="danger-btn" onclick="adminReset()">🗑️ ALLE Daten löschen</button>
+
+                <button onclick="adminLogout()">Logout</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -394,6 +473,105 @@
             addWalk();
         }
     });
+
+    // Admin-Funktionen
+    let adminCredentials = null;
+
+    function adminLogin() {
+        const username = document.getElementById('adminUsername').value;
+        const password = document.getElementById('adminPassword').value;
+
+        if (!username || !password) {
+            alert('Bitte Benutzername und Passwort eingeben!');
+            return;
+        }
+
+        adminCredentials = btoa(username + ':' + password);
+
+        document.getElementById('adminLoginForm').classList.remove('active');
+        document.getElementById('adminPanel').classList.add('active');
+
+        document.getElementById('adminUsername').value = '';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function adminLogout() {
+        adminCredentials = null;
+        document.getElementById('adminLoginForm').classList.add('active');
+        document.getElementById('adminPanel').classList.remove('active');
+    }
+
+    async function adminCleanup() {
+        if (!adminCredentials) {
+            alert('Nicht eingeloggt!');
+            return;
+        }
+
+        const days = document.getElementById('cleanupDays').value;
+
+        if (!confirm(`Wirklich alle Einträge älter als ${days} Tage löschen?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/cleanup?days=${days}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Basic ' + adminCredentials
+                }
+            });
+
+            if (response.ok) {
+                alert('Alte Einträge wurden gelöscht!');
+                loadStatus();
+            } else if (response.status === 401) {
+                alert('Ungültige Zugangsdaten!');
+                adminLogout();
+            } else {
+                alert('Fehler beim Löschen!');
+            }
+        } catch (error) {
+            console.error('Fehler:', error);
+            alert('Fehler beim Löschen!');
+        }
+    }
+
+    async function adminReset() {
+        if (!adminCredentials) {
+            alert('Nicht eingeloggt!');
+            return;
+        }
+
+        if (!confirm('WIRKLICH ALLE Daten unwiderruflich löschen?')) {
+            return;
+        }
+
+        if (!confirm('Letzte Warnung! Alle Einträge werden gelöscht. Fortfahren?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/admin/reset', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + adminCredentials
+                }
+            });
+
+            if (response.ok) {
+                alert('Alle Daten wurden gelöscht!');
+                loadStatus();
+            } else if (response.status === 401) {
+                alert('Ungültige Zugangsdaten!');
+                adminLogout();
+            } else {
+                alert('Fehler beim Löschen!');
+            }
+        } catch (error) {
+            console.error('Fehler:', error);
+            alert('Fehler beim Löschen!');
+        }
+    }
 
     // Initial laden und alle 30 Sekunden aktualisieren
     loadStatus();

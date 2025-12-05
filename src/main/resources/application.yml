@@ -1,9 +1,12 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kiratracker}
-    username: ${SPRING_DATASOURCE_USERNAME:kirauser}
-    password: ${SPRING_DATASOURCE_PASSWORD:kirapass123}
-    driver-class-name: org.postgresql.Driver
+    spring:
+      datasource:
+        url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/kiratracker}
+        username: ${DB_USERNAME:kirauser}
+        password: ${DB_PASSWORD:kirapass123}
+        driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}

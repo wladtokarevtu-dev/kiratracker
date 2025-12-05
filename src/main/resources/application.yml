@@ -1,6 +1,6 @@
 spring:
   datasource:
-    # Holt sich die Werte direkt aus deinen Render Environment Variables
+    # Die Variablen müssen exakt so in Render unter "Environment" stehen
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
@@ -8,53 +8,21 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    # WICHTIG: update erstellt fehlende Tabellen automatisch beim Start
     hibernate:
+      # update erstellt Tabellen automatisch, falls sie fehlen
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
 
-  # Mapping für deine eigenen Security-Variablen
+  # Login-Daten aus Render übernehmen
   security:
     user:
       name: ${APP_SECURITY_USERNAME:admin}
       password: ${APP_SECURITY_PASSWORD:password}
 
-# Deine Wetter-Keys (Fallback leer, falls noch nicht gesetzt)
-weather:
-  api:
-    key: ${WEATHER_API_KEY:}
-  city: Berlin
-
-server:
-  port: 8080
-spring:
-  datasource:
-    # Holt sich die Werte direkt aus deinen Render Environment Variables
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    # WICHTIG: update erstellt fehlende Tabellen automatisch beim Start
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-  # Mapping für deine eigenen Security-Variablen
-  security:
-    user:
-      name: ${APP_SECURITY_USERNAME:admin}
-      password: ${APP_SECURITY_PASSWORD:password}
-
-# Deine Wetter-Keys (Fallback leer, falls noch nicht gesetzt)
+# Wetter API Konfiguration
 weather:
   api:
     key: ${WEATHER_API_KEY:}

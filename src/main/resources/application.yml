@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kiratracker}
+    username: ${SPRING_DATASOURCE_USERNAME:kirauser}
+    password: ${SPRING_DATASOURCE_PASSWORD:kirapass123}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: Europe/Berlin
+
+app:
+  security:
+    username: ${APP_SECURITY_USERNAME:admin}
+    password: ${APP_SECURITY_PASSWORD:kira2024}
+
+weather:
+  api:
+    key: ${WEATHER_API_KEY:your_api_key_here}
+    url: https://api.openweathermap.org/data/2.5/weather
+  city: Berlin
+  country: DE
+
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    root: INFO
+    de.wlad.kiratracker: DEBUG

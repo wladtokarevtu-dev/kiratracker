@@ -11,31 +11,19 @@ public class WalkRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String requester;
-
-    @Column(nullable = false)
-    private String message;
-
-    @Column(nullable = false)
+    private String person;
+    private String time;
     private ZonedDateTime requestTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RequestStatus status = RequestStatus.PENDING;
+    private RequestStatus status;
 
-    private ZonedDateTime respondedTime;
+    public enum RequestStatus {
+        PENDING, APPROVED, REJECTED
+    }
 
     // Constructors
-    public WalkRequest() {
-    }
-
-    public WalkRequest(String requester, String message) {
-        this.requester = requester;
-        this.message = message;
-        this.requestTime = ZonedDateTime.now();
-        this.status = RequestStatus.PENDING;
-    }
+    public WalkRequest() {}
 
     // Getters and Setters
     public Long getId() {
@@ -46,20 +34,20 @@ public class WalkRequest {
         this.id = id;
     }
 
-    public String getRequester() {
-        return requester;
+    public String getPerson() {
+        return person;
     }
 
-    public void setRequester(String requester) {
-        this.requester = requester;
+    public void setPerson(String person) {
+        this.person = person;
     }
 
-    public String getMessage() {
-        return message;
+    public String getTime() {
+        return time;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public ZonedDateTime getRequestTime() {
@@ -76,17 +64,5 @@ public class WalkRequest {
 
     public void setStatus(RequestStatus status) {
         this.status = status;
-    }
-
-    public ZonedDateTime getRespondedTime() {
-        return respondedTime;
-    }
-
-    public void setRespondedTime(ZonedDateTime respondedTime) {
-        this.respondedTime = respondedTime;
-    }
-
-    public enum RequestStatus {
-        PENDING, ACCEPTED, REJECTED
     }
 }

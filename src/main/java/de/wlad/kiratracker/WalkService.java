@@ -27,11 +27,15 @@ public class WalkService {
         return walkRepository.save(entry);
     }
 
+    @Transactional
+    public void addWalk(String person, String time) {
+        addEntry(person);
+    }
+
     public boolean wasMorning() {
         ZonedDateTime now = ZonedDateTime.now(BERLIN_ZONE);
         ZonedDateTime todayStart = now.toLocalDate().atStartOfDay(BERLIN_ZONE);
         ZonedDateTime noon = todayStart.plusHours(12);
-
         List<WalkEntry> todayWalks = walkRepository.findEntriesSince(todayStart);
         return todayWalks.stream().anyMatch(w -> w.getTime().isBefore(noon));
     }
@@ -40,7 +44,6 @@ public class WalkService {
         ZonedDateTime now = ZonedDateTime.now(BERLIN_ZONE);
         ZonedDateTime todayStart = now.toLocalDate().atStartOfDay(BERLIN_ZONE);
         ZonedDateTime noon = todayStart.plusHours(12);
-
         List<WalkEntry> todayWalks = walkRepository.findEntriesSince(todayStart);
         return todayWalks.stream().anyMatch(w -> !w.getTime().isBefore(noon));
     }
@@ -54,7 +57,6 @@ public class WalkService {
     public Map<String, Long> getLeaderboardLast7Days() {
         ZonedDateTime sevenDaysAgo = ZonedDateTime.now(BERLIN_ZONE).minusDays(7);
         List<Object[]> results = walkRepository.getLeaderboardSince(sevenDaysAgo);
-
         Map<String, Long> leaderboard = new LinkedHashMap<>();
         for (Object[] result : results) {
             leaderboard.put((String) result[0], (Long) result[1]);
@@ -82,13 +84,11 @@ public class WalkService {
     public WalkEntry updateEntry(Long id, String person, String timeString) {
         WalkEntry entry = walkRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Entry not found: " + id));
-
         entry.setPerson(person);
         if (timeString != null && !timeString.isEmpty()) {
             ZonedDateTime newTime = ZonedDateTime.parse(timeString);
             entry.setTime(newTime);
         }
-
         return walkRepository.save(entry);
     }
 
@@ -98,6 +98,11 @@ public class WalkService {
                 .orElseThrow(() -> new IllegalArgumentException("Entry not found: " + id));
         entry.incrementApplause();
         walkRepository.save(entry);
+    }
+
+    @Transactional
+    public void addApplause(Long id) {
+        incrementApplause(id);
     }
 
     public Optional<WalkEntry> findById(Long id) {

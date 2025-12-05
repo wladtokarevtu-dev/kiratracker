@@ -1,50 +1,90 @@
 package de.wlad.kiratracker;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @RestController
 public class HelloController {
 
     private final WalkService walkService;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
+    private final WeatherService weatherService;
+    private final WalkRequestService requestService;
 
-    public HelloController(WalkService walkService) {
+    @Autowired
+    public HelloController(WalkService walkService, WeatherService weatherService, WalkRequestService requestService) {
         this.walkService = walkService;
-    }
-
-    // Eintrag speichern
-    @PostMapping("/walk")
-    public void addWalk(@RequestParam String person) {
-        walkService.addEntry(person);
+        this.weatherService = weatherService;
+        this.requestService = requestService;
     }
 
     // Status für die HTML-Seite
     @GetMapping("/status")
-    public StatusDto status() {
-        return new StatusDto(
+    public ResponseEntity<StatusDto> status() {
+        StatusDto statusDto = new StatusDto(
                 walkService.wasMorning(),
                 walkService.wasEvening(),
                 walkService.getEntries(),
-                walkService.getLeaderboardLast7Days()
+                walkService.getLeaderboardLast7Days(),
+                weatherService.getCurrentWeather(),
+                requestService.getPendingRequestsCount()
         );
+        return ResponseEntity.ok(statusDto);
     }
 
-    // ==== Admin-Endpoints ====
-
-    // löscht Einträge, die älter als ?days sind (Standard 30)
-    @GetMapping("/admin/cleanup")
-    public String cleanup(@RequestParam(defaultValue = "30") int days) {
-        walkService.deleteOlderThanDays(days);
-        return "Einträge, die älter als " + days + " Tage sind, wurden gelöscht.";
+    // Walk eintragen
+    @PostMapping("/walk")
+    public ResponseEntity<String> addWalk(@RequestBody WalkRequest request) {
+        walkService.addWalk(request.getPerson(), request.getTime());
+        return ResponseEntity.ok("Spaziergang eingetragen!");
     }
 
-    // löscht ALLE Einträge
-    @PostMapping("/admin/reset")
-    public String reset() {
-        walkService.deleteAll();
-        return "redirect:/";
+    // Walk Request erstellen
+    @PostMapping("/walk/request")
+    public ResponseEntity<String> createWalkRequest(@RequestBody WalkRequestDto dto) {
+        requestService.createRequest(dto.getPerson(), dto.getTime());
+        return ResponseEntity.ok("Anfrage erstellt!");
+    }
+
+    // Walk Request annehmen
+    @PostMapping("/walk/request/{id}/approve")
+    public ResponseEntity<String> approveRequest(@PathVariable Long id) {
+        requestService.approveRequest(id);
+        return ResponseEntity.ok("Anfrage genehmigt!");
+    }
+
+    // Walk Request ablehnen
+    @PostMapping("/walk/request/{id}/reject")
+    public ResponseEntity<String> rejectRequest(@PathVariable Long id) {
+        requestService.rejectRequest(id);
+        return ResponseEntity.ok("Anfrage abgelehnt!");
+    }
+
+    // Applaus geben
+    @PostMapping("/walk/{id}/applause")
+    public ResponseEntity<String> addApplause(@PathVariable Long id) {
+        walkService.addApplause(id);
+        return ResponseEntity.ok("Applaus gegeben!");
+    }
+
+    static class WalkRequest {
+        private String person;
+        private String time;
+
+        public String getPerson() {
+            return person;
+        }
+
+        public void setPerson(String person) {
+            this.person = person;
+        }
+
+        public String getTime() {
+            return time;
+        }
+
+        public void setTime(String time) {
+            this.time = time;
+        }
     }
 }
-

@@ -1,11 +1,10 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:resolve
+RUN apk add --no-cache maven
+COPY pom.xml ./
+RUN mvn dependency:resolve
 COPY src ./src
-RUN rm -f src/main/resources/application.properties
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app

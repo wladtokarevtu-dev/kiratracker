@@ -1,18 +1,23 @@
 package de.wlad.kiratracker;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.time.LocalDateTime;
+
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Repository
 public interface WalkRepository extends JpaRepository<WalkEntry, Long> {
 
-    List<WalkEntry> findByTimeAfter(LocalDateTime time);
+    List<WalkEntry> findAllByOrderByTimeDesc();
 
-    @Modifying
-    @Query("DELETE FROM WalkEntry w WHERE w.time < ?1")
-    void deleteByTimeBefore(LocalDateTime time);
+    void deleteByTimeBefore(ZonedDateTime cutoffTime);
+
+    @Query("SELECT w FROM WalkEntry w WHERE w.time >= :startDate ORDER BY w.time DESC")
+    List<WalkEntry> findEntriesSince(@Param("startDate") ZonedDateTime startDate);
+
+    @Query("SELECT w.person, COUNT(w) as walkCount FROM WalkEntry w WHERE w.time >= :startDate GROUP BY w.person ORDER BY walkCount DESC")
+    List<Object[]> getLeaderboardSince(@Param("startDate") ZonedDateTime startDate);
 }

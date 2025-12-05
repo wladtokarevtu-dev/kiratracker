@@ -41,6 +41,46 @@
             opacity: 0.9;
         }
 
+        /* NEU: Wetter Widget */
+        .weather-widget {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .weather-icon-img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .weather-info {
+            flex: 1;
+        }
+
+        .weather-temp {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .weather-desc {
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        .weather-details {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 5px;
+        }
+
         .status-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -97,16 +137,22 @@
             margin-bottom: 15px;
         }
 
-        input[type="text"], input[type="password"], input[type="number"] {
+        input[type="text"], input[type="password"], input[type="number"], textarea {
             flex: 1;
             padding: 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 1em;
             transition: border-color 0.3s ease;
+            font-family: inherit;
         }
 
-        input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -155,6 +201,30 @@
         .quick-btn:hover {
             background: #667eea;
             color: white;
+        }
+
+        /* NEU: Anfrage-Sektion */
+        .request-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .request-section h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .pending-badge {
+            background: #ffc107;
+            color: #856404;
+            padding: 10px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
         }
 
         .leaderboard, .history {
@@ -207,6 +277,7 @@
             background: #f8f9fa;
             border-radius: 5px;
             margin-bottom: 10px;
+            position: relative;
         }
 
         .history-person {
@@ -219,6 +290,30 @@
             color: #666;
             font-size: 0.9em;
             margin-top: 5px;
+        }
+
+        /* NEU: Applaus Button */
+        .applause-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .applause-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .applause-count {
+            font-weight: bold;
         }
 
         .empty-state {
@@ -272,6 +367,13 @@
             color: #856404;
         }
 
+        .admin-link-btn {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 2em;
@@ -279,6 +381,18 @@
 
             .input-group {
                 flex-direction: column;
+            }
+
+            .weather-widget {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .applause-btn {
+                position: static;
+                margin-top: 10px;
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -288,6 +402,19 @@
     <div class="header">
         <h1>🐕 Kira Tracker</h1>
         <p>War Kira heute schon draußen?</p>
+    </div>
+
+    <!-- NEU: Wetter Widget -->
+    <div class="weather-widget">
+        <img id="weatherIcon" class="weather-icon-img" src="" alt="Wetter" style="display:none;">
+        <div class="weather-info">
+            <div class="weather-temp" id="weatherTemp">--°C</div>
+            <div class="weather-desc" id="weatherDesc">Lade Wetter...</div>
+            <div class="weather-details">
+                <span id="weatherHumidity">💧 --%</span>
+                <span id="weatherWind">💨 -- km/h</span>
+            </div>
+        </div>
     </div>
 
     <div class="status-cards">
@@ -318,6 +445,19 @@
         </div>
     </div>
 
+    <!-- NEU: Anfrage-Sektion -->
+    <div class="request-section">
+        <h2>💬 Mit Kira rausgehen?</h2>
+        <div class="input-group" style="flex-direction: column;">
+            <input type="text" id="requesterName" placeholder="Dein Name" />
+            <textarea id="requestMessage" placeholder="Nachricht (optional, z.B. 'Kann ich morgen um 15 Uhr mit Kira?')"></textarea>
+            <button onclick="sendRequest()">Anfrage senden</button>
+        </div>
+        <div id="pendingBadge" class="pending-badge" style="display: none;">
+            <span id="pendingCount">0</span> offene Anfrage(n)
+        </div>
+    </div>
+
     <div class="leaderboard">
         <h2>🏆 Top Gassigänger (Letzte 7 Tage)</h2>
         <div id="leaderboardContent"></div>
@@ -345,6 +485,10 @@
             </div>
 
             <div class="admin-actions">
+                <a href="/admin.html" class="admin-link-btn" style="padding: 15px 30px;">
+                    📋 Zu Admin-Dashboard (Einträge & Anfragen verwalten)
+                </a>
+
                 <div class="input-group">
                     <input type="number" id="cleanupDays" placeholder="Tage (z.B. 30)" value="30" min="1" />
                     <button onclick="adminCleanup()">Alte Einträge löschen</button>
@@ -389,10 +533,30 @@
             const response = await fetch('/status');
             const data = await response.json();
 
+            // Wetter aktualisieren
+            if (data.weather) {
+                document.getElementById('weatherTemp').textContent = `${Math.round(data.weather.temperature)}°C`;
+                document.getElementById('weatherDesc').textContent = data.weather.description;
+                document.getElementById('weatherHumidity').textContent = `💧 ${data.weather.humidity}%`;
+                document.getElementById('weatherWind').textContent = `💨 ${data.weather.windSpeed} km/h`;
+
+                const iconImg = document.getElementById('weatherIcon');
+                iconImg.src = `https://openweathermap.org/img/wn/${data.weather.icon}@2x.png`;
+                iconImg.style.display = 'block';
+            }
+
+            // Pending Requests Badge
+            if (data.pendingRequestsCount > 0) {
+                document.getElementById('pendingCount').textContent = data.pendingRequestsCount;
+                document.getElementById('pendingBadge').style.display = 'inline-block';
+            } else {
+                document.getElementById('pendingBadge').style.display = 'none';
+            }
+
             // Morgen Status
             const morningIcon = document.getElementById('morningIcon');
             const morningStatus = document.getElementById('morningStatus');
-            if (data.morning) {
+            if (data.wasMorning) {
                 morningIcon.textContent = '✅';
                 morningStatus.textContent = 'Ja, war draußen!';
             } else {
@@ -403,7 +567,7 @@
             // Abend Status
             const eveningIcon = document.getElementById('eveningIcon');
             const eveningStatus = document.getElementById('eveningStatus');
-            if (data.evening) {
+            if (data.wasEvening) {
                 eveningIcon.textContent = '✅';
                 eveningStatus.textContent = 'Ja, war draußen!';
             } else {
@@ -418,25 +582,28 @@
             } else {
                 const sorted = Object.entries(data.leaderboard).sort((a, b) => b[1] - a[1]);
                 leaderboardContent.innerHTML = sorted.map(([person, count]) => `
-                        <div class="leaderboard-item">
-                            <span class="leaderboard-name">${person}</span>
-                            <span class="leaderboard-count">${count} ${count === 1 ? 'Spaziergang' : 'Spaziergänge'}</span>
-                        </div>
-                    `).join('');
+                    <div class="leaderboard-item">
+                        <span class="leaderboard-name">${person}</span>
+                        <span class="leaderboard-count">${count} ${count === 1 ? 'Spaziergang' : 'Spaziergänge'}</span>
+                    </div>
+                `).join('');
             }
 
-            // History
+            // History mit Applaus-Button
             const historyContent = document.getElementById('historyContent');
             if (data.entries.length === 0) {
                 historyContent.innerHTML = '<div class="empty-state">Noch keine Einträge vorhanden</div>';
             } else {
-                const recent = data.entries.slice(-10).reverse();
+                const recent = data.entries.slice(0, 10);
                 historyContent.innerHTML = recent.map(entry => `
-                        <div class="history-entry">
-                            <div class="history-person">${entry.person} war mit Kira spazieren</div>
-                            <div class="history-time">um ${formatTimestamp(entry.time)}</div>
-                        </div>
-                    `).join('');
+                    <div class="history-entry">
+                        <div class="history-person">${entry.person} war mit Kira spazieren</div>
+                        <div class="history-time">um ${entry.timeFormatted}</div>
+                        <button class="applause-btn" onclick="applause(${entry.id})">
+                            👏 <span class="applause-count">${entry.applauseCount || 0}</span>
+                        </button>
+                    </div>
+                `).join('');
             }
         } catch (error) {
             console.error('Fehler beim Laden:', error);
@@ -465,6 +632,51 @@
     function quickAdd(person) {
         document.getElementById('personInput').value = person;
         addWalk();
+    }
+
+    // NEU: Applaus-Funktion
+    async function applause(entryId) {
+        try {
+            await fetch(`/applause/${entryId}`, {
+                method: 'POST'
+            });
+            loadStatus();
+        } catch (error) {
+            console.error('Fehler beim Applaudieren:', error);
+        }
+    }
+
+    // NEU: Anfrage senden
+    async function sendRequest() {
+        const requester = document.getElementById('requesterName').value.trim();
+        const message = document.getElementById('requestMessage').value.trim();
+
+        if (!requester) {
+            alert('Bitte gib deinen Namen ein!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `requester=${encodeURIComponent(requester)}&message=${encodeURIComponent(message || 'Keine Nachricht')}`
+            });
+
+            if (response.ok) {
+                alert('Anfrage wurde gesendet! 🎉');
+                document.getElementById('requesterName').value = '';
+                document.getElementById('requestMessage').value = '';
+                loadStatus();
+            } else {
+                alert('Fehler beim Senden der Anfrage!');
+            }
+        } catch (error) {
+            console.error('Fehler:', error);
+            alert('Fehler beim Senden!');
+        }
     }
 
     // Enter-Taste zum Absenden

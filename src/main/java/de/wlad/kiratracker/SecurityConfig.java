@@ -8,8 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -17,38 +15,43 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${app.security.username}")
-    private String username;
+    // Liest die Werte aus der application.yml (die wiederum von Render kommen)
+    @Value("${spring.security.user.name}")
+    private String adminUsername;
 
-    @Value("${app.security.password}")
-    private String password;
+    @Value("${spring.security.user.password}")
+    private String adminPassword;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // WICHTIG: CSRF deaktivieren, damit das Speichern (POST Requests) nicht blockiert wird
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").authenticated()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/", "/css/**", "/js/**", "/images/**").permitAll() // Startseite & Ressourcen frei
+                        .anyRequest().authenticated() // Alles andere (z.B. /admin) erfordert Login
                 )
-                .httpBasic(basic -> {});
+                .formLogin(form -> form
+                        .defaultSuccessUrl("/", true) // Nach Login zur Startseite
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/")
+                        .permitAll()
+                );
 
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails admin = User.builder()
-                .username(username)
-                .password(passwordEncoder().encode(password))
+        // Erstellt den Admin-User mit deinen Render-Daten
+        UserDetails admin = User.withDefaultPasswordEncoder()
+                .username(adminUsername)
+                .password(adminPassword)
                 .roles("ADMIN")
                 .build();
 
         return new InMemoryUserDetailsManager(admin);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

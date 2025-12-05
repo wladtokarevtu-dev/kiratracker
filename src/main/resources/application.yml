@@ -1,39 +1,64 @@
 spring:
   datasource:
-    spring:
-      datasource:
-        url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/kiratracker}
-        username: ${DB_USERNAME:kirauser}
-        password: ${DB_PASSWORD:kirapass123}
-        driver-class-name: org.postgresql.Driver
+    # Holt sich die Werte direkt aus deinen Render Environment Variables
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # WICHTIG: update erstellt fehlende Tabellen automatisch beim Start
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
-    show-sql: false
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        jdbc:
-          time_zone: Europe/Berlin
 
-app:
+  # Mapping für deine eigenen Security-Variablen
   security:
-    username: ${APP_SECURITY_USERNAME:admin}
-    password: ${APP_SECURITY_PASSWORD:kira2024}
+    user:
+      name: ${APP_SECURITY_USERNAME:admin}
+      password: ${APP_SECURITY_PASSWORD:password}
 
+# Deine Wetter-Keys (Fallback leer, falls noch nicht gesetzt)
 weather:
   api:
-    key: ${WEATHER_API_KEY:your_api_key_here}
-    url: https://api.openweathermap.org/data/2.5/weather
+    key: ${WEATHER_API_KEY:}
   city: Berlin
-  country: DE
 
 server:
-  port: ${PORT:8080}
+  port: 8080
+spring:
+  datasource:
+    # Holt sich die Werte direkt aus deinen Render Environment Variables
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
-logging:
-  level:
-    root: INFO
-    de.wlad.kiratracker: DEBUG
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # WICHTIG: update erstellt fehlende Tabellen automatisch beim Start
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Mapping für deine eigenen Security-Variablen
+  security:
+    user:
+      name: ${APP_SECURITY_USERNAME:admin}
+      password: ${APP_SECURITY_PASSWORD:password}
+
+# Deine Wetter-Keys (Fallback leer, falls noch nicht gesetzt)
+weather:
+  api:
+    key: ${WEATHER_API_KEY:}
+  city: Berlin
+
+server:
+  port: 8080

@@ -5,99 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Kira Tracker</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; background: #f0f2f5; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h1 { color: #dc3545; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; }
-        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
-        button { cursor: pointer; padding: 5px 10px; border-radius: 4px; border: none; }
-        .btn-save { background: #28a745; color: white; }
-        .btn-delete { background: #dc3545; color: white; }
-        .btn-back { background: #6c757d; color: white; text-decoration: none; padding: 10px 20px; display: inline-block; margin-bottom: 20px; border-radius: 5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+
+        .card-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h2 { color: #667eea; margin-bottom: 20px; font-size: 1.4em; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; }
+
+        /* Tabelle Styles */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 12px; color: #666; font-size: 0.9em; background: #f8f9fa; border-radius: 5px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+
+        /* Inputs in der Tabelle */
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        input[type="text"]:focus { outline: none; border-color: #667eea; background: #fdfdfd; }
+
+        /* Login Felder */
+        .login-inputs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .login-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        .btn-primary { background: #667eea; color: white; width: 100%; padding: 12px; font-size: 1em; }
+        .btn-save { background: #28a745; color: white; font-size: 1.2em; padding: 5px 10px; }
+        .btn-delete { background: #dc3545; color: white; font-size: 1.2em; padding: 5px 10px; margin-left: 5px;}
+
+        .btn-back {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+            font-weight: bold;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.3); }
+
+        .danger-zone { border: 2px solid #ffcccc; background: #fff5f5; }
+        .danger-zone h2 { color: #dc3545; border-color: #ffcccc; }
+        .btn-reset { background: #dc3545; color: white; width: 100%; padding: 15px; font-size: 1em; }
+
     </style>
 </head>
 <body>
-<a href="/" class="btn-back">← Zurück zur App</a>
 
-<div class="card" id="loginCard">
-    <h2>🔒 Login erforderlich</h2>
-    <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <input type="text" id="user" placeholder="User" style="flex:1">
-        <input type="password" id="pass" placeholder="Passwort" style="flex:1">
-    </div>
-    <button onclick="login()" style="background: #007bff; color: white; padding: 10px 20px; width:100%">Einloggen</button>
-</div>
+<div class="container">
+    <a href="/" class="btn-back">← Zurück zur App</a>
 
-<div id="content" style="display: none;">
-    <h1>Verwaltung</h1>
-
-    <div class="card">
-        <h2>Spaziergänge bearbeiten</h2>
-        <div id="loading">Lade...</div>
-        <table>
-            <thead>
-            <tr>
-                <th style="width:50px">ID</th>
-                <th>Person</th>
-                <th>Zeit (Format: HH:mm dd.MM.yy)</th>
-                <th style="width:150px">Aktionen</th>
-            </tr>
-            </thead>
-            <tbody id="entriesTable"></tbody>
-        </table>
+    <div class="header">
+        <h1>🔒 Admin Panel</h1>
     </div>
 
-    <div class="card" style="border: 2px solid #dc3545;">
-        <h2 style="color:#dc3545">Gefahrenzone</h2>
-        <button onclick="resetAll()" style="background:#dc3545; color:white; padding:10px;">⚠️ Alles unwiderruflich löschen</button>
+    <!-- LOGIN SCREEN -->
+    <div class="card-box" id="loginCard" style="max-width: 400px; margin: 0 auto;">
+        <h2>Anmeldung</h2>
+        <div class="login-inputs" style="flex-direction: column;">
+            <input type="text" id="user" class="login-input" placeholder="Benutzername">
+            <input type="password" id="pass" class="login-input" placeholder="Passwort">
+        </div>
+        <button onclick="login()" class="btn btn-primary">Einloggen</button>
+    </div>
+
+    <!-- ADMIN CONTENT -->
+    <div id="content" style="display: none;">
+
+        <div class="card-box">
+            <h2>Einträge bearbeiten</h2>
+            <div id="loading" style="color:#888; text-align:center;">Lade Daten...</div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="width:50px">ID</th>
+                        <th>Person</th>
+                        <th>Zeit (HH:mm dd.MM.yy)</th>
+                        <th style="width:120px; text-align:right;">Aktionen</th>
+                    </tr>
+                    </thead>
+                    <tbody id="entriesTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-box danger-zone">
+            <h2>⚠️ Gefahrenzone</h2>
+            <p style="margin-bottom:15px; color:#666;">Hier werden alle Daten unwiderruflich gelöscht.</p>
+            <button onclick="resetAll()" class="btn btn-reset">🗑️ ALLES LÖSCHEN</button>
+        </div>
     </div>
 </div>
 
 <script>
     let auth = '';
 
+    // --- LOGIN LOGIK ---
     function login() {
         const u = document.getElementById('user').value;
         const p = document.getElementById('pass').value;
-        if(!u || !p) return alert('Bitte Login eingeben');
+
+        if(!u || !p) return alert('Bitte Zugangsdaten eingeben.');
 
         auth = 'Basic ' + btoa(u + ':' + p);
         loadData();
     }
 
+    // --- DATEN LADEN ---
     async function loadData() {
         try {
-            // Wir versuchen einen geschützten Request, um Login zu testen
-            // Cleanup Aufruf als Test
+            // Test-Request um zu prüfen ob Auth stimmt
             const res = await fetch('/status');
             const data = await res.json();
 
-            // Login Card weg
+            // Wenn erfolgreich, UI umschalten
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('content').style.display = 'block';
             document.getElementById('loading').style.display = 'none';
 
-            const tbody = document.getElementById('entriesTable');
-            tbody.innerHTML = data.entries.map(e => `
-                <tr>
-                    <td>${e.id}</td>
-                    <td><input type="text" value="${e.person}" id="person-${e.id}"></td>
-                    <td><input type="text" value="${e.timeFormatted}" id="time-${e.id}"></td>
-                    <td>
-                        <button class="btn-save" onclick="updateEntry(${e.id})">💾</button>
-                        <button class="btn-delete" onclick="deleteEntry(${e.id})">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
+            renderTable(data.entries);
 
         } catch (e) {
             console.error(e);
-            alert('Fehler beim Laden.');
+            alert('Login fehlgeschlagen oder Verbindungsfehler.');
         }
     }
 
+    function renderTable(entries) {
+        const tbody = document.getElementById('entriesTable');
+
+        if(entries.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Keine Einträge vorhanden.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = entries.map(e => `
+            <tr>
+                <td style="color:#888;">#${e.id}</td>
+                <td>
+                    <input type="text" value="${e.person}" id="person-${e.id}">
+                </td>
+                <td>
+                    <input type="text" value="${e.timeFormatted}" id="time-${e.id}" placeholder="HH:mm dd.MM.yy">
+                </td>
+                <td style="text-align:right;">
+                    <button class="btn btn-save" onclick="updateEntry(${e.id})" title="Speichern">💾</button>
+                    <button class="btn btn-delete" onclick="deleteEntry(${e.id})" title="Löschen">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // --- BEARBEITEN ---
     async function updateEntry(id) {
         const person = document.getElementById(`person-${id}`).value;
         const time = document.getElementById(`time-${id}`).value;
@@ -113,19 +208,21 @@
             });
 
             if(res.ok) {
-                alert('Gespeichert!');
-                loadData(); // Reload table
+                // Kurzes Feedback (Grüner Rahmen um Inputs)
+                document.getElementById(`person-${id}`).style.borderColor = '#28a745';
+                setTimeout(() => document.getElementById(`person-${id}`).style.borderColor = '#ddd', 1000);
             } else if(res.status === 401) {
-                alert('Falsches Passwort!');
+                alert('Session abgelaufen. Bitte neu einloggen.');
                 location.reload();
             } else {
-                alert('Fehler: ' + res.status);
+                alert('Fehler beim Speichern (Format HH:mm dd.MM.yy beachten!)');
             }
         } catch(e) { console.error(e); }
     }
 
+    // --- LÖSCHEN ---
     async function deleteEntry(id) {
-        if(!confirm('Wirklich löschen?')) return;
+        if(!confirm('Diesen Eintrag wirklich löschen?')) return;
 
         try {
             const res = await fetch(`/admin/walk/${id}`, {
@@ -133,13 +230,21 @@
                 headers: { 'Authorization': auth }
             });
 
-            if(res.ok) loadData();
-            else alert('Fehler beim Löschen');
+            if(res.ok) {
+                loadData(); // Tabelle neu laden
+            } else {
+                alert('Fehler beim Löschen');
+            }
         } catch(e) { console.error(e); }
     }
 
+    // --- ALLES RESETTEN ---
     async function resetAll() {
-        if(!confirm('SICHER? ALLE DATEN GEHEN VERLOREN!')) return;
+        const check = confirm('Bist du sicher? Alle Daten werden gelöscht!');
+        if(!check) return;
+
+        const doubleCheck = confirm('Wirklich? Das kann nicht rückgängig gemacht werden.');
+        if(!doubleCheck) return;
 
         try {
             const res = await fetch(`/admin/reset`, {
@@ -147,7 +252,7 @@
                 headers: { 'Authorization': auth }
             });
             if(res.ok) {
-                alert('Alles gelöscht.');
+                alert('Datenbank wurde geleert.');
                 loadData();
             }
         } catch(e) { console.error(e); }

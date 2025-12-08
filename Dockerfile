@@ -1,11 +1,16 @@
-FROM eclipse-temurin:17-jdk-alpine AS build
+# Stage 1: Build
+FROM maven:3.9-eclipse-temurin-17-alpine AS build
 WORKDIR /app
-RUN apk add --no-cache maven
-COPY pom.xml ./
-RUN mvn dependency:resolve
+
+# Nur pom.xml kopieren und Dependencies laden (nutzt Docker Cache!)
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Jetzt erst den Code kopieren und bauen
 COPY src ./src
 RUN mvn clean package -DskipTests
 
+# Stage 2: Run (kleines Image für Produktion)
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar

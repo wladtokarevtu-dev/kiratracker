@@ -618,8 +618,12 @@
         }
 
         try {
-            await fetch('/walk?person=' + encodeURIComponent(person), {
-                method: 'POST'
+            await fetch('/walk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ person: person })
             });
             document.getElementById('personInput').value = '';
             loadStatus();
@@ -637,7 +641,7 @@
     // NEU: Applaus-Funktion
     async function applause(entryId) {
         try {
-            await fetch(`/applause/${entryId}`, {
+            await fetch(`/walk/${entryId}/applause`, {
                 method: 'POST'
             });
             loadStatus();
@@ -657,12 +661,15 @@
         }
 
         try {
-            const response = await fetch('/request', {
+            const response = await fetch('/walk/request', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/json'
                 },
-                body: `requester=${encodeURIComponent(requester)}&message=${encodeURIComponent(message || 'Keine Nachricht')}`
+                body: JSON.stringify({
+                    person: requester,
+                    time: message || 'Keine Nachricht'
+                })
             });
 
             if (response.ok) {
@@ -791,3 +798,4 @@
 </script>
 </body>
 </html>
+

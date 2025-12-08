@@ -5,436 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kira Tracker 🐕</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 3em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 10px; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
+        .card-box { background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        h2 { color: #667eea; margin-bottom: 20px; }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        /* Wetter */
+        .weather-widget { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.95); }
+        .weather-temp { font-size: 2em; font-weight: bold; color: #667eea; }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
+        /* Status Grid */
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .status-item { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .status-icon { font-size: 2.5em; display: block; margin: 10px 0; }
 
-        .header h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+        /* Inputs & Buttons */
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        input, button { padding: 15px; border-radius: 10px; border: 2px solid #e0e0e0; font-size: 1em; }
+        input { flex: 1; }
+        button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { transform: scale(1.02); }
 
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
+        .quick-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .quick-btn { flex: 1; background: #f0f2f5; color: #667eea; border: 1px solid #667eea; padding: 10px; min-width: 80px; }
 
-        /* NEU: Wetter Widget */
-        .weather-widget {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        /* WhatsApp Button */
+        .wa-btn { background: #25D366; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .wa-btn:hover { background: #128C7E; }
 
-        .weather-icon-img {
-            width: 60px;
-            height: 60px;
-        }
+        /* History Liste */
+        .history-entry { padding: 15px; background: #f8f9fa; border-left: 4px solid #667eea; margin-bottom: 10px; border-radius: 5px; position: relative; }
+        .history-time { font-size: 0.85em; color: #666; margin-top: 4px; }
 
-        .weather-info {
-            flex: 1;
-        }
+        /* Applaus Button Fix */
+        .applause-btn { float: right; margin-top: -35px; background: white; border: 2px solid #667eea; color: #667eea; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .applause-btn:hover { background: #667eea; color: white; }
 
-        .weather-temp {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-        }
+        /* Admin Link */
+        .admin-link { text-align: center; margin-top: 40px; }
+        .admin-link a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9em; }
 
-        .weather-desc {
-            color: #666;
-            text-transform: capitalize;
-        }
-
-        .weather-details {
-            display: flex;
-            gap: 15px;
-            font-size: 0.9em;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        .status-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .status-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .status-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .status-card h3 {
-            font-size: 1.1em;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .status-icon {
-            font-size: 3em;
-            margin: 10px 0;
-        }
-
-        .status-text {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .add-walk-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-        }
-
-        .add-walk-section h2 {
-            margin-bottom: 20px;
-            color: #667eea;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"], input[type="password"], input[type="number"], textarea {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-            font-family: inherit;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .quick-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-        }
-
-        .quick-btn {
-            padding: 15px;
-            background: #f5f5f5;
-            color: #667eea;
-            border: 2px solid #667eea;
-            font-weight: bold;
-        }
-
-        .quick-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        /* NEU: Anfrage-Sektion */
-        .request-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-        }
-
-        .request-section h2 {
-            margin-bottom: 20px;
-            color: #667eea;
-        }
-
-        .pending-badge {
-            background: #ffc107;
-            color: #856404;
-            padding: 10px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .leaderboard, .history {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-        }
-
-        .leaderboard h2, .history h2 {
-            margin-bottom: 20px;
-            color: #667eea;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .leaderboard-item:first-child {
-            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-            color: white;
-        }
-
-        .leaderboard-name {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .leaderboard-count {
-            background: rgba(102, 126, 234, 0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .leaderboard-item:first-child .leaderboard-count {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .history-entry {
-            padding: 15px;
-            border-left: 4px solid #667eea;
-            background: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            position: relative;
-        }
-
-        .history-person {
-            font-weight: bold;
-            color: #667eea;
-            font-size: 1.1em;
-        }
-
-        .history-time {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        /* NEU: Applaus Button */
-        .applause-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: transparent;
-            border: 2px solid #667eea;
-            color: #667eea;
-            padding: 8px 15px;
-            font-size: 0.9em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .applause-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .applause-count {
-            font-weight: bold;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-style: italic;
-        }
-
-        .admin-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-            border: 2px solid #dc3545;
-        }
-
-        .admin-section h2 {
-            margin-bottom: 20px;
-            color: #dc3545;
-        }
-
-        .admin-logged-out, .admin-logged-in {
-            display: none;
-        }
-
-        .admin-logged-out.active, .admin-logged-in.active {
-            display: block;
-        }
-
-        .danger-btn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-
-        .danger-btn:hover {
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
-        }
-
-        .admin-actions {
-            display: grid;
-            gap: 15px;
-        }
-
-        .admin-info {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #ffc107;
-            margin-bottom: 15px;
-            color: #856404;
-        }
-
-        .admin-link-btn {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .input-group {
-                flex-direction: column;
-            }
-
-            .weather-widget {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .applause-btn {
-                position: static;
-                margin-top: 10px;
-                width: 100%;
-                justify-content: center;
-            }
-        }
+        @media(max-width: 600px) { .status-grid { grid-template-columns: 1fr; } .input-group { flex-direction: column; } }
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="header">
         <h1>🐕 Kira Tracker</h1>
         <p>War Kira heute schon draußen?</p>
     </div>
 
-    <!-- NEU: Wetter Widget -->
-    <div class="weather-widget">
-        <img id="weatherIcon" class="weather-icon-img" src="" alt="Wetter" style="display:none;">
-        <div class="weather-info">
+    <!-- Wetter -->
+    <div class="card-box weather-widget">
+        <div style="flex:1">
             <div class="weather-temp" id="weatherTemp">--°C</div>
-            <div class="weather-desc" id="weatherDesc">Lade Wetter...</div>
-            <div class="weather-details">
-                <span id="weatherHumidity">💧 --%</span>
-                <span id="weatherWind">💨 -- km/h</span>
-            </div>
+            <div id="weatherDesc">Lade Wetter...</div>
+        </div>
+        <div style="text-align: right; font-size: 0.9em; color: #666;">
+            <div id="weatherHumidity">💧 --%</div>
+            <div id="weatherWind">💨 -- km/h</div>
         </div>
     </div>
 
-    <div class="status-cards">
-        <div class="status-card">
-            <h3>Heute Morgen</h3>
-            <div class="status-icon" id="morningIcon">❓</div>
-            <div class="status-text" id="morningStatus">Lädt...</div>
+    <!-- Status -->
+    <div class="status-grid">
+        <div class="status-item">
+            <h3>Morgens</h3>
+            <span class="status-icon" id="morningIcon">❓</span>
+            <strong id="morningStatus">...</strong>
         </div>
-        <div class="status-card">
-            <h3>Heute Abend</h3>
-            <div class="status-icon" id="eveningIcon">❓</div>
-            <div class="status-text" id="eveningStatus">Lädt...</div>
+        <div class="status-item">
+            <h3>Abends</h3>
+            <span class="status-icon" id="eveningIcon">❓</span>
+            <strong id="eveningStatus">...</strong>
         </div>
     </div>
 
-    <div class="add-walk-section">
-        <h2>✨ Spaziergang hinzufügen</h2>
+    <!-- Eintragen -->
+    <div class="card-box">
+        <h2>✨ Spaziergang eintragen</h2>
         <div class="input-group">
-            <input type="text" id="personInput" placeholder="Dein Name (z.B. Wlad)" />
-            <button onclick="addWalk()">Spaziergang eintragen</button>
+            <input type="text" id="personInput" placeholder="Dein Name">
+            <button onclick="addWalk()">Speichern</button>
         </div>
         <div class="quick-buttons">
             <button class="quick-btn" onclick="quickAdd('Wlad')">Wlad</button>
@@ -445,357 +103,103 @@
         </div>
     </div>
 
-    <!-- NEU: Anfrage-Sektion -->
-    <div class="request-section">
-        <h2>💬 Mit Kira rausgehen?</h2>
-        <div class="input-group" style="flex-direction: column;">
-            <input type="text" id="requesterName" placeholder="Dein Name" />
-            <textarea id="requestMessage" placeholder="Nachricht (optional, z.B. 'Kann ich morgen um 15 Uhr mit Kira?')"></textarea>
-            <button onclick="sendRequest()">Anfrage senden</button>
-        </div>
-        <div id="pendingBadge" class="pending-badge" style="display: none;">
-            <span id="pendingCount">0</span> offene Anfrage(n)
-        </div>
+    <!-- Kontakt / Anfrage -->
+    <div class="card-box" style="border-left: 5px solid #25D366;">
+        <h2 style="color: #25D366;">💬 Gassi gehen?</h2>
+        <p style="margin-bottom: 15px; color: #666;">Frag einfach kurz per WhatsApp:</p>
+        <button class="wa-btn" onclick="openWhatsApp()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.694c.93.515 1.733.709 2.805.709 3.183 0 5.768-2.586 5.769-5.766.001-3.181-2.585-5.768-5.768-5.768zm9.263 4.906c.075 4.932-2.923 9.423-7.469 11.164-1.284.492-2.597.747-3.905.748-1.503 0-2.919-.333-4.226-.959l-5.694 1.488 1.524-5.545c-1.161-1.956-1.527-4.269-1.071-6.495.749-3.66 3.684-6.527 7.336-7.165 4.896-.856 9.407 2.454 9.479 7.394l.026-.63z"/></svg>
+            Anfrage senden
+        </button>
     </div>
 
-    <div class="leaderboard">
-        <h2>🏆 Top Gassigänger (Letzte 7 Tage)</h2>
-        <div id="leaderboardContent"></div>
-    </div>
-
-    <div class="history">
-        <h2>📜 Letzte Spaziergänge</h2>
+    <!-- Verlauf -->
+    <div class="card-box">
+        <h2>📜 Verlauf</h2>
         <div id="historyContent"></div>
     </div>
 
-    <div class="admin-section">
-        <h2>⚙️ Admin-Bereich</h2>
-
-        <div class="admin-logged-out active" id="adminLoginForm">
-            <div class="input-group">
-                <input type="text" id="adminUsername" placeholder="Benutzername" />
-                <input type="password" id="adminPassword" placeholder="Passwort" />
-                <button onclick="adminLogin()">Login</button>
-            </div>
-        </div>
-
-        <div class="admin-logged-in" id="adminPanel">
-            <div class="admin-info">
-                ⚠️ <strong>Achtung:</strong> Diese Aktionen können nicht rückgängig gemacht werden!
-            </div>
-
-            <div class="admin-actions">
-                <a href="/admin.html" class="admin-link-btn" style="padding: 15px 30px;">
-                    📋 Zu Admin-Dashboard (Einträge & Anfragen verwalten)
-                </a>
-
-                <div class="input-group">
-                    <input type="number" id="cleanupDays" placeholder="Tage (z.B. 30)" value="30" min="1" />
-                    <button onclick="adminCleanup()">Alte Einträge löschen</button>
-                </div>
-
-                <button class="danger-btn" onclick="adminReset()">🗑️ ALLE Daten löschen</button>
-
-                <button onclick="adminLogout()">Logout</button>
-            </div>
-        </div>
+    <div class="admin-link">
+        <a href="/admin.html">🔒 Admin Login</a>
     </div>
 </div>
 
 <script>
-    function formatTimestamp(timestamp) {
-        const date = new Date(timestamp);
-        const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
+    // ----------------------------------------------------------------------------------
+    // HIER DEINE NUMMER EINTRAGEN
+    // Format: 49 ohne führende 0. Beispiel: 4917612345678
+    const WA_NUMBER = "4917600000000";
+    // ----------------------------------------------------------------------------------
 
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = String(date.getFullYear()).slice(-2);
-
-        let dayText;
-        if (date >= today) {
-            dayText = 'Heute';
-        } else if (date >= yesterday) {
-            dayText = 'Gestern';
-        } else {
-            dayText = `am ${day}.${month}.${year}`;
-        }
-
-        return `${hours}:${minutes} Uhr (${dayText})`;
+    function openWhatsApp() {
+        // Erstellt automatisch den Link
+        window.open(`https://wa.me/${WA_NUMBER}?text=Hey,%20kann%20ich%20mal%20mit%20Kira%20raus?%20🐕`, '_blank');
     }
 
     async function loadStatus() {
         try {
-            const response = await fetch('/status');
-            const data = await response.json();
+            const res = await fetch('/status');
+            const data = await res.json();
 
-            // Wetter aktualisieren
-            if (data.weather) {
-                document.getElementById('weatherTemp').textContent = `${Math.round(data.weather.temperature)}°C`;
-                document.getElementById('weatherDesc').textContent = data.weather.description;
-                document.getElementById('weatherHumidity').textContent = `💧 ${data.weather.humidity}%`;
-                document.getElementById('weatherWind').textContent = `💨 ${data.weather.windSpeed} km/h`;
-
-                const iconImg = document.getElementById('weatherIcon');
-                iconImg.src = `https://openweathermap.org/img/wn/${data.weather.icon}@2x.png`;
-                iconImg.style.display = 'block';
+            // Wetter
+            if(data.weather) {
+                document.getElementById('weatherTemp').innerText = Math.round(data.weather.temperature) + "°C";
+                document.getElementById('weatherDesc').innerText = data.weather.description;
+                document.getElementById('weatherHumidity').innerText = "💧 " + data.weather.humidity + "%";
+                document.getElementById('weatherWind').innerText = "💨 " + data.weather.windSpeed + " km/h";
             }
 
-            // Pending Requests Badge
-            if (data.pendingRequestsCount > 0) {
-                document.getElementById('pendingCount').textContent = data.pendingRequestsCount;
-                document.getElementById('pendingBadge').style.display = 'inline-block';
-            } else {
-                document.getElementById('pendingBadge').style.display = 'none';
-            }
+            // Status
+            document.getElementById('morningIcon').innerText = data.wasMorning ? "✅" : "❌";
+            document.getElementById('morningStatus').innerText = data.wasMorning ? "Erledigt" : "Offen";
 
-            // Morgen Status
-            const morningIcon = document.getElementById('morningIcon');
-            const morningStatus = document.getElementById('morningStatus');
-            if (data.wasMorning) {
-                morningIcon.textContent = '✅';
-                morningStatus.textContent = 'Ja, war draußen!';
-            } else {
-                morningIcon.textContent = '❌';
-                morningStatus.textContent = 'Noch nicht';
-            }
+            document.getElementById('eveningIcon').innerText = data.wasEvening ? "✅" : "❌";
+            document.getElementById('eveningStatus').innerText = data.wasEvening ? "Erledigt" : "Offen";
 
-            // Abend Status
-            const eveningIcon = document.getElementById('eveningIcon');
-            const eveningStatus = document.getElementById('eveningStatus');
-            if (data.wasEvening) {
-                eveningIcon.textContent = '✅';
-                eveningStatus.textContent = 'Ja, war draußen!';
-            } else {
-                eveningIcon.textContent = '❌';
-                eveningStatus.textContent = 'Noch nicht';
-            }
-
-            // Leaderboard
-            const leaderboardContent = document.getElementById('leaderboardContent');
-            if (Object.keys(data.leaderboard).length === 0) {
-                leaderboardContent.innerHTML = '<div class="empty-state">Noch keine Einträge vorhanden</div>';
-            } else {
-                const sorted = Object.entries(data.leaderboard).sort((a, b) => b[1] - a[1]);
-                leaderboardContent.innerHTML = sorted.map(([person, count]) => `
-                    <div class="leaderboard-item">
-                        <span class="leaderboard-name">${person}</span>
-                        <span class="leaderboard-count">${count} ${count === 1 ? 'Spaziergang' : 'Spaziergänge'}</span>
-                    </div>
-                `).join('');
-            }
-
-            // History mit Applaus-Button
-            const historyContent = document.getElementById('historyContent');
-            if (data.entries.length === 0) {
-                historyContent.innerHTML = '<div class="empty-state">Noch keine Einträge vorhanden</div>';
-            } else {
-                const recent = data.entries.slice(0, 10);
-                historyContent.innerHTML = recent.map(entry => `
+            // Liste
+            const list = document.getElementById('historyContent');
+            if(data.entries.length === 0) list.innerHTML = '<p style="text-align:center;color:#999">Nichts los heute.</p>';
+            else {
+                list.innerHTML = data.entries.slice(0,10).map(e => `
                     <div class="history-entry">
-                        <div class="history-person">${entry.person} war mit Kira spazieren</div>
-                        <div class="history-time">um ${entry.timeFormatted}</div>
-                        <button class="applause-btn" onclick="applause(${entry.id})">
-                            👏 <span class="applause-count">${entry.applauseCount || 0}</span>
+                        <div><strong>${e.person}</strong></div>
+                        <div class="history-time">${e.timeFormatted}</div>
+                        <button class="applause-btn" onclick="applause(${e.id})">
+                            👏 <b>${e.applauseCount}</b>
                         </button>
                     </div>
                 `).join('');
             }
-        } catch (error) {
-            console.error('Fehler beim Laden:', error);
-        }
+        } catch(e) { console.error(e); }
     }
 
     async function addWalk() {
-        const person = document.getElementById('personInput').value.trim();
-        if (!person) {
-            alert('Bitte gib deinen Namen ein!');
-            return;
-        }
+        const p = document.getElementById('personInput').value;
+        if(!p) return alert('Name fehlt!');
 
-        try {
-            await fetch('/walk', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ person: person })
-            });
-            document.getElementById('personInput').value = '';
-            loadStatus();
-        } catch (error) {
-            console.error('Fehler beim Hinzufügen:', error);
-            alert('Fehler beim Speichern!');
-        }
+        await fetch('/walk', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ person: p })
+        });
+        document.getElementById('personInput').value = '';
+        loadStatus();
     }
 
-    function quickAdd(person) {
-        document.getElementById('personInput').value = person;
+    function quickAdd(name) {
+        document.getElementById('personInput').value = name;
         addWalk();
     }
 
-    // NEU: Applaus-Funktion
-    async function applause(entryId) {
-        try {
-            await fetch(`/walk/${entryId}/applause`, {
-                method: 'POST'
-            });
-            loadStatus();
-        } catch (error) {
-            console.error('Fehler beim Applaudieren:', error);
-        }
+    async function applause(id) {
+        // Applaus geben ohne Reload, nur Counter hochzählen
+        await fetch(`/walk/${id}/applause`, { method: 'POST' });
+        loadStatus();
     }
 
-    // NEU: Anfrage senden
-    async function sendRequest() {
-        const requester = document.getElementById('requesterName').value.trim();
-        const message = document.getElementById('requestMessage').value.trim();
-
-        if (!requester) {
-            alert('Bitte gib deinen Namen ein!');
-            return;
-        }
-
-        try {
-            const response = await fetch('/walk/request', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    person: requester,
-                    time: message || 'Keine Nachricht'
-                })
-            });
-
-            if (response.ok) {
-                alert('Anfrage wurde gesendet! 🎉');
-                document.getElementById('requesterName').value = '';
-                document.getElementById('requestMessage').value = '';
-                loadStatus();
-            } else {
-                alert('Fehler beim Senden der Anfrage!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Senden!');
-        }
-    }
-
-    // Enter-Taste zum Absenden
-    document.getElementById('personInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            addWalk();
-        }
-    });
-
-    // Admin-Funktionen
-    let adminCredentials = null;
-
-    function adminLogin() {
-        const username = document.getElementById('adminUsername').value;
-        const password = document.getElementById('adminPassword').value;
-
-        if (!username || !password) {
-            alert('Bitte Benutzername und Passwort eingeben!');
-            return;
-        }
-
-        adminCredentials = btoa(username + ':' + password);
-
-        document.getElementById('adminLoginForm').classList.remove('active');
-        document.getElementById('adminPanel').classList.add('active');
-
-        document.getElementById('adminUsername').value = '';
-        document.getElementById('adminPassword').value = '';
-    }
-
-    function adminLogout() {
-        adminCredentials = null;
-        document.getElementById('adminLoginForm').classList.add('active');
-        document.getElementById('adminPanel').classList.remove('active');
-    }
-
-    async function adminCleanup() {
-        if (!adminCredentials) {
-            alert('Nicht eingeloggt!');
-            return;
-        }
-
-        const days = document.getElementById('cleanupDays').value;
-
-        if (!confirm(`Wirklich alle Einträge älter als ${days} Tage löschen?`)) {
-            return;
-        }
-
-        try {
-            const response = await fetch(`/admin/cleanup?days=${days}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok) {
-                alert('Alte Einträge wurden gelöscht!');
-                loadStatus();
-            } else if (response.status === 401) {
-                alert('Ungültige Zugangsdaten!');
-                adminLogout();
-            } else {
-                alert('Fehler beim Löschen!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Löschen!');
-        }
-    }
-
-    async function adminReset() {
-        if (!adminCredentials) {
-            alert('Nicht eingeloggt!');
-            return;
-        }
-
-        if (!confirm('WIRKLICH ALLE Daten unwiderruflich löschen?')) {
-            return;
-        }
-
-        if (!confirm('Letzte Warnung! Alle Einträge werden gelöscht. Fortfahren?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch('/admin/reset', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok) {
-                alert('Alle Daten wurden gelöscht!');
-                loadStatus();
-            } else if (response.status === 401) {
-                alert('Ungültige Zugangsdaten!');
-                adminLogout();
-            } else {
-                alert('Fehler beim Löschen!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Löschen!');
-        }
-    }
-
-    // Initial laden und alle 30 Sekunden aktualisieren
+    // Start
     loadStatus();
-    setInterval(loadStatus, 30000);
+    setInterval(loadStatus, 30000); // Auto-Refresh
 </script>
 </body>
 </html>
-

@@ -3,6 +3,7 @@ package de.wlad.kiratracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 public class HelloController {
@@ -46,20 +47,6 @@ public class HelloController {
         return ResponseEntity.ok("Anfrage erstellt!");
     }
 
-    // Walk Request annehmen
-    @PostMapping("/walk/request/{id}/approve")
-    public ResponseEntity<String> approveRequest(@PathVariable Long id) {
-        requestService.approveRequest(id);
-        return ResponseEntity.ok("Anfrage genehmigt!");
-    }
-
-    // Walk Request ablehnen
-    @PostMapping("/walk/request/{id}/reject")
-    public ResponseEntity<String> rejectRequest(@PathVariable Long id) {
-        requestService.rejectRequest(id);
-        return ResponseEntity.ok("Anfrage abgelehnt!");
-    }
-
     // Applaus geben
     @PostMapping("/walk/{id}/applause")
     public ResponseEntity<String> addApplause(@PathVariable Long id) {
@@ -67,24 +54,39 @@ public class HelloController {
         return ResponseEntity.ok("Applaus gegeben!");
     }
 
+    // --- ADMIN ENDPOINTS ---
+
+    // Eintrag löschen
+    @DeleteMapping("/admin/walk/{id}")
+    public ResponseEntity<String> deleteWalk(@PathVariable Long id) {
+        walkService.deleteById(id);
+        return ResponseEntity.ok("Gelöscht");
+    }
+
+    // Eintrag bearbeiten (PUT)
+    @PutMapping("/admin/walk/{id}")
+    public ResponseEntity<String> updateWalk(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String newPerson = payload.get("person");
+        String newTime = payload.get("time"); // Erwartet Format: HH:mm dd.MM.yy
+
+        walkService.updateEntry(id, newPerson, newTime);
+        return ResponseEntity.ok("Aktualisiert");
+    }
+
+    // Alles löschen / Reset
+    @PostMapping("/admin/reset")
+    public ResponseEntity<String> resetAll() {
+        walkService.deleteAll();
+        return ResponseEntity.ok("Alles gelöscht");
+    }
+
+    // DTO Helper Class
     static class WalkRequest {
         private String person;
         private String time;
-
-        public String getPerson() {
-            return person;
-        }
-
-        public void setPerson(String person) {
-            this.person = person;
-        }
-
-        public String getTime() {
-            return time;
-        }
-
-        public void setTime(String time) {
-            this.time = time;
-        }
+        public String getPerson() { return person; }
+        public void setPerson(String person) { this.person = person; }
+        public String getTime() { return time; }
+        public void setTime(String time) { this.time = time; }
     }
 }

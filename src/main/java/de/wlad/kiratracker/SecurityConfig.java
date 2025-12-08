@@ -15,22 +15,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. CSRF deaktivieren, damit POST-Requests (Speichern) einfach funktionieren
-                .csrf(csrf -> csrf.disable())
-
+                .csrf(csrf -> csrf.disable()) // Wichtig für POST Requests
                 .authorizeHttpRequests(auth -> auth
-                        // 2. Öffentliche Bereiche definieren (kein Login nötig)
-                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/status").permitAll()      // Status abrufen
-                        .requestMatchers(HttpMethod.POST, "/walk").permitAll()       // Spaziergang eintragen
-                        .requestMatchers(HttpMethod.POST, "/walk/request").permitAll() // Anfrage stellen
-                        .requestMatchers(HttpMethod.POST, "/walk/**/applause").permitAll() // Applaus geben
+                        // 1. Statische Ressourcen IMMER erlauben
+                        .requestMatchers("/", "/index.html", "/admin.html", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
 
-                        // 3. Admin-Bereiche schützen (Login nötig)
-                        .requestMatchers("/walk/request/**/approve").authenticated()
-                        .requestMatchers("/walk/request/**/reject").authenticated()
+                        // 2. Öffentliche API Endpoints
+                        .requestMatchers(HttpMethod.GET, "/status").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/walk").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/walk/request").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/walk/*/applause").permitAll()
 
-                        // Alles andere erfordert ebenfalls Login
+                        // 3. Admin API Endpoints schützen (Muss eingeloggt sein)
+                        .requestMatchers("/admin/**").authenticated() // Schützt alle API Calls unter /admin/...
+
+                        // Alles andere erfordert Login
                         .anyRequest().authenticated()
                 )
                 .formLogin(Customizer.withDefaults())
@@ -39,4 +38,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-

@@ -6,46 +6,26 @@ public class WalkEntryDto {
     private String timeFormatted;
     private Integer applauseCount;
 
-    public WalkEntryDto() {
-    }
-
+    // Konstruktor
     public WalkEntryDto(Long id, String person, String timeFormatted, Integer applauseCount) {
         this.id = id;
         this.person = person;
         this.timeFormatted = timeFormatted;
-        this.applauseCount = applauseCount;
+        this.applauseCount = applauseCount != null ? applauseCount : 0;
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    // Default Konstruktor (für JSON Deserialisierung manchmal nötig)
+    public WalkEntryDto() {}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // Getters
+    public Long getId() { return id; }
+    public String getPerson() { return person; }
+    public String getTimeFormatted() { return timeFormatted; }
+    public Integer getApplauseCount() { return applauseCount; }
 
-    public String getPerson() {
-        return person;
-    }
-
-    public void setPerson(String person) {
-        this.person = person;
-    }
-
-    public String getTimeFormatted() {
-        return timeFormatted;
-    }
-
-    public void setTimeFormatted(String timeFormatted) {
-        this.timeFormatted = timeFormatted;
-    }
-
-    public Integer getApplauseCount() {
-        return applauseCount;
-    }
-
-    public void setApplauseCount(Integer applauseCount) {
-        this.applauseCount = applauseCount;
-    }
+    // Setters
+    public void setId(Long id) { this.id = id; }
+    public void setPerson(String person) { this.person = person; }
+    public void setTimeFormatted(String timeFormatted) { this.timeFormatted = timeFormatted; }
+    public void setApplauseCount(Integer applauseCount) { this.applauseCount = applauseCount; }
 }

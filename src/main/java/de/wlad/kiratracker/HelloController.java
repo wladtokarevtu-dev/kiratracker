@@ -3,6 +3,8 @@ package de.wlad.kiratracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
 import java.util.Map;
 
 @RestController
@@ -18,6 +20,16 @@ public class HelloController {
         this.weatherService = weatherService;
         this.requestService = requestService;
     }
+
+    // --- HTML SEITEN ---
+
+    // Liefert die Admin-Seite aus (erwartet src/main/resources/templates/admin.html)
+    @GetMapping("/admin")
+    public ModelAndView adminPage() {
+        return new ModelAndView("admin");
+    }
+
+    // --- API ENDPOINTS ---
 
     // Status für die HTML-Seite
     @GetMapping("/status")
@@ -54,7 +66,7 @@ public class HelloController {
         return ResponseEntity.ok("Applaus gegeben!");
     }
 
-    // --- ADMIN ENDPOINTS ---
+    // --- ADMIN API ENDPOINTS (Geschützt durch SecurityConfig) ---
 
     // Eintrag löschen
     @DeleteMapping("/admin/walk/{id}")
@@ -84,6 +96,8 @@ public class HelloController {
     static class WalkRequest {
         private String person;
         private String time;
+
+        // Getter & Setter
         public String getPerson() { return person; }
         public void setPerson(String person) { this.person = person; }
         public String getTime() { return time; }

@@ -15,25 +15,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Wichtig für POST Requests
-                .authorizeHttpRequests(auth -> auth
-                        // 1. Statische Ressourcen IMMER erlauben
-                        .requestMatchers("/", "/index.html", "/admin.html", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // 1. Alles Statische + PWA Files erlauben
+                .requestMatchers("/", "/index.html", "/manifest.json", "/sw.js", "/favicon.ico", "/apple-touch-icon.png").permitAll()
+                
+                // 2. ÖFFENTLICHE API (Lesen & Eintragen für alle erlaubt)
+                .requestMatchers(HttpMethod.GET, "/status", "/leaderboard").permitAll()
+                .requestMatchers(HttpMethod.POST, "/walk", "/walk/request", "/walk/*/applause").permitAll()
 
-                        // 2. Öffentliche API Endpoints
-                        .requestMatchers(HttpMethod.GET, "/status").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/walk").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/walk/request").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/walk/*/applause").permitAll()
-
-                        // 3. Admin API Endpoints schützen (Muss eingeloggt sein)
-                        .requestMatchers("/admin/**").authenticated() // Schützt alle API Calls unter /admin/...
-
-                        // Alles andere erfordert Login
-                        .anyRequest().authenticated()
-                )
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults());
+                // 3. ADMIN API (Nur mit Passwort / Schloss-Icon)
+                .requestMatchers("/admin/**").authenticated()
+                
+                // Alles andere sicherheitshalber sperren
+                .anyRequest().authenticated()
+            )
+            .httpBasic(Customizer.withDefaults())
+            .formLogin(Customizer.withDefaults());
 
         return http.build();
     }

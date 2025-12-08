@@ -13,7 +13,7 @@
         body.dark-mode { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:20px; max-width:500px; margin:0 auto; padding-top:100px; transition:0.3s; }
-        
+
         .controls { position:absolute; top:25px; right:20px; display:flex; gap:8px; z-index:10; }
         .pill { background:var(--card); padding:4px; border-radius:100px; display:flex; gap:2px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
         .pill-opt { padding:6px 12px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); transition:0.3s; }
@@ -26,27 +26,28 @@
         .weather-card { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:var(--radius); padding:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
         .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px; }
         .status-box { background:var(--card); border-radius:var(--radius); padding:20px; text-align:center; height:120px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-        .status-box.done { background:#E4F9E8; color:#1E6F30; } 
+        .status-box.done { background:#E4F9E8; color:#1E6F30; }
         body.dark-mode .status-box.done { background:#11331B; color:#4CD964; }
         .status-box.open { background:#FFF0F0; color:#D63031; }
         body.dark-mode .status-box.open { background:#3A0F0F; color:#FF453A; }
-        
+
         .card { background:var(--card); border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
         .input-area { display:flex; gap:10px; margin-top:15px; }
         input { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; }
-        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; }
+        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; transition:0.2s; }
+        .btn-circle:hover { transform:scale(1.1); background:var(--primary); }
         .quick-row { display:flex; gap:8px; margin-top:15px; overflow-x:auto; }
         .quick-btn { background:var(--input-bg); color:var(--primary); border:none; padding:8px 14px; border-radius:100px; font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
 
         .lb-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
         .time-switch { background:var(--input-bg); border-radius:8px; padding:2px; display:flex; }
-        .time-opt { padding:4px 8px; font-size:0.7rem; font-weight:600; cursor:pointer; border-radius:6px; color:var(--text-sec); }
+        .time-opt { padding:4px 8px; font-size:0.7rem; font-weight:600; cursor:pointer; border-radius:6px; color:var(--text-sec); transition:0.3s; }
         .time-opt.active { background:var(--card); color:var(--text); }
         .lb-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
 
         .entry { display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--input-bg); }
         .avatar { width:38px; height:38px; border-radius:10px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-weight:600; margin-right:12px; }
-        .applause-tag { background:var(--input-bg); padding:5px 10px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); cursor:pointer; }
+        .applause-tag { background:var(--input-bg); padding:5px 10px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); cursor:pointer; transition:0.2s; }
         .applause-tag.active { background:#FFD60A; color:#333; }
         .wa-card { background:#E9FCF2; color:#0C4A28; padding:18px; border-radius:var(--radius); margin-top:30px; text-align:center; cursor:pointer; }
         body.dark-mode .wa-card { background:#063318; color:#4CD964; }
@@ -58,51 +59,51 @@
     </style>
 </head>
 <body>
-    <div class="controls">
-        <div class="pill" onclick="toggleLang()"><div class="pill-opt active" id="l-de">DE</div><div class="pill-opt" id="l-ru">RU</div></div>
-        <div class="pill" onclick="toggleDark()"><div class="pill-opt active" id="dm-light">☀️</div><div class="pill-opt" id="dm-dark">🌙</div></div>
+<div class="controls">
+    <div class="pill" onclick="toggleLang()"><div class="pill-opt active" id="l-de">DE</div><div class="pill-opt" id="l-ru">RU</div></div>
+    <div class="pill" onclick="toggleDark()"><div class="pill-opt active" id="dm-light">☀️</div><div class="pill-opt" id="dm-dark">🌙</div></div>
+</div>
+<header><h1>Kira Tracker</h1><div class="subtitle" data-key="subtitle">...</div></header>
+
+<div class="weather-card" id="weatherWidget" style="display:none;"><div style="font-size:2rem;font-weight:700" id="wTemp">--°</div><div id="wDesc">...</div></div>
+
+<div class="status-grid">
+    <div class="status-box" id="morningBox"><div style="font-size:2rem">🌅</div><div style="font-weight:600;font-size:0.8rem" data-key="morning">Morgen</div><div id="morningStatus" style="font-weight:700">...</div></div>
+    <div class="status-box" id="eveningBox"><div style="font-size:2rem">🌙</div><div style="font-weight:600;font-size:0.8rem" data-key="evening">Abend</div><div id="eveningStatus" style="font-weight:700">...</div></div>
+</div>
+
+<div class="card">
+    <h3 style="font-size:1rem; margin-bottom:10px" data-key="add_title">Eintragen</h3>
+    <div class="input-area"><input type="text" id="nameInput" /><button class="btn-circle" onclick="addWalk()">+</button></div>
+    <div class="quick-row">
+        <button class="quick-btn" onclick="quickAdd('Wlad')">Wlad</button>
+        <button class="quick-btn" onclick="quickAdd('Mama')">Mama</button>
+        <button class="quick-btn" onclick="quickAdd('Ilja')">Ilja</button>
+        <button class="quick-btn" onclick="quickAdd('Aaron')">Aaron</button>
+        <button class="quick-btn" onclick="quickAdd('Dajen')">Dajen</button>
     </div>
-    <header><h1>Kira Tracker</h1><div class="subtitle" data-key="subtitle">...</div></header>
+</div>
 
-    <div class="weather-card" id="weatherWidget" style="display:none;"><div style="font-size:2rem;font-weight:700" id="wTemp">--°</div><div id="wDesc">...</div></div>
-
-    <div class="status-grid">
-        <div class="status-box" id="morningBox"><div style="font-size:2rem">🌅</div><div style="font-weight:600;font-size:0.8rem" data-key="morning">Morgen</div><div id="morningStatus" style="font-weight:700">...</div></div>
-        <div class="status-box" id="eveningBox"><div style="font-size:2rem">🌙</div><div style="font-weight:600;font-size:0.8rem" data-key="evening">Abend</div><div id="eveningStatus" style="font-weight:700">...</div></div>
-    </div>
-
-    <div class="card">
-        <h3 style="font-size:1rem; margin-bottom:10px" data-key="add_title">Eintragen</h3>
-        <div class="input-area"><input type="text" id="nameInput" /><button class="btn-circle" onclick="addWalk()">+</button></div>
-        <div class="quick-row">
-            <button class="quick-btn" onclick="quickAdd('\''Wlad'\'')">Wlad</button>
-            <button class="quick-btn" onclick="quickAdd('\''Mama'\'')">Mama</button>
-            <button class="quick-btn" onclick="quickAdd('\''Ilja'\'')">Ilja</button>
-            <button class="quick-btn" onclick="quickAdd('\''Aaron'\'')">Aaron</button>
-            <button class="quick-btn" onclick="quickAdd('\''Dajen'\'')">Dajen</button>
+<div class="card">
+    <div class="lb-header">
+        <div style="font-weight:700" data-key="leaderboard">🏆 Leaderboard</div>
+        <div class="time-switch">
+            <div class="time-opt active" onclick="setLbDays(3,this)">3d</div>
+            <div class="time-opt" onclick="setLbDays(7,this)">7d</div>
+            <div class="time-opt" onclick="setLbDays(14,this)">14d</div>
+            <div class="time-opt" onclick="setLbDays(30,this)">30d</div>
         </div>
     </div>
+    <div id="leaderboardList"></div>
+</div>
 
-    <div class="card">
-        <div class="lb-header">
-            <div style="font-weight:700" data-key="leaderboard">🏆 Leaderboard</div>
-            <div class="time-switch">
-                <div class="time-opt active" onclick="setLbDays(3,this)">3d</div>
-                <div class="time-opt" onclick="setLbDays(7,this)">7d</div>
-                <div class="time-opt" onclick="setLbDays(14,this)">14d</div>
-                <div class="time-opt" onclick="setLbDays(30,this)">30d</div>
-            </div>
-        </div>
-        <div id="leaderboardList"></div>
-    </div>
+<div style="font-weight:600;margin:30px 0 15px 5px" data-key="history">Verlauf</div>
+<div class="card" id="historyList" style="padding:10px 20px"></div>
 
-    <div style="font-weight:600;margin:30px 0 15px 5px" data-key="history">Verlauf</div>
-    <div class="card" id="historyList" style="padding:10px 20px"></div>
-    
-    <div class="wa-card" onclick="openWhatsApp()"><div style="font-weight:700">💬 WhatsApp</div><div data-key="wa_sub" style="font-size:0.85rem;opacity:0.8">...</div></div>
-    <div style="text-align:center;margin-top:50px;opacity:0.2;cursor:pointer;margin-bottom:30px" onclick="unlockAdmin()">🔒</div>
+<div class="wa-card" onclick="openWhatsApp()"><div style="font-weight:700">💬 WhatsApp</div><div data-key="wa_sub" style="font-size:0.85rem;opacity:0.8">...</div></div>
+<div style="text-align:center;margin-top:50px;opacity:0.2;cursor:pointer;margin-bottom:30px" onclick="unlockAdmin()">🔒</div>
 
-    <div class="overlay" id="editModal"><div class="modal"><h3 data-key="edit" style="margin-bottom:15px">Bearbeiten</h3><input type="hidden" id="editId"><input id="editName" style="width:100%;margin-bottom:10px;padding:10px"><input id="editTime" style="width:100%;margin-bottom:20px;padding:10px"><div style="display:flex;justify-content:space-between"><button onclick="deleteEntry()" style="background:#FF3B30;color:white;border:none;padding:10px 20px;border-radius:12px">Del</button><button onclick="saveEntry()" style="background:#007AFF;color:white;border:none;padding:10px 20px;border-radius:12px">Save</button></div><div style="text-align:center;margin-top:15px;color:#888;cursor:pointer" onclick="closeModal()">Cancel</div></div></div>
+<div class="overlay" id="editModal"><div class="modal"><h3 data-key="edit" style="margin-bottom:15px">Bearbeiten</h3><input type="hidden" id="editId"><input id="editName" style="width:100%;margin-bottom:10px;padding:10px"><input id="editTime" style="width:100%;margin-bottom:20px;padding:10px"><div style="display:flex;justify-content:space-between"><button onclick="deleteEntry()" style="background:#FF3B30;color:white;border:none;padding:10px 20px;border-radius:12px">Del</button><button onclick="saveEntry()" style="background:#007AFF;color:white;border:none;padding:10px 20px;border-radius:12px">Save</button></div><div style="text-align:center;margin-top:15px;color:#888;cursor:pointer" onclick="closeModal()">Cancel</div></div></div>
 
 <script>
     if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
@@ -114,35 +115,36 @@
     if(auth) document.body.classList.add("admin-mode");
 
     async function loadData() {
-        const res=await fetch("/status"); 
-        if(res.status === 401) return; // Kein Zugriff
-        const data=await res.json();
-        
-        if(data.weather && data.weather.temperature!==0) {
-            document.getElementById("weatherWidget").style.display="flex";
-            document.getElementById("wTemp").innerText=Math.round(data.weather.temperature)+"°";
-            document.getElementById("wDesc").innerText=data.weather.description;
-        }
-        document.getElementById("morningStatus").innerText=data.wasMorning?texts[lang].status_done:texts[lang].status_open;
-        document.getElementById("morningBox").className=data.wasMorning?"status-box done":"status-box open";
-        document.getElementById("eveningStatus").innerText=data.wasEvening?texts[lang].status_done:texts[lang].status_open;
-        document.getElementById("eveningBox").className=data.wasEvening?"status-box done":"status-box open";
-        
-        // LIMIT 10
-        const list=document.getElementById("historyList");
-        list.innerHTML=data.entries.length?data.entries.slice(0,10).map(e=><div class="entry"><div class="avatar"></div><div style="flex:1"><div style="font-weight:600"></div><div style="font-size:0.8rem;color:var(--text-sec)"></div></div><div class="applause-tag" onclick="applause(,this)">👏 </div><div class="edit-icon" onclick="openEdit(,\\\,\\\)">✏️</div></div>).join("") : <div style="text-align:center;color:var(--text-sec)"></div>;
-        
-        loadLeaderboard(); updateTexts();
+        try {
+            const res = await fetch("/status");
+            if(res.status === 401) return; // Kein Zugriff
+            const data = await res.json();
+
+            if(data.weather && data.weather.temperature!==0) {
+                document.getElementById("weatherWidget").style.display="flex";
+                document.getElementById("wTemp").innerText=Math.round(data.weather.temperature)+"°";
+                document.getElementById("wDesc").innerText=data.weather.description;
+            }
+            document.getElementById("morningStatus").innerText=data.wasMorning?texts[lang].status_done:texts[lang].status_open;
+            document.getElementById("morningBox").className=data.wasMorning?"status-box done":"status-box open";
+            document.getElementById("eveningStatus").innerText=data.wasEvening?texts[lang].status_done:texts[lang].status_open;
+            document.getElementById("eveningBox").className=data.wasEvening?"status-box done":"status-box open";
+
+            const list=document.getElementById("historyList");
+            list.innerHTML=data.entries.length?data.entries.slice(0,10).map(e=>`<div class="entry"><div class="avatar">${e.person[0].toUpperCase()}</div><div style="flex:1"><div style="font-weight:600">${e.person}</div><div style="font-size:0.8rem;color:var(--text-sec)">${e.timeFormatted}</div></div><div class="applause-tag" onclick="applause(${e.id},this)">👏 ${e.applauseCount}</div><div class="edit-icon" onclick="openEdit(${e.id},'${e.person}','${e.timeFormatted}')">✏️</div></div>`).join("") : `<div style="text-align:center;color:var(--text-sec)">${texts[lang].empty}</div>`;
+
+            loadLeaderboard(); updateTexts();
+        } catch(e) { console.error("LoadData Error", e); }
     }
-    
+
     async function loadLeaderboard() {
         try {
-            const res=await fetch("/leaderboard?days="+lbDays); 
+            const res=await fetch("/leaderboard?days="+lbDays);
             if(res.status === 401) return;
             const data=await res.json();
             const lb=document.getElementById("leaderboardList");
             const sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
-            lb.innerHTML=sorted.length?sorted.map(([n,c])=><div class="lb-row"><span></span><span style="font-weight:700;color:var(--primary)"></span></div>).join("") : <div style="text-align:center;color:var(--text-sec)"></div>;
+            lb.innerHTML=sorted.length?sorted.map(([n,c])=>`<div class="lb-row"><span>${n}</span><span style="font-weight:700;color:var(--primary)">${c}</span></div>`).join("") : `<div style="text-align:center;color:var(--text-sec)">${texts[lang].empty}</div>`;
         } catch(e){}
     }
 
@@ -150,17 +152,17 @@
     function toggleLang() { lang=lang==="de"?"ru":"de"; document.getElementById("l-de").classList.toggle("active"); document.getElementById("l-ru").classList.toggle("active"); loadData(); }
     function toggleDark() { document.body.classList.toggle("dark-mode"); document.getElementById("dm-light").classList.toggle("active"); document.getElementById("dm-dark").classList.toggle("active"); }
     function updateTexts() { document.querySelectorAll("[data-key]").forEach(el=>el.innerText=texts[lang][el.dataset.key]); document.getElementById("nameInput").placeholder=texts[lang].placeholder; }
-    
+
     async function addWalk() { const p=document.getElementById("nameInput").value; if(!p)return; await fetch("/walk",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({person:p})}); document.getElementById("nameInput").value=""; loadData(); }
     function quickAdd(n) { document.getElementById("nameInput").value=n; addWalk(); }
-    async function applause(id,el) { el.classList.add("active"); el.innerHTML=👏 ; await fetch(/walk//applause,{method:"POST"}); }
-    function openWhatsApp() { window.open(https://wa.me/?text=,"_blank"); }
-    
-    function unlockAdmin() { const p=prompt("Admin:"); if(p){ auth="Basic "+btoa("admin:"+p); fetch("/admin/reset",{method:"OPTIONS",headers:{"Authorization":auth}}).then(r=>{ if(r.ok){ document.body.classList.add("admin-mode"); localStorage.setItem("adminAuth",auth); }else{alert("Falsch!")} }); } }
+    async function applause(id,el) { el.classList.add("active"); el.innerHTML=`👏 ${parseInt(el.innerText.split(" ")[1])+1}`; await fetch(`/walk/${id}/applause`,{method:"POST"}); }
+    function openWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(texts[lang].wa_phrases[0])}`,"_blank"); }
+
+    function unlockAdmin() { const p=prompt("Admin Passwort:"); if(p){ auth="Basic "+btoa("admin:"+p); fetch("/admin/reset",{method:"OPTIONS",headers:{"Authorization":auth}}).then(r=>{ if(r.ok){ document.body.classList.add("admin-mode"); localStorage.setItem("adminAuth",auth); loadData(); alert("Admin aktiv!"); }else{alert("Falsches Passwort!")} }); } }
     function openEdit(id,n,t) { document.getElementById("editModal").style.display="flex"; document.getElementById("editId").value=id; document.getElementById("editName").value=n; document.getElementById("editTime").value=t; }
     function closeModal() { document.getElementById("editModal").style.display="none"; }
     async function saveEntry() { await fetch("/admin/walk/"+document.getElementById("editId").value,{method:"PUT",headers:{"Authorization":auth,"Content-Type":"application/json"},body:JSON.stringify({person:document.getElementById("editName").value,time:document.getElementById("editTime").value})}); closeModal(); loadData(); }
-    async function deleteEntry() { if(confirm("Del?")) await fetch("/admin/walk/"+document.getElementById("editId").value,{method:"DELETE",headers:{"Authorization":auth}}); closeModal(); loadData(); }
+    async function deleteEntry() { if(confirm("Wirklich löschen?")) await fetch("/admin/walk/"+document.getElementById("editId").value,{method:"DELETE",headers:{"Authorization":auth}}); closeModal(); loadData(); }
 
     loadData(); setInterval(loadData,10000);
 </script>

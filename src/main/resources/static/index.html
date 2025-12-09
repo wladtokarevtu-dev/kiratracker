@@ -158,7 +158,8 @@
             const data = await res.json();
 
             // Wetter Code übersetzen
-            if(data.weather && data.weather.temperature!==0) {
+            if(data.weather) {  // Hier war vorher: && data.weather.temperature!==0
+                // Das habe ich entfernt, damit auch 0 Grad angezeigt wird!
                 document.getElementById("weatherWidget").style.display="flex";
                 document.getElementById("wTemp").innerText=Math.round(data.weather.temperature)+"°";
                 const code = data.weather.code;

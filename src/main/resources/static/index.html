@@ -33,8 +33,8 @@
 
         .card { background:var(--card); border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
         .input-area { display:flex; gap:10px; margin-top:15px; align-items: center; }
-        input { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width: 0; }
-        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; transition:0.2s; flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
+        input { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width:0; }
+        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; transition:0.2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
         .btn-circle:hover { transform:scale(1.1); background:var(--primary); }
         .quick-row { display:flex; gap:8px; margin-top:15px; overflow-x:auto; }
         .quick-btn { background:var(--input-bg); color:var(--primary); border:none; padding:8px 14px; border-radius:100px; font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
@@ -57,8 +57,13 @@
         .edit-icon { display:none; margin-left:10px; opacity:0.3; cursor:pointer; }
         body.admin-mode .edit-icon { display:block; }
 
-        .food-status { font-size:0.9rem; color:var(--text-sec); margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--input-bg); }
-        .food-status strong { color:var(--primary); }
+        /* FOOD LIST STYLES */
+        .food-list { margin-bottom:15px; }
+        .food-entry { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
+        .food-time { color:var(--text-sec); font-size:0.8rem; margin-right:10px; min-width:40px; }
+        .food-desc { color:var(--text-sec); font-size:0.85rem; margin-left:5px; }
+        .del-food-icon { display:none; margin-left:auto; cursor:pointer; opacity:0.5; }
+        body.admin-mode .del-food-icon { display:block; }
     </style>
 </head>
 <body>
@@ -90,8 +95,10 @@
 
 <!-- FOOD CARD -->
 <div class="card">
-    <h3 style="font-size:1rem; margin-bottom:5px" data-key="food_title">🥣 Fütterung</h3>
-    <div id="foodStatusDisplay" class="food-status">...</div>
+    <h3 style="font-size:1rem; margin-bottom:10px" data-key="food_title">🥣 Fütterung</h3>
+
+    <div id="foodList" class="food-list"></div>
+
     <div class="input-area" style="margin-top:10px">
         <input type="text" id="foodName" placeholder="Wer?" style="flex:1" />
         <input type="text" id="foodDesc" placeholder="Was? (Optional)" style="flex:1.5" />
@@ -99,9 +106,9 @@
     </div>
     <div class="quick-row">
         <button class="quick-btn" onclick="quickFood('Mama')">Mama</button>
-        <button class="quick-btn" onclick="quickFood('Dajen')">Dajen</button>
         <button class="quick-btn" onclick="quickFood('Wlad')">Wlad</button>
         <button class="quick-btn" onclick="quickFood('Ilja')">Ilja</button>
+        <button class="quick-btn" onclick="quickFood('Dajen')">Dajen</button>
     </div>
 </div>
 
@@ -129,9 +136,18 @@
 <script>
     if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
     let lang="de", lbDays=3, auth=localStorage.getItem("adminAuth")||"";
+
+    // WMO Weather Codes (De/Ru)
+    const weatherCodes = {
+        0: {de:"Klar", ru:"Ясно"}, 1: {de:"Leicht bewölkt", ru:"Малооблачно"}, 2: {de:"Bewölkt", ru:"Облачно"}, 3: {de:"Bedeckt", ru:"Пасмурно"},
+        45: {de:"Nebel", ru:"Туман"}, 48: {de:"Nebel", ru:"Туман"}, 51: {de:"Niesel", ru:"Морось"}, 53: {de:"Niesel", ru:"Морось"},
+        61: {de:"Regen", ru:"Дождь"}, 63: {de:"Regen", ru:"Дождь"}, 65: {de:"Starker Regen", ru:"Сильный дождь"},
+        71: {de:"Schnee", ru:"Снег"}, 73: {de:"Schnee", ru:"Снег"}, 80: {de:"Regenschauer", ru:"Ливень"}, 95: {de:"Gewitter", ru:"Гроза"}
+    };
+
     const texts={
-        de:{subtitle:"Der tägliche Gassibegleiter",morning:"Morgen",evening:"Abend",add_title:"Gassi eintragen",food_title:"🥣 Fütterung",history:"Verlauf",wa_sub:"Jemand anderen fragen?",edit:"Bearbeiten",status_done:"ERLEDIGT",status_open:"OFFEN",placeholder:"Name...",empty:"Leer",leaderboard:"🏆 Leaderboard",food_empty:"Heute noch nichts.",food_pre:"Heute gefüttert von: ",wa_phrases:["Hey, kannst du heute mit Kira gehen? 🐕","Kira muss mal raus! 🐾"]},
-        ru:{subtitle:"Ежедневный трекер прогулок",morning:"Утро",evening:"Вечер",add_title:"Добавить прогулку",food_title:"🥣 Кормление",history:"История",wa_sub:"Спросить другого?",edit:"Изменить",status_done:"ГОТОВО",status_open:"ОТКРЫТО",placeholder:"Имя...",empty:"Пусто",leaderboard:"🏆 Топ-лист",food_empty:"Сегодня еще не кормили.",food_pre:"Покормил сегодня: ",wa_phrases:["Привет, можешь погулять с Кирой? 🐕","Кире нужно на улицу! 🐾"]}
+        de:{subtitle:"Der tägliche Gassibegleiter",morning:"Morgen",evening:"Abend",add_title:"Gassi eintragen",food_title:"🥣 Fütterung",history:"Verlauf",wa_sub:"Jemand anderen fragen?",edit:"Bearbeiten",status_done:"ERLEDIGT",status_open:"OFFEN",placeholder:"Name...",empty:"Leer",leaderboard:"🏆 Leaderboard",food_empty:"Heute noch nichts.",wa_phrases:["Hey, kannst du heute mit Kira gehen? 🐕","Kira muss mal raus! 🐾"]},
+        ru:{subtitle:"Ежедневный трекер прогулок",morning:"Утро",evening:"Вечер",add_title:"Добавить прогулку",food_title:"🥣 Кормление",history:"История",wa_sub:"Спросить другого?",edit:"Изменить",status_done:"ГОТОВО",status_open:"ОТКРЫТО",placeholder:"Имя...",empty:"Пусто",leaderboard:"🏆 Топ-лист",food_empty:"Сегодня еще не кормили.",wa_phrases:["Привет, можешь погулять с Кирой? 🐕","Кире нужно на улицу! 🐾"]}
     };
     if(auth) document.body.classList.add("admin-mode");
 
@@ -141,22 +157,34 @@
             if(res.status === 401) return;
             const data = await res.json();
 
+            // Wetter Code übersetzen
             if(data.weather && data.weather.temperature!==0) {
                 document.getElementById("weatherWidget").style.display="flex";
                 document.getElementById("wTemp").innerText=Math.round(data.weather.temperature)+"°";
-                document.getElementById("wDesc").innerText=data.weather.description;
+                const code = data.weather.code;
+                const desc = (weatherCodes[code] && weatherCodes[code][lang]) ? weatherCodes[code][lang] : "Wetter";
+                document.getElementById("wDesc").innerText=desc;
             }
+
             document.getElementById("morningStatus").innerText=data.wasMorning?texts[lang].status_done:texts[lang].status_open;
             document.getElementById("morningBox").className=data.wasMorning?"status-box done":"status-box open";
             document.getElementById("eveningStatus").innerText=data.wasEvening?texts[lang].status_done:texts[lang].status_open;
             document.getElementById("eveningBox").className=data.wasEvening?"status-box done":"status-box open";
 
-            // FOOD STATUS
-            const foodDiv = document.getElementById("foodStatusDisplay");
+            // FOOD LISTE RENDER
+            const foodListDiv = document.getElementById("foodList");
             if(data.foodToday && data.foodToday.length > 0) {
-                foodDiv.innerHTML = texts[lang].food_pre + "<strong>" + data.foodToday.join(", ") + "</strong>";
+                foodListDiv.innerHTML = data.foodToday.map(f => {
+                    const desc = f.description ? `<span class="food-desc">(${f.description})</span>` : "";
+                    return `<div class="food-entry">
+                        <span class="food-time">${f.timeFormatted}</span>
+                        <span style="font-weight:600">${f.person}</span>
+                        ${desc}
+                        <span class="del-food-icon" onclick="deleteFood(${f.id})">🗑️</span>
+                    </div>`;
+                }).join("");
             } else {
-                foodDiv.innerHTML = texts[lang].food_empty;
+                foodListDiv.innerHTML = `<div style="color:var(--text-sec);font-size:0.9rem">${texts[lang].food_empty}</div>`;
             }
 
             const list=document.getElementById("historyList");
@@ -195,6 +223,13 @@
         loadData();
     }
     function quickFood(n) { document.getElementById("foodName").value=n; addFood(); }
+    async function deleteFood(id) {
+        if(!auth) return;
+        if(confirm("Fütterung löschen?")) {
+            await fetch("/admin/food/"+id, {method:"DELETE", headers:{"Authorization":auth}});
+            loadData();
+        }
+    }
 
     async function applause(id,el) { el.classList.add("active"); el.innerHTML=`👏 ${parseInt(el.innerText.split(" ")[1])+1}`; await fetch(`/walk/${id}/applause`,{method:"POST"}); }
     function openWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(texts[lang].wa_phrases[0])}`,"_blank"); }

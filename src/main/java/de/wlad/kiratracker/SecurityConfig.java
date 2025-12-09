@@ -21,8 +21,9 @@ public class SecurityConfig {
                 .requestMatchers("/", "/index.html", "/manifest.json", "/sw.js", "/favicon.ico", "/apple-touch-icon.png").permitAll()
                 
                 // 2. ÖFFENTLICHE API (Lesen & Eintragen für alle erlaubt)
+                // Hier wurde /food hinzugefügt!
                 .requestMatchers(HttpMethod.GET, "/status", "/leaderboard").permitAll()
-                .requestMatchers(HttpMethod.POST, "/walk", "/walk/request", "/walk/*/applause").permitAll()
+                .requestMatchers(HttpMethod.POST, "/walk", "/walk/request", "/walk/*/applause", "/food").permitAll()
 
                 // 3. ADMIN API (Nur mit Passwort / Schloss-Icon)
                 .requestMatchers("/admin/**").authenticated()

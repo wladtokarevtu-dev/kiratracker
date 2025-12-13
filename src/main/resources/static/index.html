@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kira Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#F5F5F7">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/616/616408.png">
     <style>
         :root { --bg:#F5F5F7; --card:#FFFFFF; --primary:#007AFF; --text:#1D1D1F; --text-sec:#86868B; --radius:18px; --input-bg:#F2F2F7; }
         body.dark-mode { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
+
+        /* Auto Dark Mode basierend auf System */
+        @media (prefers-color-scheme: dark) {
+            :root { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
+        }
+
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:20px; max-width:500px; margin:0 auto; padding-top:100px; transition:0.3s; }
 
@@ -25,6 +30,11 @@
         .subtitle { color:var(--text-sec); font-size:0.95rem; }
 
         .weather-card { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:var(--radius); padding:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
+        .weather-left h3 { font-size:1.1rem; margin-bottom:5px; }
+        .weather-left p { opacity:0.9; font-size:0.9rem; }
+        .weather-right { text-align:right; }
+        .weather-temp { font-size:2.5rem; font-weight:700; }
+
         .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px; }
         .status-box { background:var(--card); border-radius:var(--radius); padding:20px; text-align:center; height:120px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
         .status-box.done { background:#E4F9E8; color:#1E6F30; }
@@ -33,216 +43,400 @@
         body.dark-mode .status-box.open { background:#3A0F0F; color:#FF453A; }
 
         .card { background:var(--card); border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
-        .input-area { display:flex; gap:10px; margin-top:15px; align-items: center; }
-        input { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width:0; }
-        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; transition:0.2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .btn-circle:hover { transform:scale(1.1); background:var(--primary); }
-        .quick-row { display:flex; gap:8px; margin-top:15px; overflow-x:auto; }
-        .quick-btn { background:var(--input-bg); color:var(--primary); border:none; padding:8px 14px; border-radius:100px; font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
+        .input-area { display:flex; gap:10px; margin-top:15px; align-items:center; }
+        input, select { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width:0; }
+        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--primary); color:white; border:none; font-size:1.3rem; cursor:pointer; flex-shrink:0; }
 
-        .lb-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
-        .time-switch { background:var(--input-bg); border-radius:8px; padding:2px; display:flex; }
-        .time-opt { padding:4px 8px; font-size:0.7rem; font-weight:600; cursor:pointer; border-radius:6px; color:var(--text-sec); transition:0.3s; }
-        .time-opt.active { background:var(--card); color:var(--text); }
-        .lb-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
+        .entry { background:var(--input-bg); padding:16px; border-radius:12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; }
+        .entry-info { flex:1; }
+        .entry-time { font-size:0.85rem; color:var(--text-sec); }
+        .entry-text { font-weight:600; margin-top:4px; }
+        .entry-actions { display:flex; gap:8px; }
+        .btn-icon { background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px; color:var(--text-sec); }
+        .btn-icon:hover { color:var(--primary); }
 
-        .entry { display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--input-bg); }
-        .avatar { width:38px; height:38px; border-radius:10px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-weight:600; margin-right:12px; }
-        .applause-tag { background:var(--input-bg); padding:5px 10px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); cursor:pointer; transition:0.2s; }
-        .applause-tag.active { background:#FFD60A; color:#333; }
-        .wa-card { background:#E9FCF2; color:#0C4A28; padding:18px; border-radius:var(--radius); margin-top:30px; text-align:center; cursor:pointer; }
-        body.dark-mode .wa-card { background:#063318; color:#4CD964; }
+        /* Edit-Buttons nur im Admin-Modus */
+        .edit-btn { display:none; }
+        body.admin-mode .edit-btn { display:inline-block; }
 
-        .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; z-index:99; }
-        .modal { background:var(--card); width:85%; max-width:300px; padding:25px; border-radius:20px; color:var(--text); }
-        .edit-icon { display:none; margin-left:10px; opacity:0.3; cursor:pointer; }
-        body.admin-mode .edit-icon { display:block; }
+        .btn-secondary { padding:12px 20px; border-radius:12px; background:var(--input-bg); color:var(--text); border:none; font-weight:600; cursor:pointer; width:100%; margin-top:10px; }
 
-        /* FOOD LIST STYLES */
-        .food-list { margin-bottom:15px; }
-        .food-entry { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
-        .food-time { color:var(--text-sec); font-size:0.8rem; margin-right:10px; min-width:40px; }
-        .food-desc { color:var(--text-sec); font-size:0.85rem; margin-left:5px; }
-        .del-food-icon { display:none; margin-left:auto; cursor:pointer; opacity:0.5; }
-        body.admin-mode .del-food-icon { display:block; }
+        .show-more-btn { text-align:center; padding:12px; color:var(--primary); font-weight:600; cursor:pointer; margin-top:10px; }
+        .hidden { display:none; }
+
+        /* WhatsApp Request Modal */
+        .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+        .modal.active { display:flex; }
+        .modal-content { background:var(--card); border-radius:var(--radius); padding:24px; max-width:400px; width:90%; }
+        .modal-option { padding:16px; background:var(--input-bg); border-radius:12px; margin-bottom:10px; cursor:pointer; transition:0.2s; }
+        .modal-option:hover { transform:scale(1.02); background:var(--primary); color:white; }
     </style>
 </head>
 <body>
 <div class="controls">
-    <div class="pill" onclick="toggleLang()"><div class="pill-opt active" id="l-de">DE</div><div class="pill-opt" id="l-ru">RU</div></div>
-    <div class="pill" onclick="toggleDark()"><div class="pill-opt active" id="dm-light">☀️</div><div class="pill-opt" id="dm-dark">🌙</div></div>
+    <div class="pill" onclick="toggleLang()">
+        <div class="pill-opt active" id="l-de">DE</div>
+        <div class="pill-opt" id="l-en">EN</div>
+    </div>
+    <div class="pill" onclick="toggleMode()">
+        <div class="pill-opt" id="m-light">☀️</div>
+        <div class="pill-opt" id="m-dark">🌙</div>
+    </div>
 </div>
-<header><h1>Kira Tracker</h1><div class="subtitle" data-key="subtitle">...</div></header>
 
-<div class="weather-card" id="weatherWidget" style="display:none;"><div style="font-size:2rem;font-weight:700" id="wTemp">--°</div><div id="wDesc">...</div></div>
+<header>
+    <h1 id="title">🐕 Kira Tracker</h1>
+    <p class="subtitle" id="subtitle">Dein Hunde-Management</p>
+</header>
 
+<!-- Wetter -->
+<div class="weather-card" id="weatherCard">
+    <div class="weather-left">
+        <h3 id="weatherCity">Berlin</h3>
+        <p id="weatherDesc">Lädt...</p>
+    </div>
+    <div class="weather-right">
+        <div class="weather-temp" id="weatherTemp">--°</div>
+    </div>
+</div>
+
+<!-- Status -->
 <div class="status-grid">
-    <div class="status-box" id="morningBox"><div style="font-size:2rem">🌅</div><div style="font-weight:600;font-size:0.8rem" data-key="morning">Morgen</div><div id="morningStatus" style="font-weight:700">...</div></div>
-    <div class="status-box" id="eveningBox"><div style="font-size:2rem">🌙</div><div style="font-weight:600;font-size:0.8rem" data-key="evening">Abend</div><div id="eveningStatus" style="font-weight:700">...</div></div>
-</div>
-
-<!-- WALK CARD -->
-<div class="card">
-    <h3 style="font-size:1rem; margin-bottom:10px" data-key="add_title">Eintragen</h3>
-    <div class="input-area"><input type="text" id="nameInput" placeholder="Name..." /><button class="btn-circle" onclick="addWalk()">+</button></div>
-    <div class="quick-row">
-        <button class="quick-btn" onclick="quickAdd('Wlad')">Wlad</button>
-        <button class="quick-btn" onclick="quickAdd('Mama')">Mama</button>
-        <button class="quick-btn" onclick="quickAdd('Ilja')">Ilja</button>
-        <button class="quick-btn" onclick="quickAdd('Aaron')">Aaron</button>
-        <button class="quick-btn" onclick="quickAdd('Dajen')">Dajen</button>
+    <div class="status-box" id="walkStatus">
+        <div style="font-size:2rem;">🦮</div>
+        <div style="margin-top:10px; font-weight:600;" id="walkStatusText">Lädt...</div>
+    </div>
+    <div class="status-box" id="foodStatus">
+        <div style="font-size:2rem;">🍖</div>
+        <div style="margin-top:10px; font-weight:600;" id="foodStatusText">Lädt...</div>
     </div>
 </div>
 
-<!-- FOOD CARD -->
+<!-- Gassi Anfrage -->
 <div class="card">
-    <h3 style="font-size:1rem; margin-bottom:10px" data-key="food_title">🥣 Fütterung</h3>
-
-    <div id="foodList" class="food-list"></div>
-
-    <div class="input-area" style="margin-top:10px">
-        <input type="text" id="foodName" placeholder="Wer?" style="flex:1" />
-        <input type="text" id="foodDesc" placeholder="Was? (Optional)" style="flex:1.5" />
-        <button class="btn-circle" onclick="addFood()">✓</button>
-    </div>
-    <div class="quick-row">
-        <button class="quick-btn" onclick="quickFood('Mama')">Mama</button>
-        <button class="quick-btn" onclick="quickFood('Wlad')">Wlad</button>
-        <button class="quick-btn" onclick="quickFood('Ilja')">Ilja</button>
-        <button class="quick-btn" onclick="quickFood('Dajen')">Dajen</button>
-    </div>
+    <h2 id="walkReqTitle">🚶 Gassi-Anfrage</h2>
+    <button class="btn-secondary" onclick="openWhatsAppModal()" id="walkReqBtn">WhatsApp-Anfrage senden</button>
 </div>
 
-<div class="card">
-    <div class="lb-header">
-        <div style="font-weight:700" data-key="leaderboard">🏆 Leaderboard</div>
-        <div class="time-switch">
-            <div class="time-opt active" onclick="setLbDays(3,this)">3d</div>
-            <div class="time-opt" onclick="setLbDays(7,this)">7d</div>
-            <div class="time-opt" onclick="setLbDays(14,this)">14d</div>
-            <div class="time-opt" onclick="setLbDays(30,this)">30d</div>
+<!-- WhatsApp Modal -->
+<div class="modal" id="whatsappModal">
+    <div class="modal-content">
+        <h3 style="margin-bottom:16px;">Wähle deine Nachricht</h3>
+        <div class="modal-option" onclick="sendWhatsApp(0)">
+            <strong>Kurz:</strong><br>Kann jemand mit Kira Gassi gehen? 🐕
         </div>
+        <div class="modal-option" onclick="sendWhatsApp(1)">
+            <strong>Höflich:</strong><br>Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏
+        </div>
+        <div class="modal-option" onclick="sendWhatsApp(2)">
+            <strong>Dringend:</strong><br>DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨
+        </div>
+        <button class="btn-secondary" onclick="closeWhatsAppModal()" style="margin-top:10px;">Abbrechen</button>
     </div>
-    <div id="leaderboardList"></div>
 </div>
 
-<div style="font-weight:600;margin:30px 0 15px 5px" data-key="history">Verlauf</div>
-<div class="card" id="historyList" style="padding:10px 20px"></div>
+<!-- Fütterung -->
+<div class="card">
+    <h2 id="foodTitle">🍖 Fütterung</h2>
+    <div class="input-area">
+        <select id="foodPersonSelect">
+            <option value="Wlad">Wlad</option>
+            <option value="Mama">Mama</option>
+            <option value="Papa">Papa</option>
+        </select>
+        <input type="text" id="foodInput" placeholder="Was? (optional)">
+        <button class="btn-circle" onclick="addFood()">+</button>
+    </div>
+    <div id="foodList"></div>
+</div>
 
-<div class="wa-card" onclick="openWhatsApp()"><div style="font-weight:700">💬 WhatsApp</div><div data-key="wa_sub" style="font-size:0.85rem;opacity:0.8">...</div></div>
-<div style="text-align:center;margin-top:50px;opacity:0.2;cursor:pointer;margin-bottom:30px" onclick="unlockAdmin()">🔒</div>
-
-<div class="overlay" id="editModal"><div class="modal"><h3 data-key="edit" style="margin-bottom:15px">Bearbeiten</h3><input type="hidden" id="editId"><input id="editName" style="width:100%;margin-bottom:10px;padding:10px"><input id="editTime" style="width:100%;margin-bottom:20px;padding:10px"><div style="display:flex;justify-content:space-between"><button onclick="deleteEntry()" style="background:#FF3B30;color:white;border:none;padding:10px 20px;border-radius:12px">Del</button><button onclick="saveEntry()" style="background:#007AFF;color:white;border:none;padding:10px 20px;border-radius:12px">Save</button></div><div style="text-align:center;margin-top:15px;color:#888;cursor:pointer" onclick="closeModal()">Cancel</div></div></div>
+<!-- Gassi -->
+<div class="card">
+    <h2 id="walkTitle">🦮 Gassi</h2>
+    <div class="input-area">
+        <select id="walkPersonSelect">
+            <option value="Wlad">Wlad</option>
+            <option value="Mama">Mama</option>
+            <option value="Papa">Papa</option>
+        </select>
+        <input type="number" id="walkDuration" placeholder="Minuten" min="1">
+        <button class="btn-circle" onclick="addWalk()">+</button>
+    </div>
+    <div id="walkList"></div>
+    <div class="show-more-btn hidden" id="showMoreWalks" onclick="toggleWalkHistory()">
+        Mehr anzeigen ▼
+    </div>
+</div>
 
 <script>
-    if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
-    let lang="de", lbDays=3, auth=localStorage.getItem("adminAuth")||"";
+    const API = window.location.origin;
+    let lang = 'de';
+    let isAdminMode = false;
+    let walks = [];
+    let showAllWalks = false;
 
-    // WMO Weather Codes (De/Ru)
-    const weatherCodes = {
-        0: {de:"Klar", ru:"Ясно"}, 1: {de:"Leicht bewölkt", ru:"Малооблачно"}, 2: {de:"Bewölkt", ru:"Облачно"}, 3: {de:"Bedeckt", ru:"Пасмурно"},
-        45: {de:"Nebel", ru:"Туман"}, 48: {de:"Nebel", ru:"Туман"}, 51: {de:"Niesel", ru:"Морось"}, 53: {de:"Niesel", ru:"Морось"},
-        61: {de:"Regen", ru:"Дождь"}, 63: {de:"Regen", ru:"Дождь"}, 65: {de:"Starker Regen", ru:"Сильный дождь"},
-        71: {de:"Schnee", ru:"Снег"}, 73: {de:"Schnee", ru:"Снег"}, 80: {de:"Regenschauer", ru:"Ливень"}, 95: {de:"Gewitter", ru:"Гроза"}
-    };
+    // AUTO DARK MODE basierend auf System
+    function initDarkMode() {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const savedMode = localStorage.getItem('darkMode');
 
-    const texts={
-        de:{subtitle:"Der tägliche Gassibegleiter",morning:"Morgen",evening:"Abend",add_title:"Gassi eintragen",food_title:"🥣 Fütterung",history:"Verlauf",wa_sub:"Jemand anderen fragen?",edit:"Bearbeiten",status_done:"ERLEDIGT",status_open:"OFFEN",placeholder:"Name...",empty:"Leer",leaderboard:"🏆 Leaderboard",food_empty:"Heute noch nichts.",wa_phrases:["Hey, kannst du heute mit Kira gehen? 🐕","Kira muss mal raus! 🐾"]},
-        ru:{subtitle:"Ежедневный трекер прогулок",morning:"Утро",evening:"Вечер",add_title:"Добавить прогулку",food_title:"🥣 Кормление",history:"История",wa_sub:"Спросить другого?",edit:"Изменить",status_done:"ГОТОВО",status_open:"ОТКРЫТО",placeholder:"Имя...",empty:"Пусто",leaderboard:"🏆 Топ-лист",food_empty:"Сегодня еще не кормили.",wa_phrases:["Привет, можешь погулять с Кирой? 🐕","Кире нужно на улицу! 🐾"]}
-    };
-    if(auth) document.body.classList.add("admin-mode");
-
-    async function loadData() {
-        try {
-            const res = await fetch("/status");
-            if(res.status === 401) return;
-            const data = await res.json();
-
-            // Wetter Code übersetzen
-            if(data.weather) {  // Hier war vorher: && data.weather.temperature!==0
-                // Das habe ich entfernt, damit auch 0 Grad angezeigt wird!
-                document.getElementById("weatherWidget").style.display="flex";
-                document.getElementById("wTemp").innerText=Math.round(data.weather.temperature)+"°";
-                const code = data.weather.code;
-                const desc = (weatherCodes[code] && weatherCodes[code][lang]) ? weatherCodes[code][lang] : "Wetter";
-                document.getElementById("wDesc").innerText=desc;
-            }
-
-            document.getElementById("morningStatus").innerText=data.wasMorning?texts[lang].status_done:texts[lang].status_open;
-            document.getElementById("morningBox").className=data.wasMorning?"status-box done":"status-box open";
-            document.getElementById("eveningStatus").innerText=data.wasEvening?texts[lang].status_done:texts[lang].status_open;
-            document.getElementById("eveningBox").className=data.wasEvening?"status-box done":"status-box open";
-
-            // FOOD LISTE RENDER
-            const foodListDiv = document.getElementById("foodList");
-            if(data.foodToday && data.foodToday.length > 0) {
-                foodListDiv.innerHTML = data.foodToday.map(f => {
-                    const desc = f.description ? `<span class="food-desc">(${f.description})</span>` : "";
-                    return `<div class="food-entry">
-                        <span class="food-time">${f.timeFormatted}</span>
-                        <span style="font-weight:600">${f.person}</span>
-                        ${desc}
-                        <span class="del-food-icon" onclick="deleteFood(${f.id})">🗑️</span>
-                    </div>`;
-                }).join("");
-            } else {
-                foodListDiv.innerHTML = `<div style="color:var(--text-sec);font-size:0.9rem">${texts[lang].food_empty}</div>`;
-            }
-
-            const list=document.getElementById("historyList");
-            list.innerHTML=data.entries.length?data.entries.slice(0,10).map(e=>`<div class="entry"><div class="avatar">${e.person[0].toUpperCase()}</div><div style="flex:1"><div style="font-weight:600">${e.person}</div><div style="font-size:0.8rem;color:var(--text-sec)">${e.timeFormatted}</div></div><div class="applause-tag" onclick="applause(${e.id},this)">👏 ${e.applauseCount}</div><div class="edit-icon" onclick="openEdit(${e.id},'${e.person}','${e.timeFormatted}')">✏️</div></div>`).join("") : `<div style="text-align:center;color:var(--text-sec)">${texts[lang].empty}</div>`;
-
-            loadLeaderboard(); updateTexts();
-        } catch(e) { console.error("LoadData Error", e); }
-    }
-
-    async function loadLeaderboard() {
-        try {
-            const res=await fetch("/leaderboard?days="+lbDays);
-            if(res.status === 401) return;
-            const data=await res.json();
-            const lb=document.getElementById("leaderboardList");
-            const sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]);
-            lb.innerHTML=sorted.length?sorted.map(([n,c])=>`<div class="lb-row"><span>${n}</span><span style="font-weight:700;color:var(--primary)">${c}</span></div>`).join("") : `<div style="text-align:center;color:var(--text-sec)">${texts[lang].empty}</div>`;
-        } catch(e){}
-    }
-
-    function setLbDays(d,el) { lbDays=d; document.querySelectorAll(".time-opt").forEach(e=>e.classList.remove("active")); el.classList.add("active"); loadLeaderboard(); }
-    function toggleLang() { lang=lang==="de"?"ru":"de"; document.getElementById("l-de").classList.toggle("active"); document.getElementById("l-ru").classList.toggle("active"); loadData(); }
-    function toggleDark() { document.body.classList.toggle("dark-mode"); document.getElementById("dm-light").classList.toggle("active"); document.getElementById("dm-dark").classList.toggle("active"); }
-    function updateTexts() { document.querySelectorAll("[data-key]").forEach(el=>el.innerText=texts[lang][el.dataset.key]); document.getElementById("nameInput").placeholder=texts[lang].placeholder; }
-
-    async function addWalk() { const p=document.getElementById("nameInput").value; if(!p)return; await fetch("/walk",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({person:p})}); document.getElementById("nameInput").value=""; loadData(); }
-    function quickAdd(n) { document.getElementById("nameInput").value=n; addWalk(); }
-
-    async function addFood() {
-        const p=document.getElementById("foodName").value;
-        const d=document.getElementById("foodDesc").value;
-        if(!p)return;
-        await fetch("/food",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({person:p, description:d})});
-        document.getElementById("foodName").value="";
-        document.getElementById("foodDesc").value="";
-        loadData();
-    }
-    function quickFood(n) { document.getElementById("foodName").value=n; addFood(); }
-    async function deleteFood(id) {
-        if(!auth) return;
-        if(confirm("Fütterung löschen?")) {
-            await fetch("/admin/food/"+id, {method:"DELETE", headers:{"Authorization":auth}});
-            loadData();
+        if (savedMode === 'dark' || (savedMode === null && prefersDark)) {
+            document.body.classList.add('dark-mode');
+            document.getElementById('m-dark').classList.add('active');
+        } else {
+            document.getElementById('m-light').classList.add('active');
         }
     }
 
-    async function applause(id,el) { el.classList.add("active"); el.innerHTML=`👏 ${parseInt(el.innerText.split(" ")[1])+1}`; await fetch(`/walk/${id}/applause`,{method:"POST"}); }
-    function openWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(texts[lang].wa_phrases[0])}`,"_blank"); }
+    function toggleMode() {
+        document.body.classList.toggle('dark-mode');
+        document.getElementById('m-light').classList.toggle('active');
+        document.getElementById('m-dark').classList.toggle('active');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
 
-    function unlockAdmin() { const p=prompt("Admin Passwort:"); if(p){ auth="Basic "+btoa("admin:"+p); fetch("/admin/reset",{method:"OPTIONS",headers:{"Authorization":auth}}).then(r=>{ if(r.ok){ document.body.classList.add("admin-mode"); localStorage.setItem("adminAuth",auth); loadData(); alert("Admin aktiv!"); }else{alert("Falsches Passwort!")} }); } }
-    function openEdit(id,n,t) { document.getElementById("editModal").style.display="flex"; document.getElementById("editId").value=id; document.getElementById("editName").value=n; document.getElementById("editTime").value=t; }
-    function closeModal() { document.getElementById("editModal").style.display="none"; }
-    async function saveEntry() { await fetch("/admin/walk/"+document.getElementById("editId").value,{method:"PUT",headers:{"Authorization":auth,"Content-Type":"application/json"},body:JSON.stringify({person:document.getElementById("editName").value,time:document.getElementById("editTime").value})}); closeModal(); loadData(); }
-    async function deleteEntry() { if(confirm("Wirklich löschen?")) await fetch("/admin/walk/"+document.getElementById("editId").value,{method:"DELETE",headers:{"Authorization":auth}}); closeModal(); loadData(); }
+    function toggleLang() {
+        lang = lang === 'de' ? 'en' : 'de';
+        document.getElementById('l-de').classList.toggle('active');
+        document.getElementById('l-en').classList.toggle('active');
+        updateTexts();
+    }
 
-    loadData(); setInterval(loadData,10000);
+    function updateTexts() {
+        const texts = {
+            de: {
+                title: '🐕 Kira Tracker',
+                subtitle: 'Dein Hunde-Management',
+                walkReqTitle: '🚶 Gassi-Anfrage',
+                walkReqBtn: 'WhatsApp-Anfrage senden',
+                foodTitle: '🍖 Fütterung',
+                walkTitle: '🦮 Gassi'
+            },
+            en: {
+                title: '🐕 Kira Tracker',
+                subtitle: 'Your Dog Management',
+                walkReqTitle: '🚶 Walk Request',
+                walkReqBtn: 'Send WhatsApp Request',
+                foodTitle: '🍖 Feeding',
+                walkTitle: '🦮 Walk'
+            }
+        };
+        Object.keys(texts[lang]).forEach(key => {
+            const el = document.getElementById(key);
+            if(el) el.textContent = texts[lang][key];
+        });
+    }
+
+    // WhatsApp Modal
+    const whatsappMessages = [
+        "Kann jemand mit Kira Gassi gehen? 🐕",
+        "Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏",
+        "DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨"
+    ];
+
+    function openWhatsAppModal() {
+        document.getElementById('whatsappModal').classList.add('active');
+    }
+
+    function closeWhatsAppModal() {
+        document.getElementById('whatsappModal').classList.remove('active');
+    }
+
+    function sendWhatsApp(index) {
+        const message = whatsappMessages[index];
+        fetch(`${API}/api/walk-request`, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({})
+        });
+        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+        closeWhatsAppModal();
+    }
+
+    // Admin Mode Check
+    function checkAdminMode() {
+        fetch(`${API}/api/status`)
+            .then(r => r.ok ? isAdminMode = true : isAdminMode = false)
+            .then(() => {
+                if(isAdminMode) document.body.classList.add('admin-mode');
+            })
+            .catch(() => {});
+    }
+
+    // Wetter laden
+    function loadWeather() {
+        fetch(`${API}/api/weather`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('weatherCity').textContent = data.city || 'Berlin';
+                document.getElementById('weatherDesc').textContent = data.description || 'Keine Daten';
+                document.getElementById('weatherTemp').textContent = data.temp ? Math.round(data.temp) + '°' : '--°';
+            })
+            .catch(() => {
+                document.getElementById('weatherDesc').textContent = 'Wetter nicht verfügbar';
+            });
+    }
+
+    // Status laden
+    function loadStatus() {
+        fetch(`${API}/api/status`)
+            .then(r => r.json())
+            .then(data => {
+                const walkBox = document.getElementById('walkStatus');
+                const foodBox = document.getElementById('foodStatus');
+
+                if(data.walkDone) {
+                    walkBox.classList.add('done');
+                    walkBox.classList.remove('open');
+                    document.getElementById('walkStatusText').textContent = lang === 'de' ? 'Erledigt ✓' : 'Done ✓';
+                } else {
+                    walkBox.classList.add('open');
+                    walkBox.classList.remove('done');
+                    document.getElementById('walkStatusText').textContent = lang === 'de' ? 'Offen' : 'Open';
+                }
+
+                if(data.foodDone) {
+                    foodBox.classList.add('done');
+                    foodBox.classList.remove('open');
+                    document.getElementById('foodStatusText').textContent = lang === 'de' ? 'Erledigt ✓' : 'Done ✓';
+                } else {
+                    foodBox.classList.add('open');
+                    foodBox.classList.remove('done');
+                    document.getElementById('foodStatusText').textContent = lang === 'de' ? 'Offen' : 'Open';
+                }
+            });
+    }
+
+    // Fütterung hinzufügen
+    function addFood() {
+        const person = document.getElementById('foodPersonSelect').value;
+        const food = document.getElementById('foodInput').value || ''; // Optional!
+
+        fetch(`${API}/api/food`, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ person, food })
+        }).then(() => {
+            document.getElementById('foodInput').value = '';
+            loadFood();
+            loadStatus();
+        });
+    }
+
+    function loadFood() {
+        fetch(`${API}/api/food`)
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('foodList');
+                list.innerHTML = data.map(f => `
+                        <div class="entry">
+                            <div class="entry-info">
+                                <div class="entry-time">${new Date(f.timestamp).toLocaleString('de-DE')}</div>
+                                <div class="entry-text">${f.person}${f.food ? ': ' + f.food : ''}</div>
+                            </div>
+                            <div class="entry-actions">
+                                <button class="btn-icon edit-btn" onclick="deleteFood(${f.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('');
+            });
+    }
+
+    function deleteFood(id) {
+        if(confirm('Eintrag löschen?')) {
+            fetch(`${API}/api/food/${id}`, {method:'DELETE'})
+                .then(() => { loadFood(); loadStatus(); });
+        }
+    }
+
+    // Gassi hinzufügen
+    function addWalk() {
+        const person = document.getElementById('walkPersonSelect').value;
+        const duration = document.getElementById('walkDuration').value;
+
+        if(!duration) return alert('Bitte Minuten angeben!');
+
+        fetch(`${API}/api/walk`, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ person, duration: parseInt(duration) })
+        }).then(() => {
+            document.getElementById('walkDuration').value = '';
+            loadWalks();
+            loadStatus();
+        });
+    }
+
+    function loadWalks() {
+        fetch(`${API}/api/walk`)
+            .then(r => r.json())
+            .then(data => {
+                walks = data;
+                renderWalks();
+            });
+    }
+
+    function renderWalks() {
+        const list = document.getElementById('walkList');
+        const showMoreBtn = document.getElementById('showMoreWalks');
+
+        const displayWalks = showAllWalks ? walks : walks.slice(0, 10);
+
+        list.innerHTML = displayWalks.map(w => `
+                <div class="entry">
+                    <div class="entry-info">
+                        <div class="entry-time">${new Date(w.timestamp).toLocaleString('de-DE')}</div>
+                        <div class="entry-text">${w.person} - ${w.duration} Min</div>
+                    </div>
+                    <div class="entry-actions">
+                        <button class="btn-icon edit-btn" onclick="deleteWalk(${w.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+        // "Mehr anzeigen" Button nur zeigen wenn > 10 Einträge
+        if(walks.length > 10) {
+            showMoreBtn.classList.remove('hidden');
+            showMoreBtn.textContent = showAllWalks ? 'Weniger anzeigen ▲' : 'Mehr anzeigen ▼';
+        } else {
+            showMoreBtn.classList.add('hidden');
+        }
+    }
+
+    function toggleWalkHistory() {
+        showAllWalks = !showAllWalks;
+        renderWalks();
+    }
+
+    function deleteWalk(id) {
+        if(confirm('Eintrag löschen?')) {
+            fetch(`${API}/api/walk/${id}`, {method:'DELETE'})
+                .then(() => { loadWalks(); loadStatus(); });
+        }
+    }
+
+    // Init
+    initDarkMode();
+    checkAdminMode();
+    loadWeather();
+    loadStatus();
+    loadFood();
+    loadWalks();
+
+    // Auto-Refresh alle 30 Sekunden
+    setInterval(() => {
+        loadWeather();
+        loadStatus();
+        loadFood();
+        loadWalks();
+    }, 30000);
+
+    // Dark Mode Listener für System-Änderungen
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if(!localStorage.getItem('darkMode')) {
+            document.body.classList.toggle('dark-mode', e.matches);
+        }
+    });
 </script>
 </body>
 </html>

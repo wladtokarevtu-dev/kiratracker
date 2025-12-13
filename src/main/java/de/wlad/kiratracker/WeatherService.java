@@ -1,43 +1,58 @@
 package de.wlad.kiratracker;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 @Service
 public class WeatherService {
-    // API URL für Berlin
-    private static final String URL = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true&timezone=Europe%2FBerlin";
+
+    @Value("${WEATHER_API_KEY:}")
+    private String apiKey;
+
+    @Value("${WEATHER_CITY:Berlin}")
+    private String city;
+
+    @Value("${WEATHER_COUNTRY:DE}")
+    private String country;
 
     public WeatherDto getCurrentWeather() {
         try {
-            RestTemplate t = new RestTemplate();
-            // Wir holen die Rohdaten als Map
-            Map<String, Object> r = t.getForObject(URL, Map.class);
-            
-            if (r != null && r.containsKey("current_weather")) {
-                Map<String, Object> c = (Map<String, Object>) r.get("current_weather");
-                
-                // Sicherer Cast für Zahlen (kann Integer oder Double sein)
-                double temp = 0.0;
-                Object tempObj = c.get("temperature");
-                if (tempObj instanceof Number) {
-                    temp = ((Number) tempObj).doubleValue();
-                }
-
-                int code = 0;
-                Object codeObj = c.get("weathercode");
-                if (codeObj instanceof Number) {
-                    code = ((Number) codeObj).intValue();
-                }
-                
-                return new WeatherDto(temp, "Wetter", code);
+            if (apiKey == null || apiKey.isEmpty()) {
+                return new WeatherDto(0, "API Key fehlt", 0);
             }
+
+            // OpenWeatherMap API URL
+            String url = String.format(
+                    "https://api.openweathermap.org/data/2.5/weather?q=%s,%s&appid=%s&units=metric&lang=de",
+                    city, country, apiKey
+            );
+
+            RestTemplate restTemplate = new RestTemplate();
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+
+            if (response != null && response.containsKey("main") && response.containsKey("weather")) {
+                Map<String, Object> main = (Map<String, Object>) response.get("main");
+                Object tempObj = main.get("temp");
+                double temp = tempObj instanceof Number ? ((Number) tempObj).doubleValue() : 0.0;
+
+                // Weather description
+                java.util.List<Map<String, Object>> weatherList = (java.util.List<Map<String, Object>>) response.get("weather");
+                String description = weatherList.get(0).get("description").toString();
+
+                // Weather code
+                Object idObj = weatherList.get(0).get("id");
+                int code = idObj instanceof Number ? ((Number) idObj).intValue() : 0;
+
+                return new WeatherDto(temp, description, code);
+            }
+
+            return new WeatherDto(0, "Keine Daten", 0);
+
         } catch (Exception e) {
-            // Fehler stillschweigend ignorieren, damit App nicht crasht
             System.out.println("Wetter-Fehler: " + e.getMessage());
+            return new WeatherDto(0, "Wetter nicht verfügbar", 0);
         }
-        // Fallback: Code 0 (Klar), 0 Grad, damit Frontend nicht leer bleibt
-        return new WeatherDto(0, "Wetter", 0);
     }
 }

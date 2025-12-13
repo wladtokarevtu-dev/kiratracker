@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kira Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#F5F5F7">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/616/616408.png">
     <style>
         :root { --bg:#F5F5F7; --card:#FFFFFF; --primary:#007AFF; --text:#1D1D1F; --text-sec:#86868B; --radius:18px; --input-bg:#F2F2F7; }
         body.dark-mode { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
-
-        /* Auto Dark Mode basierend auf System */
+        /* Auto Dark Mode basierend auf System-Einstellung */
         @media (prefers-color-scheme: dark) {
-            :root { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
+            :root:not(.light-mode-forced) {
+                --bg:#000000; --card:#1C1C1E; --primary:#0A84FF;
+                --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E;
+            }
         }
-
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:20px; max-width:500px; margin:0 auto; padding-top:100px; transition:0.3s; }
 
@@ -30,11 +31,6 @@
         .subtitle { color:var(--text-sec); font-size:0.95rem; }
 
         .weather-card { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:var(--radius); padding:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
-        .weather-left h3 { font-size:1.1rem; margin-bottom:5px; }
-        .weather-left p { opacity:0.9; font-size:0.9rem; }
-        .weather-right { text-align:right; }
-        .weather-temp { font-size:2.5rem; font-weight:700; }
-
         .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px; }
         .status-box { background:var(--card); border-radius:var(--radius); padding:20px; text-align:center; height:120px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
         .status-box.done { background:#E4F9E8; color:#1E6F30; }
@@ -43,130 +39,118 @@
         body.dark-mode .status-box.open { background:#3A0F0F; color:#FF453A; }
 
         .card { background:var(--card); border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
-        .input-area { display:flex; gap:10px; margin-top:15px; align-items:center; }
-        input, select { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width:0; }
-        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--primary); color:white; border:none; font-size:1.3rem; cursor:pointer; flex-shrink:0; }
+        .input-area { display:flex; gap:10px; margin-top:15px; align-items: center; }
+        input { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width:0; }
+        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; transition:0.2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+        .btn-circle:hover { transform:scale(1.1); background:var(--primary); }
+        .quick-row { display:flex; gap:8px; margin-top:15px; overflow-x:auto; }
+        .quick-btn { background:var(--input-bg); color:var(--primary); border:none; padding:8px 14px; border-radius:100px; font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
 
-        .entry { background:var(--input-bg); padding:16px; border-radius:12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; }
-        .entry-info { flex:1; }
-        .entry-time { font-size:0.85rem; color:var(--text-sec); }
-        .entry-text { font-weight:600; margin-top:4px; }
-        .entry-actions { display:flex; gap:8px; }
-        .btn-icon { background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px; color:var(--text-sec); }
-        .btn-icon:hover { color:var(--primary); }
+        .lb-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+        .time-switch { background:var(--input-bg); border-radius:8px; padding:2px; display:flex; }
+        .time-opt { padding:4px 8px; font-size:0.7rem; font-weight:600; cursor:pointer; border-radius:6px; color:var(--text-sec); transition:0.3s; }
+        .time-opt.active { background:var(--card); color:var(--text); }
+        .lb-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
 
-        /* Edit-Buttons nur im Admin-Modus */
-        .edit-btn { display:none; }
-        body.admin-mode .edit-btn { display:inline-block; }
+        .entry { display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--input-bg); }
+        .avatar { width:38px; height:38px; border-radius:10px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-weight:600; margin-right:12px; }
+        .applause-tag { background:var(--input-bg); padding:5px 10px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); cursor:pointer; transition:0.2s; }
+        .applause-tag.active { background:#FFD60A; color:#333; }
+        .wa-card { background:#E9FCF2; color:#0C4A28; padding:18px; border-radius:var(--radius); margin-top:30px; text-align:center; cursor:pointer; }
+        body.dark-mode .wa-card { background:#063318; color:#4CD964; }
 
-        .btn-secondary { padding:12px 20px; border-radius:12px; background:var(--input-bg); color:var(--text); border:none; font-weight:600; cursor:pointer; width:100%; margin-top:10px; }
+        .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; z-index:99; }
+        .modal { background:var(--card); width:85%; max-width:300px; padding:25px; border-radius:20px; color:var(--text); }
+        .edit-icon { display:none; margin-left:10px; opacity:0.3; cursor:pointer; }
+        body.admin-mode .edit-icon { display:block; }
 
+        /* FOOD LIST STYLES */
+        .food-list { margin-bottom:15px; }
+        .food-entry { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
+        .food-time { color:var(--text-sec); font-size:0.8rem; margin-right:10px; min-width:40px; }
+        .food-desc { color:var(--text-sec); font-size:0.85rem; margin-left:5px; }
+        .del-food-icon { display:none; margin-left:auto; cursor:pointer; opacity:0.5; }
+        body.admin-mode .del-food-icon { display:block; }
+
+        .edit-btn { display: none; }
+        body.admin-mode .edit-btn { display: inline-block; }
         .show-more-btn { text-align:center; padding:12px; color:var(--primary); font-weight:600; cursor:pointer; margin-top:10px; }
         .hidden { display:none; }
-
-        /* WhatsApp Request Modal */
-        .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+        /* WhatsApp Modal */
+        .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; }
         .modal.active { display:flex; }
-        .modal-content { background:var(--card); border-radius:var(--radius); padding:24px; max-width:400px; width:90%; }
+        .modal-content { background:var(--card); border-radius:var(--radius); padding:24px; max-width:400px; width:90%; max-height:80vh; overflow-y:auto; }
         .modal-option { padding:16px; background:var(--input-bg); border-radius:12px; margin-bottom:10px; cursor:pointer; transition:0.2s; }
         .modal-option:hover { transform:scale(1.02); background:var(--primary); color:white; }
+        .modal-option strong { display:block; margin-bottom:4px; }
     </style>
 </head>
 <body>
 <div class="controls">
-    <div class="pill" onclick="toggleLang()">
-        <div class="pill-opt active" id="l-de">DE</div>
-        <div class="pill-opt" id="l-en">EN</div>
-    </div>
-    <div class="pill" onclick="toggleMode()">
-        <div class="pill-opt" id="m-light">☀️</div>
-        <div class="pill-opt" id="m-dark">🌙</div>
-    </div>
+    <div class="pill" onclick="toggleLang()"><div class="pill-opt active" id="l-de">DE</div><div class="pill-opt" id="l-ru">RU</div></div>
+    <div class="pill" onclick="toggleDark()"><div class="pill-opt active" id="dm-light">☀️</div><div class="pill-opt" id="dm-dark">🌙</div></div>
 </div>
+<header><h1>Kira Tracker</h1><div class="subtitle" data-key="subtitle">...</div></header>
 
-<header>
-    <h1 id="title">🐕 Kira Tracker</h1>
-    <p class="subtitle" id="subtitle">Dein Hunde-Management</p>
-</header>
+<div class="weather-card" id="weatherWidget" style="display:none;"><div style="font-size:2rem;font-weight:700" id="wTemp">--°</div><div id="wDesc">...</div></div>
 
-<!-- Wetter -->
-<div class="weather-card" id="weatherCard">
-    <div class="weather-left">
-        <h3 id="weatherCity">Berlin</h3>
-        <p id="weatherDesc">Lädt...</p>
-    </div>
-    <div class="weather-right">
-        <div class="weather-temp" id="weatherTemp">--°</div>
-    </div>
-</div>
-
-<!-- Status -->
 <div class="status-grid">
-    <div class="status-box" id="walkStatus">
-        <div style="font-size:2rem;">🦮</div>
-        <div style="margin-top:10px; font-weight:600;" id="walkStatusText">Lädt...</div>
-    </div>
-    <div class="status-box" id="foodStatus">
-        <div style="font-size:2rem;">🍖</div>
-        <div style="margin-top:10px; font-weight:600;" id="foodStatusText">Lädt...</div>
-    </div>
+    <div class="status-box" id="morningBox"><div style="font-size:2rem">🌅</div><div style="font-weight:600;font-size:0.8rem" data-key="morning">Morgen</div><div id="morningStatus" style="font-weight:700">...</div></div>
+    <div class="status-box" id="eveningBox"><div style="font-size:2rem">🌙</div><div style="font-weight:600;font-size:0.8rem" data-key="evening">Abend</div><div id="eveningStatus" style="font-weight:700">...</div></div>
 </div>
 
-<!-- Gassi Anfrage -->
+<!-- WALK CARD -->
 <div class="card">
-    <h2 id="walkReqTitle">🚶 Gassi-Anfrage</h2>
-    <button class="btn-secondary" onclick="openWhatsAppModal()" id="walkReqBtn">WhatsApp-Anfrage senden</button>
-</div>
-
-<!-- WhatsApp Modal -->
-<div class="modal" id="whatsappModal">
-    <div class="modal-content">
-        <h3 style="margin-bottom:16px;">Wähle deine Nachricht</h3>
-        <div class="modal-option" onclick="sendWhatsApp(0)">
-            <strong>Kurz:</strong><br>Kann jemand mit Kira Gassi gehen? 🐕
-        </div>
-        <div class="modal-option" onclick="sendWhatsApp(1)">
-            <strong>Höflich:</strong><br>Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏
-        </div>
-        <div class="modal-option" onclick="sendWhatsApp(2)">
-            <strong>Dringend:</strong><br>DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨
-        </div>
-        <button class="btn-secondary" onclick="closeWhatsAppModal()" style="margin-top:10px;">Abbrechen</button>
+    <h3 style="font-size:1rem; margin-bottom:10px" data-key="add_title">Eintragen</h3>
+    <div class="input-area"><input type="text" id="nameInput" placeholder="Name..." /><button class="btn-circle" onclick="addWalk()">+</button></div>
+    <div class="quick-row">
+        <button class="quick-btn" onclick="quickAdd('Wlad')">Wlad</button>
+        <button class="quick-btn" onclick="quickAdd('Mama')">Mama</button>
+        <button class="quick-btn" onclick="quickAdd('Ilja')">Ilja</button>
+        <button class="quick-btn" onclick="quickAdd('Aaron')">Aaron</button>
+        <button class="quick-btn" onclick="quickAdd('Dajen')">Dajen</button>
     </div>
 </div>
 
-<!-- Fütterung -->
+<!-- FOOD CARD -->
 <div class="card">
-    <h2 id="foodTitle">🍖 Fütterung</h2>
-    <div class="input-area">
-        <select id="foodPersonSelect">
-            <option value="Wlad">Wlad</option>
-            <option value="Mama">Mama</option>
-            <option value="Papa">Papa</option>
-        </select>
-        <input type="text" id="foodInput" placeholder="Was? (optional)">
-        <button class="btn-circle" onclick="addFood()">+</button>
+    <h3 style="font-size:1rem; margin-bottom:10px" data-key="food_title">🥣 Fütterung</h3>
+
+    <div id="foodList" class="food-list"></div>
+
+    <div class="input-area" style="margin-top:10px">
+        <input type="text" id="foodName" placeholder="Wer?" style="flex:1" />
+        <input type="text" id="foodDesc" placeholder="Was? (Optional)" style="flex:1.5" />
+        <button class="btn-circle" onclick="addFood()">✓</button>
     </div>
-    <div id="foodList"></div>
+    <div class="quick-row">
+        <button class="quick-btn" onclick="quickFood('Mama')">Mama</button>
+        <button class="quick-btn" onclick="quickFood('Wlad')">Wlad</button>
+        <button class="quick-btn" onclick="quickFood('Ilja')">Ilja</button>
+        <button class="quick-btn" onclick="quickFood('Dajen')">Dajen</button>
+    </div>
 </div>
 
-<!-- Gassi -->
 <div class="card">
-    <h2 id="walkTitle">🦮 Gassi</h2>
-    <div class="input-area">
-        <select id="walkPersonSelect">
-            <option value="Wlad">Wlad</option>
-            <option value="Mama">Mama</option>
-            <option value="Papa">Papa</option>
-        </select>
-        <input type="number" id="walkDuration" placeholder="Minuten" min="1">
-        <button class="btn-circle" onclick="addWalk()">+</button>
+    <div class="lb-header">
+        <div style="font-weight:700" data-key="leaderboard">🏆 Leaderboard</div>
+        <div class="time-switch">
+            <div class="time-opt active" onclick="setLbDays(3,this)">3d</div>
+            <div class="time-opt" onclick="setLbDays(7,this)">7d</div>
+            <div class="time-opt" onclick="setLbDays(14,this)">14d</div>
+            <div class="time-opt" onclick="setLbDays(30,this)">30d</div>
+        </div>
     </div>
-    <div id="walkList"></div>
-    <div class="show-more-btn hidden" id="showMoreWalks" onclick="toggleWalkHistory()">
-        Mehr anzeigen ▼
-    </div>
+    <div id="leaderboardList"></div>
 </div>
+
+<div style="font-weight:600;margin:30px 0 15px 5px" data-key="history">Verlauf</div>
+<div class="card" id="historyList" style="padding:10px 20px"></div>
+
+<div class="wa-card" onclick="openWhatsApp()"><div style="font-weight:700">💬 WhatsApp</div><div data-key="wa_sub" style="font-size:0.85rem;opacity:0.8">...</div></div>
+<div style="text-align:center;margin-top:50px;opacity:0.2;cursor:pointer;margin-bottom:30px" onclick="unlockAdmin()">🔒</div>
+
+<div class="overlay" id="editModal"><div class="modal"><h3 data-key="edit" style="margin-bottom:15px">Bearbeiten</h3><input type="hidden" id="editId"><input id="editName" style="width:100%;margin-bottom:10px;padding:10px"><input id="editTime" style="width:100%;margin-bottom:20px;padding:10px"><div style="display:flex;justify-content:space-between"><button onclick="deleteEntry()" style="background:#FF3B30;color:white;border:none;padding:10px 20px;border-radius:12px">Del</button><button onclick="saveEntry()" style="background:#007AFF;color:white;border:none;padding:10px 20px;border-radius:12px">Save</button></div><div style="text-align:center;margin-top:15px;color:#888;cursor:pointer" onclick="closeModal()">Cancel</div></div></div>
 
 <script>
     const API = window.location.origin;
@@ -175,7 +159,7 @@
     let walks = [];
     let showAllWalks = false;
 
-    // AUTO DARK MODE basierend auf System
+    // AUTO DARK MODE - System-Einstellung erkennen
     function initDarkMode() {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const savedMode = localStorage.getItem('darkMode');
@@ -204,22 +188,8 @@
 
     function updateTexts() {
         const texts = {
-            de: {
-                title: '🐕 Kira Tracker',
-                subtitle: 'Dein Hunde-Management',
-                walkReqTitle: '🚶 Gassi-Anfrage',
-                walkReqBtn: 'WhatsApp-Anfrage senden',
-                foodTitle: '🍖 Fütterung',
-                walkTitle: '🦮 Gassi'
-            },
-            en: {
-                title: '🐕 Kira Tracker',
-                subtitle: 'Your Dog Management',
-                walkReqTitle: '🚶 Walk Request',
-                walkReqBtn: 'Send WhatsApp Request',
-                foodTitle: '🍖 Feeding',
-                walkTitle: '🦮 Walk'
-            }
+            de: { title: '🐕 Kira Tracker', subtitle: 'Dein Hunde-Management' },
+            en: { title: '🐕 Kira Tracker', subtitle: 'Your Dog Management' }
         };
         Object.keys(texts[lang]).forEach(key => {
             const el = document.getElementById(key);
@@ -227,7 +197,7 @@
         });
     }
 
-    // WhatsApp Modal
+    // WHATSAPP MODAL - Nachricht auswählen
     const whatsappMessages = [
         "Kann jemand mit Kira Gassi gehen? 🐕",
         "Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏",
@@ -253,31 +223,35 @@
         closeWhatsAppModal();
     }
 
-    // Admin Mode Check
+    // ADMIN MODE CHECK - für Edit-Buttons
     function checkAdminMode() {
-        fetch(`${API}/api/status`)
-            .then(r => r.ok ? isAdminMode = true : isAdminMode = false)
-            .then(() => {
-                if(isAdminMode) document.body.classList.add('admin-mode');
+        fetch(`${API}/api/status`, {
+            headers: {
+                'Authorization': 'Basic ' + btoa('admin:kira2024')
+            }
+        })
+            .then(r => {
+                if(r.ok) {
+                    isAdminMode = true;
+                    document.body.classList.add('admin-mode');
+                }
             })
             .catch(() => {});
     }
 
-    // Wetter laden
     function loadWeather() {
         fetch(`${API}/api/weather`)
             .then(r => r.json())
             .then(data => {
                 document.getElementById('weatherCity').textContent = data.city || 'Berlin';
-                document.getElementById('weatherDesc').textContent = data.description || 'Keine Daten';
+                document.getElementById('weatherDesc').textContent = data.description || 'Lädt...';
                 document.getElementById('weatherTemp').textContent = data.temp ? Math.round(data.temp) + '°' : '--°';
             })
             .catch(() => {
-                document.getElementById('weatherDesc').textContent = 'Wetter nicht verfügbar';
+                document.getElementById('weatherDesc').textContent = 'Nicht verfügbar';
             });
     }
 
-    // Status laden
     function loadStatus() {
         fetch(`${API}/api/status`)
             .then(r => r.json())
@@ -307,7 +281,7 @@
             });
     }
 
-    // Fütterung hinzufügen
+    // FÜTTERUNG - Essen OPTIONAL
     function addFood() {
         const person = document.getElementById('foodPersonSelect').value;
         const food = document.getElementById('foodInput').value || ''; // Optional!
@@ -349,7 +323,6 @@
         }
     }
 
-    // Gassi hinzufügen
     function addWalk() {
         const person = document.getElementById('walkPersonSelect').value;
         const duration = document.getElementById('walkDuration').value;
@@ -367,6 +340,7 @@
         });
     }
 
+    // GASSI VERLAUF - Auf 10 cappen + Mehr anzeigen
     function loadWalks() {
         fetch(`${API}/api/walk`)
             .then(r => r.json())
@@ -378,8 +352,6 @@
 
     function renderWalks() {
         const list = document.getElementById('walkList');
-        const showMoreBtn = document.getElementById('showMoreWalks');
-
         const displayWalks = showAllWalks ? walks : walks.slice(0, 10);
 
         list.innerHTML = displayWalks.map(w => `
@@ -394,7 +366,16 @@
                 </div>
             `).join('');
 
-        // "Mehr anzeigen" Button nur zeigen wenn > 10 Einträge
+        // Mehr anzeigen Button nur wenn > 10 Einträge
+        let showMoreBtn = document.getElementById('showMoreWalks');
+        if(!showMoreBtn) {
+            showMoreBtn = document.createElement('div');
+            showMoreBtn.id = 'showMoreWalks';
+            showMoreBtn.className = 'show-more-btn hidden';
+            showMoreBtn.onclick = toggleWalkHistory;
+            list.parentElement.appendChild(showMoreBtn);
+        }
+
         if(walks.length > 10) {
             showMoreBtn.classList.remove('hidden');
             showMoreBtn.textContent = showAllWalks ? 'Weniger anzeigen ▲' : 'Mehr anzeigen ▼';
@@ -415,7 +396,7 @@
         }
     }
 
-    // Init
+    // INIT
     initDarkMode();
     checkAdminMode();
     loadWeather();
@@ -423,7 +404,6 @@
     loadFood();
     loadWalks();
 
-    // Auto-Refresh alle 30 Sekunden
     setInterval(() => {
         loadWeather();
         loadStatus();
@@ -431,7 +411,7 @@
         loadWalks();
     }, 30000);
 
-    // Dark Mode Listener für System-Änderungen
+    // Dark Mode System Listener
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if(!localStorage.getItem('darkMode')) {
             document.body.classList.toggle('dark-mode', e.matches);

@@ -1,32 +1,30 @@
 spring:
   datasource:
-    # Die Variablen müssen exakt so in Render unter "Environment" stehen
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
-
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      # update erstellt Tabellen automatisch, falls sie fehlen
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
-
-  # Login-Daten aus Render übernehmen
+        format_sql: false
   security:
     user:
       name: ${APP_SECURITY_USERNAME:admin}
       password: ${APP_SECURITY_PASSWORD:password}
 
-# Wetter API Konfiguration
 weather:
   api:
     key: ${WEATHER_API_KEY:}
-  city: Berlin
+    city: Berlin
 
 server:
   port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/json,application/javascript
+    min-response-size: 1024

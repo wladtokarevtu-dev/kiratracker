@@ -11,12 +11,8 @@
     <style>
         :root { --bg:#F5F5F7; --card:#FFFFFF; --primary:#007AFF; --text:#1D1D1F; --text-sec:#86868B; --radius:18px; --input-bg:#F2F2F7; }
         body.dark-mode { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
-        /* Auto Dark Mode basierend auf System-Einstellung */
         @media (prefers-color-scheme: dark) {
-            :root:not(.light-mode-forced) {
-                --bg:#000000; --card:#1C1C1E; --primary:#0A84FF;
-                --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E;
-            }
+            :root { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
         }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:20px; max-width:500px; margin:0 auto; padding-top:100px; transition:0.3s; }
@@ -76,13 +72,11 @@
         body.admin-mode .edit-btn { display: inline-block; }
         .show-more-btn { text-align:center; padding:12px; color:var(--primary); font-weight:600; cursor:pointer; margin-top:10px; }
         .hidden { display:none; }
-        /* WhatsApp Modal */
         .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; }
         .modal.active { display:flex; }
-        .modal-content { background:var(--card); border-radius:var(--radius); padding:24px; max-width:400px; width:90%; max-height:80vh; overflow-y:auto; }
-        .modal-option { padding:16px; background:var(--input-bg); border-radius:12px; margin-bottom:10px; cursor:pointer; transition:0.2s; }
-        .modal-option:hover { transform:scale(1.02); background:var(--primary); color:white; }
-        .modal-option strong { display:block; margin-bottom:4px; }
+        .modal-content { background:var(--card); border-radius:var(--radius); padding:24px; max-width:400px; width:90%; }
+        .modal-option { padding:16px; background:var(--input-bg); border-radius:12px; margin-bottom:10px; cursor:pointer; }
+        .modal-option:hover { background:var(--primary); color:white; }
     </style>
 </head>
 <body>
@@ -154,28 +148,27 @@
 
 <script>
     const API = window.location.origin;
-    let lang = 'de';
-    let isAdminMode = false;
-    let walks = [];
-    let showAllWalks = false;
+    let lang = 'de', isAdminMode = false, walks = [], showAllWalks = false;
 
-    // AUTO DARK MODE - System-Einstellung erkennen
     function initDarkMode() {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const savedMode = localStorage.getItem('darkMode');
+        const saved = localStorage.getItem('darkMode');
+        const darkBtn = document.getElementById('m-dark');
+        const lightBtn = document.getElementById('m-light');
 
-        if (savedMode === 'dark' || (savedMode === null && prefersDark)) {
+        if (saved === 'dark' || (saved === null && prefersDark)) {
             document.body.classList.add('dark-mode');
-            document.getElementById('m-dark').classList.add('active');
+            if(darkBtn) darkBtn.classList.add('active');
         } else {
-            document.getElementById('m-light').classList.add('active');
+            if(lightBtn) lightBtn.classList.add('active');
         }
     }
 
     function toggleMode() {
         document.body.classList.toggle('dark-mode');
-        document.getElementById('m-light').classList.toggle('active');
-        document.getElementById('m-dark').classList.toggle('active');
+        const d = document.getElementById('m-dark'), l = document.getElementById('m-light');
+        if(l) l.classList.toggle('active');
+        if(d) d.classList.toggle('active');
         localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
 
@@ -183,240 +176,111 @@
         lang = lang === 'de' ? 'en' : 'de';
         document.getElementById('l-de').classList.toggle('active');
         document.getElementById('l-en').classList.toggle('active');
-        updateTexts();
     }
 
-    function updateTexts() {
-        const texts = {
-            de: { title: '🐕 Kira Tracker', subtitle: 'Dein Hunde-Management' },
-            en: { title: '🐕 Kira Tracker', subtitle: 'Your Dog Management' }
-        };
-        Object.keys(texts[lang]).forEach(key => {
-            const el = document.getElementById(key);
-            if(el) el.textContent = texts[lang][key];
-        });
-    }
+    const msgs = ["Kann jemand mit Kira Gassi gehen? 🐕","Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏","DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨"];
 
-    // WHATSAPP MODAL - Nachricht auswählen
-    const whatsappMessages = [
-        "Kann jemand mit Kira Gassi gehen? 🐕",
-        "Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏",
-        "DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨"
-    ];
-
-    function openWhatsAppModal() {
-        document.getElementById('whatsappModal').classList.add('active');
-    }
-
-    function closeWhatsAppModal() {
-        document.getElementById('whatsappModal').classList.remove('active');
-    }
-
-    function sendWhatsApp(index) {
-        const message = whatsappMessages[index];
-        fetch(`${API}/api/walk-request`, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({})
-        });
-        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+    function openWhatsAppModal() { document.getElementById('whatsappModal').classList.add('active'); }
+    function closeWhatsAppModal() { document.getElementById('whatsappModal').classList.remove('active'); }
+    function sendWhatsApp(i) {
+        fetch(`${API}/api/walk-request`, {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+        window.open(`https://wa.me/?text=${encodeURIComponent(msgs[i])}`);
         closeWhatsAppModal();
     }
 
-    // ADMIN MODE CHECK - für Edit-Buttons
     function checkAdminMode() {
-        fetch(`${API}/api/status`, {
-            headers: {
-                'Authorization': 'Basic ' + btoa('admin:kira2024')
-            }
-        })
-            .then(r => {
-                if(r.ok) {
-                    isAdminMode = true;
-                    document.body.classList.add('admin-mode');
-                }
-            })
-            .catch(() => {});
+        fetch(`${API}/api/status`).then(r => r.ok && (isAdminMode=true, document.body.classList.add('admin-mode'))).catch(()=>{});
     }
 
     function loadWeather() {
-        fetch(`${API}/api/weather`)
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('weatherCity').textContent = data.city || 'Berlin';
-                document.getElementById('weatherDesc').textContent = data.description || 'Lädt...';
-                document.getElementById('weatherTemp').textContent = data.temp ? Math.round(data.temp) + '°' : '--°';
-            })
-            .catch(() => {
-                document.getElementById('weatherDesc').textContent = 'Nicht verfügbar';
-            });
+        fetch(`${API}/api/weather`).then(r=>r.json()).then(d => {
+            document.getElementById('weatherCity').textContent = d.city || 'Berlin';
+            document.getElementById('weatherDesc').textContent = d.description || 'Lädt...';
+            document.getElementById('weatherTemp').textContent = d.temp ? Math.round(d.temp)+'°' : '--°';
+        }).catch(() => document.getElementById('weatherDesc').textContent = 'Nicht verfügbar');
     }
 
     function loadStatus() {
-        fetch(`${API}/api/status`)
-            .then(r => r.json())
-            .then(data => {
-                const walkBox = document.getElementById('walkStatus');
-                const foodBox = document.getElementById('foodStatus');
-
-                if(data.walkDone) {
-                    walkBox.classList.add('done');
-                    walkBox.classList.remove('open');
-                    document.getElementById('walkStatusText').textContent = lang === 'de' ? 'Erledigt ✓' : 'Done ✓';
-                } else {
-                    walkBox.classList.add('open');
-                    walkBox.classList.remove('done');
-                    document.getElementById('walkStatusText').textContent = lang === 'de' ? 'Offen' : 'Open';
-                }
-
-                if(data.foodDone) {
-                    foodBox.classList.add('done');
-                    foodBox.classList.remove('open');
-                    document.getElementById('foodStatusText').textContent = lang === 'de' ? 'Erledigt ✓' : 'Done ✓';
-                } else {
-                    foodBox.classList.add('open');
-                    foodBox.classList.remove('done');
-                    document.getElementById('foodStatusText').textContent = lang === 'de' ? 'Offen' : 'Open';
-                }
-            });
+        fetch(`${API}/api/status`).then(r=>r.json()).then(d => {
+            const w = document.getElementById('walkStatus'), f = document.getElementById('foodStatus');
+            w.className = 'status-box ' + (d.walkDone ? 'done' : 'open');
+            f.className = 'status-box ' + (d.foodDone ? 'done' : 'open');
+            document.getElementById('walkStatusText').textContent = d.walkDone ? (lang==='de'?'Erledigt ✓':'Done ✓') : (lang==='de'?'Offen':'Open');
+            document.getElementById('foodStatusText').textContent = d.foodDone ? (lang==='de'?'Erledigt ✓':'Done ✓') : (lang==='de'?'Offen':'Open');
+        });
     }
 
-    // FÜTTERUNG - Essen OPTIONAL
     function addFood() {
-        const person = document.getElementById('foodPersonSelect').value;
-        const food = document.getElementById('foodInput').value || ''; // Optional!
-
-        fetch(`${API}/api/food`, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ person, food })
-        }).then(() => {
-            document.getElementById('foodInput').value = '';
-            loadFood();
-            loadStatus();
-        });
+        const p = document.getElementById('foodPersonSelect').value, f = document.getElementById('foodInput').value || '';
+        fetch(`${API}/api/food`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:p,food:f})})
+            .then(() => { document.getElementById('foodInput').value=''; loadFood(); loadStatus(); });
     }
 
     function loadFood() {
-        fetch(`${API}/api/food`)
-            .then(r => r.json())
-            .then(data => {
-                const list = document.getElementById('foodList');
-                list.innerHTML = data.map(f => `
-                        <div class="entry">
-                            <div class="entry-info">
-                                <div class="entry-time">${new Date(f.timestamp).toLocaleString('de-DE')}</div>
-                                <div class="entry-text">${f.person}${f.food ? ': ' + f.food : ''}</div>
-                            </div>
-                            <div class="entry-actions">
-                                <button class="btn-icon edit-btn" onclick="deleteFood(${f.id})">🗑️</button>
-                            </div>
-                        </div>
-                    `).join('');
-            });
-    }
-
-    function deleteFood(id) {
-        if(confirm('Eintrag löschen?')) {
-            fetch(`${API}/api/food/${id}`, {method:'DELETE'})
-                .then(() => { loadFood(); loadStatus(); });
-        }
-    }
-
-    function addWalk() {
-        const person = document.getElementById('walkPersonSelect').value;
-        const duration = document.getElementById('walkDuration').value;
-
-        if(!duration) return alert('Bitte Minuten angeben!');
-
-        fetch(`${API}/api/walk`, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ person, duration: parseInt(duration) })
-        }).then(() => {
-            document.getElementById('walkDuration').value = '';
-            loadWalks();
-            loadStatus();
+        fetch(`${API}/api/food`).then(r=>r.json()).then(d => {
+            document.getElementById('foodList').innerHTML = d.map(f =>
+                `<div class="entry"><div class="entry-info"><div class="entry-time">${new Date(f.timestamp).toLocaleString('de-DE')}</div>
+                    <div class="entry-text">${f.person}${f.food?': '+f.food:''}</div></div>
+                    <div class="entry-actions"><button class="btn-icon edit-btn" onclick="deleteFood(${f.id})">🗑️</button></div></div>`
+            ).join('');
         });
     }
 
-    // GASSI VERLAUF - Auf 10 cappen + Mehr anzeigen
+    function deleteFood(id) {
+        confirm('Löschen?') && fetch(`${API}/api/food/${id}`,{method:'DELETE'}).then(()=>{loadFood();loadStatus();});
+    }
+
+    function addWalk() {
+        const p = document.getElementById('walkPersonSelect').value, d = document.getElementById('walkDuration').value;
+        if(!d) return alert('Bitte Minuten angeben!');
+        fetch(`${API}/api/walk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:p,duration:parseInt(d)})})
+            .then(() => { document.getElementById('walkDuration').value=''; loadWalks(); loadStatus(); });
+    }
+
     function loadWalks() {
-        fetch(`${API}/api/walk`)
-            .then(r => r.json())
-            .then(data => {
-                walks = data;
-                renderWalks();
-            });
+        fetch(`${API}/api/walk`).then(r=>r.json()).then(d => { walks=d; renderWalks(); });
     }
 
     function renderWalks() {
         const list = document.getElementById('walkList');
-        const displayWalks = showAllWalks ? walks : walks.slice(0, 10);
+        const show = showAllWalks ? walks : walks.slice(0,10);
+        list.innerHTML = show.map(w =>
+            `<div class="entry"><div class="entry-info"><div class="entry-time">${new Date(w.timestamp).toLocaleString('de-DE')}</div>
+                <div class="entry-text">${w.person} - ${w.duration} Min</div></div>
+                <div class="entry-actions"><button class="btn-icon edit-btn" onclick="deleteWalk(${w.id})">🗑️</button></div></div>`
+        ).join('');
 
-        list.innerHTML = displayWalks.map(w => `
-                <div class="entry">
-                    <div class="entry-info">
-                        <div class="entry-time">${new Date(w.timestamp).toLocaleString('de-DE')}</div>
-                        <div class="entry-text">${w.person} - ${w.duration} Min</div>
-                    </div>
-                    <div class="entry-actions">
-                        <button class="btn-icon edit-btn" onclick="deleteWalk(${w.id})">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-
-        // Mehr anzeigen Button nur wenn > 10 Einträge
-        let showMoreBtn = document.getElementById('showMoreWalks');
-        if(!showMoreBtn) {
-            showMoreBtn = document.createElement('div');
-            showMoreBtn.id = 'showMoreWalks';
-            showMoreBtn.className = 'show-more-btn hidden';
-            showMoreBtn.onclick = toggleWalkHistory;
-            list.parentElement.appendChild(showMoreBtn);
+        let btn = document.getElementById('showMoreWalks');
+        if(!btn) {
+            btn = document.createElement('div');
+            btn.id = 'showMoreWalks';
+            btn.className = 'show-more-btn hidden';
+            btn.onclick = toggleWalkHistory;
+            list.parentElement.appendChild(btn);
         }
-
-        if(walks.length > 10) {
-            showMoreBtn.classList.remove('hidden');
-            showMoreBtn.textContent = showAllWalks ? 'Weniger anzeigen ▲' : 'Mehr anzeigen ▼';
-        } else {
-            showMoreBtn.classList.add('hidden');
-        }
+        walks.length > 10 ? (btn.classList.remove('hidden'), btn.textContent = showAllWalks?'Weniger anzeigen ▲':'Mehr anzeigen ▼') : btn.classList.add('hidden');
     }
 
-    function toggleWalkHistory() {
-        showAllWalks = !showAllWalks;
-        renderWalks();
-    }
+    function toggleWalkHistory() { showAllWalks = !showAllWalks; renderWalks(); }
 
     function deleteWalk(id) {
-        if(confirm('Eintrag löschen?')) {
-            fetch(`${API}/api/walk/${id}`, {method:'DELETE'})
-                .then(() => { loadWalks(); loadStatus(); });
-        }
+        confirm('Löschen?') && fetch(`${API}/api/walk/${id}`,{method:'DELETE'}).then(()=>{loadWalks();loadStatus();});
     }
 
-    // INIT
-    initDarkMode();
-    checkAdminMode();
-    loadWeather();
-    loadStatus();
-    loadFood();
-    loadWalks();
-
-    setInterval(() => {
-        loadWeather();
-        loadStatus();
-        loadFood();
-        loadWalks();
-    }, 30000);
-
-    // Dark Mode System Listener
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if(!localStorage.getItem('darkMode')) {
-            document.body.classList.toggle('dark-mode', e.matches);
-        }
-    });
+    initDarkMode(); checkAdminMode(); loadWeather(); loadStatus(); loadFood(); loadWalks();
+    setInterval(() => { loadWeather(); loadStatus(); loadFood(); loadWalks(); }, 30000);
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => !localStorage.getItem('darkMode') && document.body.classList.toggle('dark-mode', e.matches));
 </script>
+
+<div class="modal" id="whatsappModal">
+    <div class="modal-content">
+        <h3 style="margin-bottom:16px;">Wähle deine Nachricht</h3>
+        <div class="modal-option" onclick="sendWhatsApp(0)"><strong>Kurz</strong><br>Kann jemand mit Kira Gassi gehen? 🐕</div>
+        <div class="modal-option" onclick="sendWhatsApp(1)"><strong>Höflich</strong><br>Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏</div>
+        <div class="modal-option" onclick="sendWhatsApp(2)"><strong>Dringend</strong><br>DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨</div>
+        <button class="btn-secondary" onclick="closeWhatsAppModal()">Abbrechen</button>
+    </div>
+</div>
+
 </body>
 </html>

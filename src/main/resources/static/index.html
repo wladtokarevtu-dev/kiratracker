@@ -11,9 +11,6 @@
     <style>
         :root { --bg:#F5F5F7; --card:#FFFFFF; --primary:#007AFF; --text:#1D1D1F; --text-sec:#86868B; --radius:18px; --input-bg:#F2F2F7; }
         body.dark-mode { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
-        @media (prefers-color-scheme: dark) {
-            :root { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
-        }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:20px; max-width:500px; margin:0 auto; padding-top:100px; transition:0.3s; }
 
@@ -67,16 +64,6 @@
         .food-desc { color:var(--text-sec); font-size:0.85rem; margin-left:5px; }
         .del-food-icon { display:none; margin-left:auto; cursor:pointer; opacity:0.5; }
         body.admin-mode .del-food-icon { display:block; }
-
-        .edit-btn { display: none; }
-        body.admin-mode .edit-btn { display: inline-block; }
-        .show-more-btn { text-align:center; padding:12px; color:var(--primary); font-weight:600; cursor:pointer; margin-top:10px; }
-        .hidden { display:none; }
-        .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center; }
-        .modal.active { display:flex; }
-        .modal-content { background:var(--card); border-radius:var(--radius); padding:24px; max-width:400px; width:90%; }
-        .modal-option { padding:16px; background:var(--input-bg); border-radius:12px; margin-bottom:10px; cursor:pointer; }
-        .modal-option:hover { background:var(--primary); color:white; }
     </style>
 </head>
 <body>
@@ -148,13 +135,15 @@
 
 <script>
     const API = window.location.origin;
-    let lang = 'de', isAdminMode = false, walks = [], showAllWalks = false;
+    let lang = 'de';
+    let isAdminMode = false;
 
+    // Auto Dark Mode mit System-Erkennung
     function initDarkMode() {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const saved = localStorage.getItem('darkMode');
-        const darkBtn = document.getElementById('m-dark');
-        const lightBtn = document.getElementById('m-light');
+        const darkBtn = document.getElementById('dm-dark');
+        const lightBtn = document.getElementById('dm-light');
 
         if (saved === 'dark' || (saved === null && prefersDark)) {
             document.body.classList.add('dark-mode');
@@ -164,123 +153,228 @@
         }
     }
 
-    function toggleMode() {
+    function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
-        const d = document.getElementById('m-dark'), l = document.getElementById('m-light');
+        const d = document.getElementById('dm-dark');
+        const l = document.getElementById('dm-light');
         if(l) l.classList.toggle('active');
         if(d) d.classList.toggle('active');
         localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
 
     function toggleLang() {
-        lang = lang === 'de' ? 'en' : 'de';
+        lang = lang === 'de' ? 'ru' : 'de';
         document.getElementById('l-de').classList.toggle('active');
-        document.getElementById('l-en').classList.toggle('active');
+        document.getElementById('l-ru').classList.toggle('active');
     }
 
-    const msgs = ["Kann jemand mit Kira Gassi gehen? 🐕","Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏","DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨"];
-
-    function openWhatsAppModal() { document.getElementById('whatsappModal').classList.add('active'); }
-    function closeWhatsAppModal() { document.getElementById('whatsappModal').classList.remove('active'); }
-    function sendWhatsApp(i) {
-        fetch(`${API}/api/walk-request`, {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
-        window.open(`https://wa.me/?text=${encodeURIComponent(msgs[i])}`);
-        closeWhatsAppModal();
+    // Admin Check
+    function checkAdmin() {
+        fetch(API + '/api/status')
+            .then(r => {
+                if(r.ok) {
+                    isAdminMode = true;
+                    document.body.classList.add('admin-mode');
+                }
+            })
+            .catch(() => {});
     }
 
-    function checkAdminMode() {
-        fetch(`${API}/api/status`).then(r => r.ok && (isAdminMode=true, document.body.classList.add('admin-mode'))).catch(()=>{});
-    }
-
+    // Wetter laden
     function loadWeather() {
-        fetch(`${API}/api/weather`).then(r=>r.json()).then(d => {
-            document.getElementById('weatherCity').textContent = d.city || 'Berlin';
-            document.getElementById('weatherDesc').textContent = d.description || 'Lädt...';
-            document.getElementById('weatherTemp').textContent = d.temp ? Math.round(d.temp)+'°' : '--°';
-        }).catch(() => document.getElementById('weatherDesc').textContent = 'Nicht verfügbar');
+        fetch(API + '/api/weather')
+            .then(r => r.json())
+            .then(d => {
+                const tempEl = document.getElementById('wTemp');
+                const descEl = document.getElementById('wDesc');
+                if(tempEl) tempEl.textContent = d.temp ? Math.round(d.temp) + '°C' : '--°C';
+                if(descEl) descEl.textContent = d.description || 'Lädt...';
+            })
+            .catch(e => {
+                console.log('Wetter Fehler:', e);
+                const descEl = document.getElementById('wDesc');
+                if(descEl) descEl.textContent = 'Nicht verfügbar';
+            });
     }
 
+    // Status laden
     function loadStatus() {
-        fetch(`${API}/api/status`).then(r=>r.json()).then(d => {
-            const w = document.getElementById('walkStatus'), f = document.getElementById('foodStatus');
-            w.className = 'status-box ' + (d.walkDone ? 'done' : 'open');
-            f.className = 'status-box ' + (d.foodDone ? 'done' : 'open');
-            document.getElementById('walkStatusText').textContent = d.walkDone ? (lang==='de'?'Erledigt ✓':'Done ✓') : (lang==='de'?'Offen':'Open');
-            document.getElementById('foodStatusText').textContent = d.foodDone ? (lang==='de'?'Erledigt ✓':'Done ✓') : (lang==='de'?'Offen':'Open');
-        });
+        fetch(API + '/api/status')
+            .then(r => r.json())
+            .then(d => {
+                const morningBox = document.getElementById('morningBox');
+                const eveningBox = document.getElementById('eveningBox');
+                const morningStatus = document.getElementById('morningStatus');
+                const eveningStatus = document.getElementById('eveningStatus');
+
+                // Morning Status
+                if(d.walkDone) {
+                    if(morningBox) morningBox.classList.add('done');
+                    if(morningStatus) morningStatus.textContent = 'Erledigt ✓';
+                } else {
+                    if(morningBox) morningBox.classList.remove('done');
+                    if(morningStatus) morningStatus.textContent = 'Offen';
+                }
+
+                // Evening/Food Status
+                if(d.foodDone) {
+                    if(eveningBox) eveningBox.classList.add('done');
+                    if(eveningStatus) eveningStatus.textContent = 'Erledigt ✓';
+                } else {
+                    if(eveningBox) eveningBox.classList.remove('done');
+                    if(eveningStatus) eveningStatus.textContent = 'Offen';
+                }
+            })
+            .catch(e => console.log('Status Fehler:', e));
     }
 
+    // Food
     function addFood() {
-        const p = document.getElementById('foodPersonSelect').value, f = document.getElementById('foodInput').value || '';
-        fetch(`${API}/api/food`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:p,food:f})})
-            .then(() => { document.getElementById('foodInput').value=''; loadFood(); loadStatus(); });
+        const person = document.getElementById('foodName')?.value;
+        const food = document.getElementById('foodDesc')?.value || '';
+
+        if(!person) return alert('Bitte Namen angeben!');
+
+        fetch(API + '/api/food', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({person, food})
+        })
+            .then(() => {
+                if(document.getElementById('foodName')) document.getElementById('foodName').value = '';
+                if(document.getElementById('foodDesc')) document.getElementById('foodDesc').value = '';
+                loadFood();
+                loadStatus();
+            })
+            .catch(e => console.log('Food Add Fehler:', e));
     }
 
     function loadFood() {
-        fetch(`${API}/api/food`).then(r=>r.json()).then(d => {
-            document.getElementById('foodList').innerHTML = d.map(f =>
-                `<div class="entry"><div class="entry-info"><div class="entry-time">${new Date(f.timestamp).toLocaleString('de-DE')}</div>
-                    <div class="entry-text">${f.person}${f.food?': '+f.food:''}</div></div>
-                    <div class="entry-actions"><button class="btn-icon edit-btn" onclick="deleteFood(${f.id})">🗑️</button></div></div>`
-            ).join('');
-        });
+        fetch(API + '/api/food')
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('foodList');
+                if(!list) return;
+
+                if(!Array.isArray(data)) {
+                    console.log('Food data ist kein Array:', data);
+                    list.innerHTML = '<p>Keine Einträge</p>';
+                    return;
+                }
+
+                list.innerHTML = data.map(f =>
+                    '<div class="entry">' +
+                    '<div class="entry-info">' +
+                    '<div class="entry-time">' + new Date(f.timestamp).toLocaleString('de-DE') + '</div>' +
+                    '<div class="entry-text">' + f.person + (f.food ? ': ' + f.food : '') + '</div>' +
+                    '</div>' +
+                    '<div class="entry-actions">' +
+                    '<button class="btn-icon edit-btn" onclick="deleteFood(' + f.id + ')">🗑️</button>' +
+                    '</div>' +
+                    '</div>'
+                ).join('');
+            })
+            .catch(e => console.log('Food Load Fehler:', e));
     }
 
     function deleteFood(id) {
-        confirm('Löschen?') && fetch(`${API}/api/food/${id}`,{method:'DELETE'}).then(()=>{loadFood();loadStatus();});
+        if(!confirm('Löschen?')) return;
+        fetch(API + '/api/food/' + id, {method: 'DELETE'})
+            .then(() => {loadFood(); loadStatus();})
+            .catch(e => console.log('Food Delete Fehler:', e));
     }
 
-    function addWalk() {
-        const p = document.getElementById('walkPersonSelect').value, d = document.getElementById('walkDuration').value;
-        if(!d) return alert('Bitte Minuten angeben!');
-        fetch(`${API}/api/walk`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:p,duration:parseInt(d)})})
-            .then(() => { document.getElementById('walkDuration').value=''; loadWalks(); loadStatus(); });
+    // Walk
+    function addWalkEntry() {
+        const person = document.getElementById('nameInput')?.value;
+        if(!person) return alert('Bitte Namen angeben!');
+
+        fetch(API + '/api/walk', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({person, duration: 30})
+        })
+            .then(() => {
+                if(document.getElementById('nameInput')) document.getElementById('nameInput').value = '';
+                loadHistory();
+                loadStatus();
+            })
+            .catch(e => console.log('Walk Add Fehler:', e));
     }
 
-    function loadWalks() {
-        fetch(`${API}/api/walk`).then(r=>r.json()).then(d => { walks=d; renderWalks(); });
+    function loadHistory() {
+        fetch(API + '/api/walk')
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('historyList');
+                if(!list) return;
+
+                if(!Array.isArray(data)) {
+                    console.log('Walk data ist kein Array:', data);
+                    list.innerHTML = '<p>Keine Einträge</p>';
+                    return;
+                }
+
+                // Nur die ersten 10 anzeigen
+                const display = data.slice(0, 10);
+
+                list.innerHTML = display.map(w =>
+                    '<div class="entry">' +
+                    '<div class="entry-info">' +
+                    '<div class="entry-time">' + (w.timestamp || 'Unbekannt') + '</div>' +
+                    '<div class="entry-text">' + w.person + '</div>' +
+                    '</div>' +
+                    '<div class="entry-actions">' +
+                    '<button class="btn-icon edit-btn" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
+                    '</div>' +
+                    '</div>'
+                ).join('');
+
+                // "Mehr anzeigen" Button (optional für später)
+                if(data.length > 10) {
+                    list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--primary);cursor:pointer;" onclick="alert('Mehr anzeigen Feature kommt bald!')">Mehr anzeigen ▼</div>';
+                }
+            })
+            .catch(e => console.log('Walk Load Fehler:', e));
     }
-
-    function renderWalks() {
-        const list = document.getElementById('walkList');
-        const show = showAllWalks ? walks : walks.slice(0,10);
-        list.innerHTML = show.map(w =>
-            `<div class="entry"><div class="entry-info"><div class="entry-time">${new Date(w.timestamp).toLocaleString('de-DE')}</div>
-                <div class="entry-text">${w.person} - ${w.duration} Min</div></div>
-                <div class="entry-actions"><button class="btn-icon edit-btn" onclick="deleteWalk(${w.id})">🗑️</button></div></div>`
-        ).join('');
-
-        let btn = document.getElementById('showMoreWalks');
-        if(!btn) {
-            btn = document.createElement('div');
-            btn.id = 'showMoreWalks';
-            btn.className = 'show-more-btn hidden';
-            btn.onclick = toggleWalkHistory;
-            list.parentElement.appendChild(btn);
-        }
-        walks.length > 10 ? (btn.classList.remove('hidden'), btn.textContent = showAllWalks?'Weniger anzeigen ▲':'Mehr anzeigen ▼') : btn.classList.add('hidden');
-    }
-
-    function toggleWalkHistory() { showAllWalks = !showAllWalks; renderWalks(); }
 
     function deleteWalk(id) {
-        confirm('Löschen?') && fetch(`${API}/api/walk/${id}`,{method:'DELETE'}).then(()=>{loadWalks();loadStatus();});
+        if(!confirm('Löschen?')) return;
+        fetch(API + '/api/walk/' + id, {method: 'DELETE'})
+            .then(() => {loadHistory(); loadStatus();})
+            .catch(e => console.log('Walk Delete Fehler:', e));
     }
 
-    initDarkMode(); checkAdminMode(); loadWeather(); loadStatus(); loadFood(); loadWalks();
-    setInterval(() => { loadWeather(); loadStatus(); loadFood(); loadWalks(); }, 30000);
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => !localStorage.getItem('darkMode') && document.body.classList.toggle('dark-mode', e.matches));
+    // WhatsApp (wenn du das Feature später willst)
+    function sendWalkRequest() {
+        const msg = "Kann jemand mit Kira Gassi gehen? 🐕";
+        fetch(API + '/api/walk-request', {method: 'POST'})
+            .catch(e => console.log('Request Fehler:', e));
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+    }
+
+    // Init
+    initDarkMode();
+    checkAdmin();
+    loadWeather();
+    loadStatus();
+    loadFood();
+    loadHistory();
+
+    // Auto-Refresh alle 30 Sekunden
+    setInterval(() => {
+        loadWeather();
+        loadStatus();
+        loadFood();
+        loadHistory();
+    }, 30000);
+
+    // Dark Mode System Listener
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if(!localStorage.getItem('darkMode')) {
+            document.body.classList.toggle('dark-mode', e.matches);
+        }
+    });
 </script>
-
-<div class="modal" id="whatsappModal">
-    <div class="modal-content">
-        <h3 style="margin-bottom:16px;">Wähle deine Nachricht</h3>
-        <div class="modal-option" onclick="sendWhatsApp(0)"><strong>Kurz</strong><br>Kann jemand mit Kira Gassi gehen? 🐕</div>
-        <div class="modal-option" onclick="sendWhatsApp(1)"><strong>Höflich</strong><br>Hallo! Könnte bitte jemand mit Kira Gassi gehen? Danke! 🙏</div>
-        <div class="modal-option" onclick="sendWhatsApp(2)"><strong>Dringend</strong><br>DRINGEND: Kira muss raus! Wer kann jetzt Gassi gehen? 🚨</div>
-        <button class="btn-secondary" onclick="closeWhatsAppModal()">Abbrechen</button>
-    </div>
-</div>
-
 </body>
 </html>

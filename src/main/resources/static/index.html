@@ -332,9 +332,8 @@
 
                 // "Mehr anzeigen" Button (optional für später)
                 if(data.length > 10) {
-                    list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--primary);cursor:pointer;" onclick="alert('Mehr anzeigen Feature kommt bald!')">Mehr anzeigen ▼</div>';
+                    list.innerHTML += "<div style='text-align:center;padding:10px;color:var(--primary);'>+" + (data.length - 10) + " weitere</div>";
                 }
-            })
             .catch(e => console.log('Walk Load Fehler:', e));
     }
 

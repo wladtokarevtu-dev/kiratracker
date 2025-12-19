@@ -14,8 +14,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/manifest.json", "/*.png", "/*.jpg", "/favicon.ico").permitAll()
-                        .requestMatchers("/api/**").permitAll()  // Alle API-Endpunkte öffentlich
-                        .requestMatchers("/admin/**").authenticated()  // Nur Admin-Bereich geschützt
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/health").permitAll()
+                        .requestMatchers("/admin/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> {});
@@ -23,6 +24,3 @@ public class SecurityConfig {
     }
 }
 
-        return http.build();
-    }
-}

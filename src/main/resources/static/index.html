@@ -46,6 +46,12 @@
         .lb-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
 
         .entry { display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--input-bg); }
+        .entry-info { flex:1; }
+        .entry-time { color:var(--text-sec); font-size:0.8rem; }
+        .entry-text { font-weight:500; }
+        .btn-icon { background:transparent; border:none; font-size:1.2rem; cursor:pointer; display:none; }
+        body.admin-mode .btn-icon { display:inline-block; }
+
         .avatar { width:38px; height:38px; border-radius:10px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-weight:600; margin-right:12px; }
         .applause-tag { background:var(--input-bg); padding:5px 10px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); cursor:pointer; transition:0.2s; }
         .applause-tag.active { background:#FFD60A; color:#333; }
@@ -57,32 +63,27 @@
         .edit-icon { display:none; margin-left:10px; opacity:0.3; cursor:pointer; }
         body.admin-mode .edit-icon { display:block; }
 
-        /* FOOD LIST STYLES */
-        .food-list { margin-bottom:15px; }
-        .food-entry { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
-        .food-time { color:var(--text-sec); font-size:0.8rem; margin-right:10px; min-width:40px; }
-        .food-desc { color:var(--text-sec); font-size:0.85rem; margin-left:5px; }
-        .del-food-icon { display:none; margin-left:auto; cursor:pointer; opacity:0.5; }
-        body.admin-mode .del-food-icon { display:block; }
+        .error-toast { position:fixed; top:80px; left:50%; transform:translateX(-50%); background:#FF453A; color:white; padding:12px 20px; border-radius:12px; font-size:0.9rem; z-index:100; display:none; }
     </style>
 </head>
 <body>
+<div class="error-toast" id="errorToast"></div>
+
 <div class="controls">
     <div class="pill" onclick="toggleLang()"><div class="pill-opt active" id="l-de">DE</div><div class="pill-opt" id="l-ru">RU</div></div>
     <div class="pill" onclick="toggleDark()"><div class="pill-opt active" id="dm-light">☀️</div><div class="pill-opt" id="dm-dark">🌙</div></div>
 </div>
-<header><h1>Kira Tracker</h1><div class="subtitle" data-key="subtitle">...</div></header>
+<header><h1>Kira Tracker</h1><div class="subtitle">Gassi & Futter</div></header>
 
-<div class="weather-card" id="weatherWidget" style="display:none;"><div style="font-size:2rem;font-weight:700" id="wTemp">--°</div><div id="wDesc">...</div></div>
+<div class="weather-card" id="weatherWidget"><div style="font-size:2rem;font-weight:700" id="wTemp">--°</div><div id="wDesc">Lädt...</div></div>
 
 <div class="status-grid">
-    <div class="status-box" id="morningBox"><div style="font-size:2rem">🌅</div><div style="font-weight:600;font-size:0.8rem" data-key="morning">Morgen</div><div id="morningStatus" style="font-weight:700">...</div></div>
-    <div class="status-box" id="eveningBox"><div style="font-size:2rem">🌙</div><div style="font-weight:600;font-size:0.8rem" data-key="evening">Abend</div><div id="eveningStatus" style="font-weight:700">...</div></div>
+    <div class="status-box" id="morningBox"><div style="font-size:2rem">🌅</div><div style="font-weight:600;font-size:0.8rem">Morgen</div><div id="morningStatus" style="font-weight:700">...</div></div>
+    <div class="status-box" id="eveningBox"><div style="font-size:2rem">🍖</div><div style="font-weight:600;font-size:0.8rem">Futter</div><div id="eveningStatus" style="font-weight:700">...</div></div>
 </div>
 
-<!-- WALK CARD -->
 <div class="card">
-    <h3 style="font-size:1rem; margin-bottom:10px" data-key="add_title">Eintragen</h3>
+    <h3 style="font-size:1rem; margin-bottom:10px">🐕 Gassi eintragen</h3>
     <div class="input-area"><input type="text" id="nameInput" placeholder="Name..." /><button class="btn-circle" onclick="addWalk()">+</button></div>
     <div class="quick-row">
         <button class="quick-btn" onclick="quickAdd('Wlad')">Wlad</button>
@@ -93,12 +94,9 @@
     </div>
 </div>
 
-<!-- FOOD CARD -->
 <div class="card">
-    <h3 style="font-size:1rem; margin-bottom:10px" data-key="food_title">🥣 Fütterung</h3>
-
-    <div id="foodList" class="food-list"></div>
-
+    <h3 style="font-size:1rem; margin-bottom:10px">🥣 Fütterung</h3>
+    <div id="foodList"></div>
     <div class="input-area" style="margin-top:10px">
         <input type="text" id="foodName" placeholder="Wer?" style="flex:1" />
         <input type="text" id="foodDesc" placeholder="Was? (Optional)" style="flex:1.5" />
@@ -114,7 +112,7 @@
 
 <div class="card">
     <div class="lb-header">
-        <div style="font-weight:700" data-key="leaderboard">🏆 Leaderboard</div>
+        <div style="font-weight:700">🏆 Leaderboard</div>
         <div class="time-switch">
             <div class="time-opt active" onclick="setLbDays(3,this)">3d</div>
             <div class="time-opt" onclick="setLbDays(7,this)">7d</div>
@@ -125,40 +123,61 @@
     <div id="leaderboardList"></div>
 </div>
 
-<div style="font-weight:600;margin:30px 0 15px 5px" data-key="history">Verlauf</div>
+<div style="font-weight:600;margin:30px 0 15px 5px">Verlauf</div>
 <div class="card" id="historyList" style="padding:10px 20px"></div>
 
-<div class="wa-card" onclick="openWhatsApp()"><div style="font-weight:700">💬 WhatsApp</div><div data-key="wa_sub" style="font-size:0.85rem;opacity:0.8">...</div></div>
-<div style="text-align:center;margin-top:50px;opacity:0.2;cursor:pointer;margin-bottom:30px" onclick="unlockAdmin()">🔒</div>
-
-<div class="overlay" id="editModal"><div class="modal"><h3 data-key="edit" style="margin-bottom:15px">Bearbeiten</h3><input type="hidden" id="editId"><input id="editName" style="width:100%;margin-bottom:10px;padding:10px"><input id="editTime" style="width:100%;margin-bottom:20px;padding:10px"><div style="display:flex;justify-content:space-between"><button onclick="deleteEntry()" style="background:#FF3B30;color:white;border:none;padding:10px 20px;border-radius:12px">Del</button><button onclick="saveEntry()" style="background:#007AFF;color:white;border:none;padding:10px 20px;border-radius:12px">Save</button></div><div style="text-align:center;margin-top:15px;color:#888;cursor:pointer" onclick="closeModal()">Cancel</div></div></div>
+<div class="wa-card" onclick="sendWalkRequest()"><div style="font-weight:700">💬 WhatsApp Anfrage</div><div style="font-size:0.85rem;opacity:0.8">Benachrichtigung senden</div></div>
 
 <script>
     const API = window.location.origin;
     let lang = 'de';
-    let isAdminMode = false;
 
-    // Auto Dark Mode mit System-Erkennung
-    function initDarkMode() {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const saved = localStorage.getItem('darkMode');
-        const darkBtn = document.getElementById('dm-dark');
-        const lightBtn = document.getElementById('dm-light');
+    // Helper function for better error handling
+    async function fetchJSON(url, options = {}) {
+        try {
+            const response = await fetch(url, options);
 
-        if (saved === 'dark' || (saved === null && prefersDark)) {
-            document.body.classList.add('dark-mode');
-            if(darkBtn) darkBtn.classList.add('active');
-        } else {
-            if(lightBtn) lightBtn.classList.add('active');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return await response.json();
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Fetch Error:', error);
+            showError('Verbindungsfehler: ' + error.message);
+            throw error;
         }
     }
 
-    function toggleDarkMode() {
+    function showError(message) {
+        const toast = document.getElementById('errorToast');
+        toast.textContent = message;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    function initDarkMode() {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const saved = localStorage.getItem('darkMode');
+        if (saved === 'dark' || (saved === null && prefersDark)) {
+            document.body.classList.add('dark-mode');
+            document.getElementById('dm-dark').classList.add('active');
+            document.getElementById('dm-light').classList.remove('active');
+        }
+    }
+
+    function toggleDark() {
         document.body.classList.toggle('dark-mode');
-        const d = document.getElementById('dm-dark');
-        const l = document.getElementById('dm-light');
-        if(l) l.classList.toggle('active');
-        if(d) d.classList.toggle('active');
+        document.getElementById('dm-dark').classList.toggle('active');
+        document.getElementById('dm-light').classList.toggle('active');
         localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     }
 
@@ -168,213 +187,248 @@
         document.getElementById('l-ru').classList.toggle('active');
     }
 
-    // Admin Check
-    function checkAdmin() {
-        fetch(API + '/api/status')
-            .then(r => {
-                if(r.ok) {
-                    isAdminMode = true;
-                    document.body.classList.add('admin-mode');
-                }
-            })
-            .catch(() => {});
+    async function loadWeather() {
+        try {
+            const data = await fetchJSON(API + '/api/weather');
+            document.getElementById('wTemp').textContent = data.temp ? Math.round(data.temp) + '°C' : '--°C';
+            document.getElementById('wDesc').textContent = data.description || 'Keine Daten';
+        } catch (error) {
+            document.getElementById('wTemp').textContent = '--°C';
+            document.getElementById('wDesc').textContent = 'Offline';
+        }
     }
 
-    // Wetter laden
-    function loadWeather() {
-        fetch(API + '/api/weather')
-            .then(r => r.json())
-            .then(d => {
-                const tempEl = document.getElementById('wTemp');
-                const descEl = document.getElementById('wDesc');
-                if(tempEl) tempEl.textContent = d.temp ? Math.round(d.temp) + '°C' : '--°C';
-                if(descEl) descEl.textContent = d.description || 'Lädt...';
-            })
-            .catch(e => {
-                console.log('Wetter Fehler:', e);
-                const descEl = document.getElementById('wDesc');
-                if(descEl) descEl.textContent = 'Nicht verfügbar';
-            });
-    }
+    async function loadStatus() {
+        try {
+            const data = await fetchJSON(API + '/api/status');
+            const mBox = document.getElementById('morningBox');
+            const eBox = document.getElementById('eveningBox');
+            const mStatus = document.getElementById('morningStatus');
+            const eStatus = document.getElementById('eveningStatus');
 
-    // Status laden
-    function loadStatus() {
-        fetch(API + '/api/status')
-            .then(r => r.json())
-            .then(d => {
-                const morningBox = document.getElementById('morningBox');
-                const eveningBox = document.getElementById('eveningBox');
-                const morningStatus = document.getElementById('morningStatus');
-                const eveningStatus = document.getElementById('eveningStatus');
-
-                // Morning Status
-                if(d.walkDone) {
-                    if(morningBox) morningBox.classList.add('done');
-                    if(morningStatus) morningStatus.textContent = 'Erledigt ✓';
-                } else {
-                    if(morningBox) morningBox.classList.remove('done');
-                    if(morningStatus) morningStatus.textContent = 'Offen';
-                }
-
-                // Evening/Food Status
-                if(d.foodDone) {
-                    if(eveningBox) eveningBox.classList.add('done');
-                    if(eveningStatus) eveningStatus.textContent = 'Erledigt ✓';
-                } else {
-                    if(eveningBox) eveningBox.classList.remove('done');
-                    if(eveningStatus) eveningStatus.textContent = 'Offen';
-                }
-            })
-            .catch(e => console.log('Status Fehler:', e));
-    }
-
-    // Food
-    function addFood() {
-        const person = document.getElementById('foodName')?.value;
-        const food = document.getElementById('foodDesc')?.value || '';
-
-        if(!person) return alert('Bitte Namen angeben!');
-
-        fetch(API + '/api/food', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({person, food})
-        })
-            .then(() => {
-                if(document.getElementById('foodName')) document.getElementById('foodName').value = '';
-                if(document.getElementById('foodDesc')) document.getElementById('foodDesc').value = '';
-                loadFood();
-                loadStatus();
-            })
-            .catch(e => console.log('Food Add Fehler:', e));
-    }
-
-    function loadFood() {
-        fetch(API + '/api/food')
-            .then(r => r.json())
-            .then(data => {
-                const list = document.getElementById('foodList');
-                if(!list) return;
-
-                if(!Array.isArray(data)) {
-                    console.log('Food data ist kein Array:', data);
-                    list.innerHTML = '<p>Keine Einträge</p>';
-                    return;
-                }
-
-                list.innerHTML = data.map(f =>
-                    '<div class="entry">' +
-                    '<div class="entry-info">' +
-                    '<div class="entry-time">' + new Date(f.timestamp).toLocaleString('de-DE') + '</div>' +
-                    '<div class="entry-text">' + f.person + (f.food ? ': ' + f.food : '') + '</div>' +
-                    '</div>' +
-                    '<div class="entry-actions">' +
-                    '<button class="btn-icon edit-btn" onclick="deleteFood(' + f.id + ')">🗑️</button>' +
-                    '</div>' +
-                    '</div>'
-                ).join('');
-            })
-            .catch(e => console.log('Food Load Fehler:', e));
-    }
-
-    function deleteFood(id) {
-        if(!confirm('Löschen?')) return;
-        fetch(API + '/api/food/' + id, {method: 'DELETE'})
-            .then(() => {loadFood(); loadStatus();})
-            .catch(e => console.log('Food Delete Fehler:', e));
-    }
-
-    // Walk
-    function addWalkEntry() {
-        const person = document.getElementById('nameInput')?.value;
-        if(!person) return alert('Bitte Namen angeben!');
-
-        fetch(API + '/api/walk', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({person, duration: 30})
-        })
-            .then(() => {
-                if(document.getElementById('nameInput')) document.getElementById('nameInput').value = '';
-                loadHistory();
-                loadStatus();
-            })
-            .catch(e => console.log('Walk Add Fehler:', e));
-    }
-
-    function loadHistory() {
-        fetch(API + '/api/walk')
-            .then(r => r.json())
-            .then(data => {
-                const list = document.getElementById('historyList');
-                if(!list) return;
-
-                if(!Array.isArray(data)) {
-                    console.log('Walk data ist kein Array:', data);
-                    list.innerHTML = '<p>Keine Einträge</p>';
-                    return;
-                }
-
-                // Nur die ersten 10 anzeigen
-                const display = data.slice(0, 10);
-
-                list.innerHTML = display.map(w =>
-                    '<div class="entry">' +
-                    '<div class="entry-info">' +
-                    '<div class="entry-time">' + (w.timestamp || 'Unbekannt') + '</div>' +
-                    '<div class="entry-text">' + w.person + '</div>' +
-                    '</div>' +
-                    '<div class="entry-actions">' +
-                    '<button class="btn-icon edit-btn" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
-                    '</div>' +
-                    '</div>'
-                ).join('');
-
-                // "Mehr anzeigen" Button (optional für später)
-                if(data.length > 10) {
-                    list.innerHTML += "<div style='text-align:center;padding:10px;color:var(--primary);'>+" + (data.length - 10) + " weitere</div>";
-                }
-
-            .catch(e => console.log('Walk Load Fehler:', e));
+            if(data.walkDone) {
+                mBox.classList.add('done');
+                mBox.classList.remove('open');
+                mStatus.textContent = 'Erledigt ✓';
+            } else {
+                mBox.classList.add('open');
+                mBox.classList.remove('done');
+                mStatus.textContent = 'Offen';
             }
 
-        function deleteWalk(id) {
-            if(!confirm('Löschen?')) return;
-            fetch(API + '/api/walk/' + id, {method: 'DELETE'})
-                .then(() => {loadHistory(); loadStatus();})
-                .catch(e => console.log('Walk Delete Fehler:', e));
+            if(data.foodDone) {
+                eBox.classList.add('done');
+                eBox.classList.remove('open');
+                eStatus.textContent = 'Erledigt ✓';
+            } else {
+                eBox.classList.add('open');
+                eBox.classList.remove('done');
+                eStatus.textContent = 'Offen';
+            }
+        } catch (error) {
+            console.log('Status Fehler:', error);
+        }
+    }
+
+    async function addFood() {
+        const person = document.getElementById('foodName').value.trim();
+        const food = document.getElementById('foodDesc').value.trim() || '';
+
+        if(!person) {
+            showError('Bitte Namen angeben!');
+            return;
         }
 
-        // WhatsApp (wenn du das Feature später willst)
-        function sendWalkRequest() {
-            const msg = "Kann jemand mit Kira Gassi gehen? 🐕";
-            fetch(API + '/api/walk-request', {method: 'POST'})
-                .catch(e => console.log('Request Fehler:', e));
-            window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+        try {
+            await fetchJSON(API + '/api/food', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({person, food})
+            });
+
+            document.getElementById('foodName').value = '';
+            document.getElementById('foodDesc').value = '';
+            await loadFood();
+            await loadStatus();
+        } catch (error) {
+            console.log('Food Error:', error);
+        }
+    }
+
+    async function loadFood() {
+        try {
+            const data = await fetchJSON(API + '/api/food');
+            const list = document.getElementById('foodList');
+
+            if(!Array.isArray(data) || data.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Keine Einträge</div>';
+                return;
+            }
+
+            list.innerHTML = data.map(f => {
+                const timestamp = f.timestamp ? new Date(f.timestamp).toLocaleString('de-DE', {hour:'2-digit', minute:'2-digit'}) : '';
+                return '<div class="entry">' +
+                    '<div class="entry-info">' +
+                    '<div class="entry-time">' + timestamp + '</div>' +
+                    '<div class="entry-text">' + (f.person || '') + (f.food ? ': ' + f.food : '') + '</div>' +
+                    '</div>' +
+                    '<button class="btn-icon" onclick="deleteFood(' + f.id + ')">🗑️</button>' +
+                    '</div>';
+            }).join('');
+        } catch (error) {
+            document.getElementById('foodList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
+        }
+    }
+
+    async function deleteFood(id) {
+        if(!confirm('Wirklich löschen?')) return;
+
+        try {
+            await fetchJSON(API + '/api/food/' + id, {method: 'DELETE'});
+            await loadFood();
+            await loadStatus();
+        } catch (error) {
+            console.log('Delete Error:', error);
+        }
+    }
+
+    async function addWalk() {
+        const person = document.getElementById('nameInput').value.trim();
+
+        if(!person) {
+            showError('Bitte Namen angeben!');
+            return;
         }
 
-        // Init
+        try {
+            await fetchJSON(API + '/api/walk', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({person, duration: 30})
+            });
+
+            document.getElementById('nameInput').value = '';
+            await loadHistory();
+            await loadStatus();
+        } catch (error) {
+            console.log('Walk Error:', error);
+        }
+    }
+
+    function quickAdd(name) {
+        document.getElementById('nameInput').value = name;
+        addWalk();
+    }
+
+    function quickFood(name) {
+        document.getElementById('foodName').value = name;
+        document.getElementById('foodDesc').focus();
+    }
+
+    async function loadHistory() {
+        try {
+            const data = await fetchJSON(API + '/api/walk');
+            const list = document.getElementById('historyList');
+
+            if(!Array.isArray(data) || data.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Keine Einträge</div>';
+                return;
+            }
+
+            const display = data.slice(0, 10);
+            list.innerHTML = display.map(w => {
+                const timestamp = w.timestamp ? new Date(w.timestamp).toLocaleString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : '';
+
+                return '<div class="entry">' +
+                    '<div class="entry-info">' +
+                    '<div class="entry-time">' + timestamp + '</div>' +
+                    '<div class="entry-text">' + (w.person || '') + '</div>' +
+                    '</div>' +
+                    '<button class="btn-icon" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
+                    '</div>';
+            }).join('');
+
+            if(data.length > 10) {
+                list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--primary);">+' + (data.length - 10) + ' weitere</div>';
+            }
+        } catch (error) {
+            document.getElementById('historyList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
+        }
+    }
+
+    async function deleteWalk(id) {
+        if(!confirm('Wirklich löschen?')) return;
+
+        try {
+            await fetchJSON(API + '/api/walk/' + id, {method: 'DELETE'});
+            await loadHistory();
+            await loadStatus();
+        } catch (error) {
+            console.log('Delete Error:', error);
+        }
+    }
+
+    async function loadLeaderboard(days) {
+        try {
+            const data = await fetchJSON(API + '/api/leaderboard?days=' + days);
+            const list = document.getElementById('leaderboardList');
+
+            if(!data || Object.keys(data).length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Keine Daten</div>';
+                return;
+            }
+
+            list.innerHTML = Object.entries(data).map(([name, count]) =>
+                '<div class="lb-row"><span>' + name + '</span><span style="font-weight:700">' + count + '</span></div>'
+            ).join('');
+        } catch (error) {
+            document.getElementById('leaderboardList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
+        }
+    }
+
+    function setLbDays(days, el) {
+        document.querySelectorAll('.time-opt').forEach(o => o.classList.remove('active'));
+        el.classList.add('active');
+        loadLeaderboard(days);
+    }
+
+    function sendWalkRequest() {
+        const msg = 'Kann jemand mit Kira Gassi gehen? 🐕';
+        fetch(API + '/api/walk-request', {method: 'POST'}).catch(() => {});
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
         initDarkMode();
-        checkAdmin();
         loadWeather();
         loadStatus();
         loadFood();
         loadHistory();
+        loadLeaderboard(3);
+    });
 
-        // Auto-Refresh alle 30 Sekunden
-        setInterval(() => {
-            loadWeather();
-            loadStatus();
-            loadFood();
-            loadHistory();
-        }, 30000);
+    // Periodic refresh
+    setInterval(() => {
+        loadWeather();
+        loadStatus();
+        loadFood();
+        loadHistory();
+    }, 30000);
 
-        // Dark Mode System Listener
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if(!localStorage.getItem('darkMode')) {
-                document.body.classList.toggle('dark-mode', e.matches);
-            }
-        });
+    // Dark mode system preference listener
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if(!localStorage.getItem('darkMode')) {
+            document.body.classList.toggle('dark-mode', e.matches);
+            document.getElementById('dm-dark').classList.toggle('active', e.matches);
+            document.getElementById('dm-light').classList.toggle('active', !e.matches);
+        }
+    });
 </script>
 </body>
 </html>

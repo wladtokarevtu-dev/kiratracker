@@ -336,45 +336,45 @@
                 }
 
             .catch(e => console.log('Walk Load Fehler:', e));
-    }
+            }
 
-    function deleteWalk(id) {
-        if(!confirm('Löschen?')) return;
-        fetch(API + '/api/walk/' + id, {method: 'DELETE'})
-            .then(() => {loadHistory(); loadStatus();})
-            .catch(e => console.log('Walk Delete Fehler:', e));
-    }
+        function deleteWalk(id) {
+            if(!confirm('Löschen?')) return;
+            fetch(API + '/api/walk/' + id, {method: 'DELETE'})
+                .then(() => {loadHistory(); loadStatus();})
+                .catch(e => console.log('Walk Delete Fehler:', e));
+        }
 
-    // WhatsApp (wenn du das Feature später willst)
-    function sendWalkRequest() {
-        const msg = "Kann jemand mit Kira Gassi gehen? 🐕";
-        fetch(API + '/api/walk-request', {method: 'POST'})
-            .catch(e => console.log('Request Fehler:', e));
-        window.open('https://wa.me/?text=' + encodeURIComponent(msg));
-    }
+        // WhatsApp (wenn du das Feature später willst)
+        function sendWalkRequest() {
+            const msg = "Kann jemand mit Kira Gassi gehen? 🐕";
+            fetch(API + '/api/walk-request', {method: 'POST'})
+                .catch(e => console.log('Request Fehler:', e));
+            window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+        }
 
-    // Init
-    initDarkMode();
-    checkAdmin();
-    loadWeather();
-    loadStatus();
-    loadFood();
-    loadHistory();
-
-    // Auto-Refresh alle 30 Sekunden
-    setInterval(() => {
+        // Init
+        initDarkMode();
+        checkAdmin();
         loadWeather();
         loadStatus();
         loadFood();
         loadHistory();
-    }, 30000);
 
-    // Dark Mode System Listener
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if(!localStorage.getItem('darkMode')) {
-            document.body.classList.toggle('dark-mode', e.matches);
-        }
-    });
+        // Auto-Refresh alle 30 Sekunden
+        setInterval(() => {
+            loadWeather();
+            loadStatus();
+            loadFood();
+            loadHistory();
+        }, 30000);
+
+        // Dark Mode System Listener
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if(!localStorage.getItem('darkMode')) {
+                document.body.classList.toggle('dark-mode', e.matches);
+            }
+        });
 </script>
 </body>
 </html>

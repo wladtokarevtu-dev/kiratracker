@@ -119,7 +119,10 @@ public class HelloController {
                 w.getCurrentWeather(), r.getPendingRequestsCount(), foodList
         ));
     }
-    @GetMapping("/leaderboard") public ResponseEntity<Map<String, Long>> lb(@RequestParam(defaultValue="7") int days) { return ResponseEntity.ok(s.getLeaderboardSinceDays(days)); }
+    @GetMapping("/api/leaderboard")
+    public ResponseEntity<Map<String, Long>> lb(@RequestParam(defaultValue="7") int days) {
+        return ResponseEntity.ok(s.getLeaderboardSinceDays(days));
+    }
     @PostMapping("/walk") public ResponseEntity<String> addWalk(@RequestBody WalkRequest req) { s.addWalk(req.getPerson(), req.getTime()); return ResponseEntity.ok("Ok"); }
     @PostMapping("/food") public ResponseEntity<String> addFood(@RequestBody FoodRequest req) {fRepo.save(new FoodEntry(req.getPerson(), req.getDescription(), ZonedDateTime.now(ZONE)));return ResponseEntity.ok("Ok");}
     @DeleteMapping("/admin/food/{id}") public ResponseEntity<String> delFood(@PathVariable Long id) {fRepo.deleteById(id);return ResponseEntity.ok("Ok");}

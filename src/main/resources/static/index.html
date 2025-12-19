@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kira Tracker</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#F5F5F7">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/616/616408.png">
     <style>
         :root { --bg:#F5F5F7; --card:#FFFFFF; --primary:#007AFF; --text:#1D1D1F; --text-sec:#86868B; --radius:18px; --input-bg:#F2F2F7; }
         body.dark-mode { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:20px; max-width:500px; margin:0 auto; padding-top:100px; transition:0.3s; }
 
-        .controls { position:absolute; top:25px; right:20px; display:flex; gap:8px; z-index:10; }
+        .controls { position:fixed; top:25px; right:20px; display:flex; gap:8px; z-index:10; }
         .pill { background:var(--card); padding:4px; border-radius:100px; display:flex; gap:2px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
         .pill-opt { padding:6px 12px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); transition:0.3s; }
         .pill-opt.active { background:var(--text); color:var(--bg); }
@@ -32,7 +30,7 @@
         body.dark-mode .status-box.open { background:#3A0F0F; color:#FF453A; }
 
         .card { background:var(--card); border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
-        .input-area { display:flex; gap:10px; margin-top:15px; align-items: center; }
+        .input-area { display:flex; gap:10px; margin-top:15px; align-items:center; }
         input { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width:0; }
         .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; transition:0.2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
         .btn-circle:hover { transform:scale(1.1); background:var(--primary); }
@@ -52,18 +50,10 @@
         .btn-icon { background:transparent; border:none; font-size:1.2rem; cursor:pointer; display:none; }
         body.admin-mode .btn-icon { display:inline-block; }
 
-        .avatar { width:38px; height:38px; border-radius:10px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-weight:600; margin-right:12px; }
-        .applause-tag { background:var(--input-bg); padding:5px 10px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); cursor:pointer; transition:0.2s; }
-        .applause-tag.active { background:#FFD60A; color:#333; }
         .wa-card { background:#E9FCF2; color:#0C4A28; padding:18px; border-radius:var(--radius); margin-top:30px; text-align:center; cursor:pointer; }
         body.dark-mode .wa-card { background:#063318; color:#4CD964; }
 
-        .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; z-index:99; }
-        .modal { background:var(--card); width:85%; max-width:300px; padding:25px; border-radius:20px; color:var(--text); }
-        .edit-icon { display:none; margin-left:10px; opacity:0.3; cursor:pointer; }
-        body.admin-mode .edit-icon { display:block; }
-
-        .error-toast { position:fixed; top:80px; left:50%; transform:translateX(-50%); background:#FF453A; color:white; padding:12px 20px; border-radius:12px; font-size:0.9rem; z-index:100; display:none; }
+        .error-toast { position:fixed; top:80px; left:50%; transform:translateX(-50%); background:#FF453A; color:white; padding:12px 20px; border-radius:12px; font-size:0.9rem; z-index:100; display:none; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
@@ -75,11 +65,22 @@
 </div>
 <header><h1>Kira Tracker</h1><div class="subtitle">Gassi & Futter</div></header>
 
-<div class="weather-card" id="weatherWidget"><div style="font-size:2rem;font-weight:700" id="wTemp">--°</div><div id="wDesc">Lädt...</div></div>
+<div class="weather-card">
+    <div style="font-size:2rem;font-weight:700" id="wTemp">--°</div>
+    <div id="wDesc">Lädt...</div>
+</div>
 
 <div class="status-grid">
-    <div class="status-box" id="morningBox"><div style="font-size:2rem">🌅</div><div style="font-weight:600;font-size:0.8rem">Morgen</div><div id="morningStatus" style="font-weight:700">...</div></div>
-    <div class="status-box" id="eveningBox"><div style="font-size:2rem">🍖</div><div style="font-weight:600;font-size:0.8rem">Futter</div><div id="eveningStatus" style="font-weight:700">...</div></div>
+    <div class="status-box" id="morningBox">
+        <div style="font-size:2rem">🐕</div>
+        <div style="font-weight:600;font-size:0.8rem">Gassi</div>
+        <div id="morningStatus" style="font-weight:700">...</div>
+    </div>
+    <div class="status-box" id="eveningBox">
+        <div style="font-size:2rem">🍖</div>
+        <div style="font-weight:600;font-size:0.8rem">Futter</div>
+        <div id="eveningStatus" style="font-weight:700">...</div>
+    </div>
 </div>
 
 <div class="card">
@@ -137,8 +138,7 @@
             const response = await fetch(url, options);
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
+                throw new Error(`HTTP ${response.status}`);
             }
 
             const contentType = response.headers.get('content-type');
@@ -149,7 +149,6 @@
             return null;
         } catch (error) {
             console.error('Fetch Error:', error);
-            showError('Verbindungsfehler: ' + error.message);
             throw error;
         }
     }
@@ -189,10 +188,15 @@
     async function loadWeather() {
         try {
             const data = await fetchJSON(API + '/api/weather');
-            document.getElementById('wTemp').textContent = data.temp ? Math.round(data.temp) + '°C' : '--°C';
-            document.getElementById('wDesc').textContent = data.description || 'Keine Daten';
+            if (data && data.temp !== undefined) {
+                document.getElementById('wTemp').textContent = Math.round(data.temp) + '°C';
+                document.getElementById('wDesc').textContent = data.description || 'Keine Daten';
+            } else {
+                document.getElementById('wTemp').textContent = '--°';
+                document.getElementById('wDesc').textContent = 'Keine Daten';
+            }
         } catch (error) {
-            document.getElementById('wTemp').textContent = '--°C';
+            document.getElementById('wTemp').textContent = '--°';
             document.getElementById('wDesc').textContent = 'Offline';
         }
     }
@@ -250,7 +254,7 @@
             await loadFood();
             await loadStatus();
         } catch (error) {
-            console.log('Food Error:', error);
+            showError('Fehler beim Speichern');
         }
     }
 
@@ -260,12 +264,21 @@
             const list = document.getElementById('foodList');
 
             if(!Array.isArray(data) || data.length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Keine Einträge</div>';
+                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">Noch keine Einträge heute</div>';
                 return;
             }
 
             list.innerHTML = data.map(f => {
-                const timestamp = f.timestamp ? new Date(f.timestamp).toLocaleString('de-DE', {hour:'2-digit', minute:'2-digit'}) : '';
+                let timestamp = '';
+                if (f.timestamp) {
+                    try {
+                        const date = new Date(f.timestamp);
+                        timestamp = date.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+                    } catch (e) {
+                        timestamp = '';
+                    }
+                }
+
                 return '<div class="entry">' +
                     '<div class="entry-info">' +
                     '<div class="entry-time">' + timestamp + '</div>' +
@@ -287,7 +300,7 @@
             await loadFood();
             await loadStatus();
         } catch (error) {
-            console.log('Delete Error:', error);
+            showError('Fehler beim Löschen');
         }
     }
 
@@ -309,8 +322,9 @@
             document.getElementById('nameInput').value = '';
             await loadHistory();
             await loadStatus();
+            await loadLeaderboard(getCurrentLbDays());
         } catch (error) {
-            console.log('Walk Error:', error);
+            showError('Fehler beim Speichern');
         }
     }
 
@@ -330,18 +344,13 @@
             const list = document.getElementById('historyList');
 
             if(!Array.isArray(data) || data.length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Keine Einträge</div>';
+                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">Noch keine Einträge</div>';
                 return;
             }
 
             const display = data.slice(0, 10);
             list.innerHTML = display.map(w => {
-                const timestamp = w.timestamp ? new Date(w.timestamp).toLocaleString('de-DE', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) : '';
+                let timestamp = w.timestamp || '';
 
                 return '<div class="entry">' +
                     '<div class="entry-info">' +
@@ -353,10 +362,36 @@
             }).join('');
 
             if(data.length > 10) {
-                list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--primary);">+' + (data.length - 10) + ' weitere</div>';
+                list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--primary);cursor:pointer;font-weight:600" onclick="showAllHistory()">+ ' + (data.length - 10) + ' weitere anzeigen</div>';
             }
         } catch (error) {
             document.getElementById('historyList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
+        }
+    }
+
+    let showingAll = false;
+    async function showAllHistory() {
+        try {
+            const data = await fetchJSON(API + '/api/walk');
+            const list = document.getElementById('historyList');
+
+            if(!Array.isArray(data)) return;
+
+            list.innerHTML = data.map(w => {
+                let timestamp = w.timestamp || '';
+
+                return '<div class="entry">' +
+                    '<div class="entry-info">' +
+                    '<div class="entry-time">' + timestamp + '</div>' +
+                    '<div class="entry-text">' + (w.person || '') + '</div>' +
+                    '</div>' +
+                    '<button class="btn-icon" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
+                    '</div>';
+            }).join('');
+
+            list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--text-sec);cursor:pointer;font-weight:600" onclick="loadHistory()">Weniger anzeigen</div>';
+        } catch (error) {
+            showError('Fehler beim Laden');
         }
     }
 
@@ -367,24 +402,35 @@
             await fetchJSON(API + '/api/walk/' + id, {method: 'DELETE'});
             await loadHistory();
             await loadStatus();
+            await loadLeaderboard(getCurrentLbDays());
         } catch (error) {
-            console.log('Delete Error:', error);
+            showError('Fehler beim Löschen');
         }
     }
 
+    let currentLbDays = 3;
+    function getCurrentLbDays() {
+        return currentLbDays;
+    }
+
     async function loadLeaderboard(days) {
+        currentLbDays = days;
         try {
             const data = await fetchJSON(API + '/api/leaderboard?days=' + days);
             const list = document.getElementById('leaderboardList');
 
             if(!data || Object.keys(data).length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Keine Daten</div>';
+                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">Keine Daten</div>';
                 return;
             }
 
-            list.innerHTML = Object.entries(data).map(([name, count]) =>
-                '<div class="lb-row"><span>' + name + '</span><span style="font-weight:700">' + count + '</span></div>'
-            ).join('');
+            list.innerHTML = Object.entries(data)
+                .sort((a, b) => b[1] - a[1])
+                .map(([name, count], index) => {
+                    const medal = index === 0 ? '🥇 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : '';
+                    return '<div class="lb-row"><span>' + medal + name + '</span><span style="font-weight:700">' + count + '</span></div>';
+                })
+                .join('');
         } catch (error) {
             document.getElementById('leaderboardList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
         }

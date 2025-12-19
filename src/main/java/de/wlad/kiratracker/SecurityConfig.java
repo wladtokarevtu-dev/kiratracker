@@ -13,15 +13,18 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Statische Dateien
                         .requestMatchers("/", "/index.html", "/manifest.json", "/favicon.ico", "/*.png", "/*.jpg", "/*.ico").permitAll()
+                        // Alle API Endpunkte öffentlich
                         .requestMatchers("/api/**").permitAll()
+                        // Health Check
                         .requestMatchers("/health").permitAll()
+                        // Nur Admin geschützt
                         .requestMatchers("/admin/**").authenticated()
+                        // Rest braucht Auth
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> {});
         return http.build();
     }
 }
-
-

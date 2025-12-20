@@ -10,7 +10,7 @@
         :root {
             --bg-light: #FAFAFA;
             --card-light: #FFFFFF;
-            --primary-light: #007AFF;
+            --primary-light: #667eea;
             --text-light: #1D1D1F;
             --text-sec-light: #86868B;
             --input-bg-light: #F5F5F7;
@@ -18,7 +18,7 @@
 
             --bg-dark: #0D0D0D;
             --card-dark: #1A1A1A;
-            --primary-dark: #0A84FF;
+            --primary-dark: #667eea;
             --text-dark: #F5F5F7;
             --text-sec-dark: #8E8E93;
             --input-bg-dark: #2C2C2E;
@@ -207,7 +207,6 @@
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(32px) saturate(200%);
             -webkit-backdrop-filter: blur(32px) saturate(200%);
-            border: 1px solid rgba(255,255,255,0.8);
             border-radius: var(--radius);
             padding: 40px;
             max-width: 520px;
@@ -232,7 +231,7 @@
             inset: 0;
             border-radius: var(--radius);
             padding: 1px;
-            background: linear-gradient(145deg, rgba(255,255,255,0.8), transparent 40%);
+            background: linear-gradient(145deg, rgba(255,255,255,0.9), transparent 40%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
@@ -241,7 +240,7 @@
         }
 
         body.dark-mode .card::before {
-            background: linear-gradient(145deg, rgba(255,255,255,0.2), transparent 50%);
+            background: linear-gradient(145deg, rgba(255,255,255,0.25), transparent 50%);
             opacity: 0.4;
         }
 
@@ -360,11 +359,6 @@
             background 0.2s ease-out;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04),
             inset 0 1px 0 rgba(255,255,255,0.5);
-        }
-
-        body.dark-mode .custom-input {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.08);
         }
 
         .custom-input::placeholder {
@@ -653,6 +647,15 @@
         localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
     }
 
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('darkMode')) {
+            const isDark = e.matches;
+            document.body.classList.toggle('dark-mode', isDark);
+            document.getElementById('dm-dark').classList.toggle('active', isDark);
+            document.getElementById('dm-light').classList.toggle('active', !isDark);
+        }
+    });
+
     function togglePerson(el, name) {
         const checkbox = el.querySelector('input[type="checkbox"]');
         checkbox.checked = !checkbox.checked;
@@ -689,8 +692,8 @@
         newPerson.className = 'person-checkbox';
         newPerson.onclick = () => togglePerson(newPerson, name);
         newPerson.innerHTML = `
-            <input type="checkbox" id="${name.toLowerCase()}" onchange="event.stopPropagation()">
-            <label for="${name.toLowerCase()}">${name}</label>
+            <input type="checkbox" onchange="event.stopPropagation()">
+            <label>${name}</label>
         `;
         personList.appendChild(newPerson);
 
@@ -778,15 +781,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         initDarkMode();
-    });
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('darkMode')) {
-            const isDark = e.matches;
-            document.body.classList.toggle('dark-mode', isDark);
-            document.getElementById('dm-dark').classList.toggle('active', isDark);
-            document.getElementById('dm-light').classList.toggle('active', !isDark);
-        }
     });
 </script>
 

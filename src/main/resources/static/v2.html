@@ -10,22 +10,40 @@
     <meta name="theme-color" content="#F5F5F7">
     <style>
         :root {
-            --bg:#F5F5F7;
-            --card:#FFFFFF;
-            --primary:#007AFF;
-            --text:#1D1D1F;
-            --text-sec:#86868B;
-            --radius:20px;
-            --input-bg:#F2F2F7;
+            --bg-light:#FAFAFA;
+            --card-light:#FFFFFF;
+            --primary-light:#007AFF;
+            --text-light:#1D1D1F;
+            --text-sec-light:#86868B;
+            --input-bg-light:#F5F5F7;
+            --border-light:rgba(0,0,0,0.08);
+
+            --bg-dark:#000000;
+            --card-dark:#1C1C1E;
+            --primary-dark:#0A84FF;
+            --text-dark:#F5F5F7;
+            --text-sec-dark:#8E8E93;
+            --input-bg-dark:#2C2C2E;
+            --border-dark:rgba(255,255,255,0.12);
+
+            --bg:var(--bg-light);
+            --card:var(--card-light);
+            --primary:var(--primary-light);
+            --text:var(--text-light);
+            --text-sec:var(--text-sec-light);
+            --input-bg:var(--input-bg-light);
+            --border:var(--border-light);
+            --radius:22px;
         }
 
         body.dark-mode {
-            --bg:#000000;
-            --card:#1C1C1E;
-            --primary:#0A84FF;
-            --text:#F5F5F7;
-            --text-sec:#8E8E93;
-            --input-bg:#2C2C2E;
+            --bg:var(--bg-dark);
+            --card:var(--card-dark);
+            --primary:var(--primary-dark);
+            --text:var(--text-dark);
+            --text-sec:var(--text-sec-dark);
+            --input-bg:var(--input-bg-dark);
+            --border:var(--border-dark);
         }
 
         * {
@@ -39,7 +57,7 @@
             font-family:"Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
             letter-spacing:-0.01em;
             line-height:1.45;
-            background:radial-gradient(circle at 30% 20%,rgba(247,247,250,1) 0%,rgba(235,235,240,1) 50%,rgba(245,245,247,1) 100%);
+            background:radial-gradient(circle at 35% 18%,#FFFFFF 0%,#F0F0F5 35%,#E8E8ED 70%,#FAFAFA 100%);
             color:var(--text);
             min-height:100vh;
             padding:20px;
@@ -48,7 +66,8 @@
             padding-top:100px;
             transition:opacity 0.4s cubic-bezier(0.16,1,0.3,1),
             transform 0.4s cubic-bezier(0.16,1,0.3,1),
-            background 0.35s ease-out;
+            background 0.4s cubic-bezier(0.16,1,0.3,1),
+            color 0.3s ease-out;
             opacity:0;
             transform:translateY(8px);
         }
@@ -59,7 +78,26 @@
         }
 
         body.dark-mode {
-            background:radial-gradient(circle at 30% 20%,#0d0d0d 0%,#000000 60%);
+            background:radial-gradient(circle at 35% 18%,#0d0d0d 0%,#000000 55%,#0a0a0a 100%);
+        }
+
+        body::before {
+            content:'';
+            position:fixed;
+            inset:-50%;
+            background:radial-gradient(circle,rgba(102,126,234,0.06) 0%,transparent 65%);
+            animation:shimmer 14s infinite linear;
+            pointer-events:none;
+            z-index:-1;
+        }
+
+        body.dark-mode::before {
+            background:radial-gradient(circle,rgba(102,126,234,0.12) 0%,transparent 65%);
+        }
+
+        @keyframes shimmer {
+            0% { transform:translate(-25%, -25%) rotate(0deg); }
+            100% { transform:translate(25%, 25%) rotate(360deg); }
         }
 
         .controls {
@@ -67,58 +105,53 @@
             top:25px;
             right:20px;
             display:flex;
-            gap:9px;
+            gap:10px;
             z-index:10;
         }
 
         .pill {
-            background:rgba(255,255,255,0.85);
-            backdrop-filter:blur(16px) saturate(180%);
-            -webkit-backdrop-filter:blur(16px) saturate(180%);
-            padding:5px;
+            background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(20px) saturate(200%);
+            -webkit-backdrop-filter:blur(20px) saturate(200%);
+            padding:6px;
             border-radius:100px;
             display:flex;
-            gap:3px;
+            gap:4px;
             cursor:pointer;
-            border:1px solid rgba(255,255,255,0.4);
-            box-shadow:0 8px 24px rgba(0,0,0,0.15),
-            inset 0 1px 0 rgba(255,255,255,0.6);
-            transition:transform 0.18s cubic-bezier(0.19,1,0.22,1),
-            box-shadow 0.18s ease-out,
-            background 0.18s ease-out;
+            border:1px solid rgba(0,0,0,0.08);
+            box-shadow:0 12px 40px rgba(0,0,0,0.12),
+            0 2px 8px rgba(0,0,0,0.06),
+            inset 0 1px 0 rgba(255,255,255,0.8);
+            transition:transform 0.2s cubic-bezier(0.19,1,0.22,1),
+            box-shadow 0.2s ease-out;
         }
 
         body.dark-mode .pill {
-            background:rgba(30,30,30,0.7);
-            border-color:rgba(255,255,255,0.1);
-            box-shadow:0 8px 24px rgba(0,0,0,0.5),
-            inset 0 1px 0 rgba(255,255,255,0.08);
+            background:rgba(30,30,30,0.85);
+            border-color:rgba(255,255,255,0.15);
+            box-shadow:0 12px 40px rgba(0,0,0,0.6),
+            inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .pill:hover {
-            transform:translateY(-2px);
-            box-shadow:0 12px 32px rgba(0,0,0,0.2),
-            inset 0 1px 0 rgba(255,255,255,0.8);
-        }
-
-        .pill:active {
-            transform:translateY(0);
-            box-shadow:0 6px 16px rgba(0,0,0,0.18);
+            transform:translateY(-2px) scale(1.02);
+            box-shadow:0 16px 50px rgba(0,0,0,0.18),
+            inset 0 1px 0 rgba(255,255,255,0.9);
         }
 
         .pill-opt {
-            padding:7px 13px;
+            padding:8px 14px;
             border-radius:100px;
-            font-size:0.75rem;
-            font-weight:600;
+            font-size:0.78rem;
+            font-weight:700;
             color:var(--text-sec);
             transition:all 0.25s cubic-bezier(0.19,1,0.22,1);
         }
 
         .pill-opt.active {
-            background:var(--text);
+            background:linear-gradient(135deg,var(--text) 0%,var(--text) 100%);
             color:var(--bg);
-            box-shadow:0 2px 6px rgba(0,0,0,0.12);
+            box-shadow:0 4px 12px rgba(0,0,0,0.15);
         }
 
         header {
@@ -128,11 +161,15 @@
         }
 
         h1 {
-            font-size:2rem;
-            font-weight:800;
-            margin-bottom:6px;
-            letter-spacing:-0.03em;
-            text-shadow:0 2px 8px rgba(0,0,0,0.08);
+            font-size:2.2rem;
+            font-weight:900;
+            background:linear-gradient(135deg,#1AD760 0%,#10B75C 40%,#0A9150 100%);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+            margin-bottom:10px;
+            letter-spacing:-0.04em;
+            filter:drop-shadow(0 4px 12px rgba(16,183,92,0.25));
         }
 
         .subtitle {
@@ -142,23 +179,43 @@
         }
 
         .card {
-            background:rgba(255,255,255,0.85);
-            backdrop-filter:blur(24px) saturate(180%);
-            -webkit-backdrop-filter:blur(24px) saturate(180%);
+            background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(32px) saturate(200%);
+            -webkit-backdrop-filter:blur(32px) saturate(200%);
             border-radius:var(--radius);
             padding:26px;
             margin-bottom:22px;
-            box-shadow:0 24px 64px rgba(0,0,0,0.12),
-            inset 0 1px 0 rgba(255,255,255,0.8);
-            border:1px solid rgba(255,255,255,0.6);
-            transition:box-shadow 0.22s ease-out,transform 0.22s ease-out,border-color 0.22s ease-out;
+            box-shadow:0 32px 80px rgba(0,0,0,0.15),
+            0 8px 28px rgba(0,0,0,0.08),
+            inset 0 1px 0 rgba(255,255,255,1);
+            border:1px solid rgba(255,255,255,0.8);
+            position:relative;
         }
 
         body.dark-mode .card {
-            background:rgba(28,28,30,0.65);
-            border-color:rgba(255,255,255,0.1);
-            box-shadow:0 24px 64px rgba(0,0,0,0.6),
-            inset 0 1px 0 rgba(255,255,255,0.06);
+            background:rgba(28,28,30,0.85);
+            border-color:rgba(255,255,255,0.15);
+            box-shadow:0 32px 80px rgba(0,0,0,0.8),
+            inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+
+        .card::before {
+            content:'';
+            position:absolute;
+            inset:0;
+            border-radius:var(--radius);
+            padding:1px;
+            background:linear-gradient(145deg,rgba(255,255,255,0.9),transparent 40%);
+            -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+            -webkit-mask-composite:xor;
+            mask-composite:exclude;
+            pointer-events:none;
+            opacity:0.6;
+        }
+
+        body.dark-mode .card::before {
+            background:linear-gradient(145deg,rgba(255,255,255,0.25),transparent 50%);
+            opacity:0.4;
         }
 
         .msg-list {
@@ -182,27 +239,27 @@
         }
 
         .msg-item:hover {
-            background:rgba(0,122,255,0.08);
+            background:rgba(26,215,96,0.06);
             transform:translateX(3px);
         }
 
         .msg-item.selected {
-            border-color:var(--primary);
-            background:rgba(0,122,255,0.12);
-            box-shadow:0 4px 16px rgba(0,122,255,0.25);
+            border-color:#1AD760;
+            background:rgba(26,215,96,0.14);
+            box-shadow:0 4px 16px rgba(26,215,96,0.35);
             transform:translateX(3px);
         }
 
         body.dark-mode .msg-item.selected {
-            background:rgba(10,132,255,0.18);
-            border-color:var(--primary);
+            background:rgba(16,183,92,0.2);
+            border-color:#1AD760;
         }
 
         textarea {
             width:100%;
             min-height:130px;
             border-radius:13px;
-            border:1px solid rgba(0,0,0,0.08);
+            border:1px solid var(--border);
             padding:14px;
             resize:vertical;
             font-family:"Inter",-apple-system,sans-serif;
@@ -215,16 +272,15 @@
             transform 0.18s ease-out;
         }
 
-        body.dark-mode textarea {
-            border-color:rgba(255,255,255,0.1);
-        }
+        textarea::placeholder { color:var(--text-sec); }
 
         textarea:focus {
             outline:none;
-            box-shadow:0 0 0 3px rgba(0,122,255,0.25),
-            0 4px 12px rgba(0,122,255,0.15);
+            box-shadow:0 0 0 3px rgba(26,215,96,0.25),
+            0 4px 12px rgba(26,215,96,0.2);
             transform:translateY(-1px);
-            border-color:rgba(0,122,255,0.4);
+            border-color:rgba(26,215,96,0.6);
+            background:var(--card);
         }
 
         .btn-row {
@@ -238,33 +294,33 @@
             padding:14px;
             border-radius:13px;
             border:none;
-            background:linear-gradient(135deg,var(--primary) 0%,#0056D6 100%);
+            background:linear-gradient(135deg,#1AD760 0%,#10B75C 50%,#0A9150 100%);
             color:white;
             font-weight:700;
             font-size:0.95rem;
             cursor:pointer;
-            box-shadow:0 8px 24px rgba(0,122,255,0.35),
-            inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow:0 10px 30px rgba(16,183,92,0.45),
+            inset 0 1px 0 rgba(255,255,255,0.25);
             transition:transform 0.18s cubic-bezier(0.19,1,0.22,1),
             box-shadow 0.18s ease-out;
         }
 
         .btn-primary:hover {
             transform:translateY(-2px) scale(1.01);
-            box-shadow:0 12px 32px rgba(0,122,255,0.45),
-            inset 0 1px 0 rgba(255,255,255,0.3);
+            box-shadow:0 16px 40px rgba(16,183,92,0.6),
+            inset 0 1px 0 rgba(255,255,255,0.35);
         }
 
         .btn-primary:active {
-            transform:translateY(0) scale(1);
-            box-shadow:0 6px 18px rgba(0,122,255,0.35);
+            transform:translateY(0);
+            box-shadow:0 8px 20px rgba(16,183,92,0.45);
         }
 
         .btn-secondary {
             flex:1;
             padding:14px;
             border-radius:13px;
-            border:1px solid rgba(0,0,0,0.08);
+            border:1px solid var(--border);
             background:var(--card);
             color:var(--text);
             font-weight:600;
@@ -274,10 +330,6 @@
             transition:transform 0.18s cubic-bezier(0.19,1,0.22,1),
             box-shadow 0.18s ease-out,
             background 0.18s ease-out;
-        }
-
-        body.dark-mode .btn-secondary {
-            border-color:rgba(255,255,255,0.1);
         }
 
         .btn-secondary:hover {
@@ -330,6 +382,7 @@
 <script>
     const API = window.location.origin;
     let lang = 'de';
+    let selectedIndex = null;
 
     const translations = {
         de: {
@@ -369,8 +422,6 @@
             ]
         }
     };
-
-    let selectedIndex = null;
 
     function initDarkMode() {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;

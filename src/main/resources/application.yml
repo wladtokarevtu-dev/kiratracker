@@ -1,30 +1,42 @@
+server:
+  port: 8080
+
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kiratracker}
+    username: ${SPRING_DATASOURCE_USERNAME:kirauser}
+    password: ${SPRING_DATASOURCE_PASSWORD:kirapass123}
     driver-class-name: org.postgresql.Driver
+
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: false
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+          time_zone: Europe/Berlin
+        order_inserts: true
+        order_updates: true
+
   security:
     user:
-      name: ${APP_SECURITY_USERNAME:admin}
-      password: ${APP_SECURITY_PASSWORD:password}
+      name: ${ADMIN_USERNAME:admin}
+      password: ${ADMIN_PASSWORD:admin123}
 
+# Weather API Configuration
 weather:
   api:
     key: ${WEATHER_API_KEY:}
-    city: Berlin
+  city: ${WEATHER_CITY:Berlin}
+  country: ${WEATHER_COUNTRY:DE}
 
-server:
-  port: 8080
-  compression:
-    enabled: true
-    mime-types: text/html,text/xml,text/plain,text/css,application/json,application/javascript
-    min-response-size: 1024
+# Logging
+logging:
+  level:
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    de.wlad.kiratracker: DEBUG

@@ -41,11 +41,15 @@ public class HelloController {
         return ResponseEntity.ok(w.getCurrentWeather());
     }
 
+    // OPTIMIERT: Nur prüfen ob Einträge existieren, nicht alle laden
     @GetMapping("/api/status")
     public ResponseEntity<Map<String, Boolean>> apiStatus() {
         ZonedDateTime startOfDay = ZonedDateTime.now(ZONE).toLocalDate().atStartOfDay(ZONE);
+
         boolean walkDone = s.wasMorning() && s.wasEvening();
-        boolean foodDone = !fRepo.findByTimeAfterOrderByTimeDesc(startOfDay).isEmpty();
+        // OPTIMIERT: existsByTimeAfter statt findByTimeAfterOrderByTimeDesc
+        boolean foodDone = fRepo.existsByTimeAfter(startOfDay);
+
         Map<String, Boolean> result = new HashMap<>();
         result.put("walkDone", walkDone);
         result.put("foodDone", foodDone);
@@ -125,6 +129,7 @@ public class HelloController {
         return new ModelAndView("admin");
     }
 
+    // Vollständiger Status - nur wenn wirklich alle Daten gebraucht werden
     @GetMapping("/status")
     public ResponseEntity<StatusDto> status() {
         ZonedDateTime startOfDay = ZonedDateTime.now(ZONE).toLocalDate().atStartOfDay(ZONE);

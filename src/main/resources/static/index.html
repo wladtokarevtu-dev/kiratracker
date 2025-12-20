@@ -457,12 +457,13 @@
         loadLeaderboard(3);
     });
 
+    // OPTIMIERT: Wegen Backend-Cache kann Intervall auf 60 Sekunden erhöht werden
     setInterval(() => {
         loadWeather();
         loadStatus();
         loadFood();
         loadHistory();
-    }, 30000);
+    }, 60000);
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if(!localStorage.getItem('darkMode')) {

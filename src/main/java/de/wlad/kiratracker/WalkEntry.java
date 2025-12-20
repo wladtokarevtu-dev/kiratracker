@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "walk_entries")
+@Table(name = "walk_entries", indexes = {
+        @Index(name = "idx_walk_time", columnList = "time")
+})
 public class WalkEntry {
 
     @Id

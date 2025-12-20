@@ -143,6 +143,12 @@ public class HelloController {
         return ResponseEntity.ok(s.getLeaderboardSinceDays(days));
     }
 
+    @GetMapping("/admin")
+    public ResponseEntity<String> adminPing() {
+        // Wird nur genutzt, um Admin-Login per Basic Auth zu prüfen.
+        return ResponseEntity.ok("OK");
+    }
+
     @PostMapping("/walk")
     public ResponseEntity<String> addWalk(@RequestBody WalkRequest req) {
         s.addWalk(req.getPerson(), req.getTime());

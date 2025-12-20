@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gamble – Kira Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#667eea">
+    <style>
+        :root {
+            --bg: #0D0D0D;
+            --card: #1A1A1A;
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --text: #F5F5F7;
+            --text-sec: #8E8E93;
+            --radius: 22px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: radial-gradient(circle at 25% 15%, #1A1A2E 0%, #0D0D0D 55%, #000000 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -50%;
+            background: radial-gradient(circle, rgba(102,126,234,0.08) 0%, transparent 60%);
+            animation: shimmer 12s infinite linear;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translate(-20%, -20%) rotate(0deg); }
+            100% { transform: translate(20%, 20%) rotate(360deg); }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 25px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 11px 20px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.18s ease-out, background 0.18s ease-out, box-shadow 0.18s ease-out;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 45px;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #F093FB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-sec);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .card {
+            background: rgba(26, 26, 26, 0.75);
+            backdrop-filter: blur(28px) saturate(160%);
+            -webkit-backdrop-filter: blur(28px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius);
+            padding: 35px;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 32px 90px rgba(0, 0, 0, 0.7),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .person-list {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+            margin-bottom: 32px;
+        }
+
+        .person-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s cubic-bezier(0.19,1,0.22,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .person-checkbox::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scaleY(0);
+            transition: transform 0.25s cubic-bezier(0.19,1,0.22,1);
+        }
+
+        .person-checkbox:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateX(3px);
+        }
+
+        .person-checkbox.selected {
+            background: rgba(102, 126, 234, 0.12);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .person-checkbox.selected::before {
+            transform: scaleY(1);
+        }
+
+        .person-checkbox input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+
+        .person-checkbox label {
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .spin-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 16px 48px rgba(102, 126, 234, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            transition: transform 0.2s cubic-bezier(0.19,1,0.22,1), box-shadow 0.2s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spin-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.2s ease-out;
+        }
+
+        .spin-btn:hover::before {
+            opacity: 1;
+        }
+
+        .spin-btn:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 24px 60px rgba(102, 126, 234, 0.65),
+            inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .spin-btn:active {
+            transform: translateY(-1px) scale(0.99);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-area {
+            margin-top: 35px;
+            text-align: center;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slot-machine {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 25px;
+            height: 90px;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.19,1,0.22,1);
+        }
+
+        .slot-machine.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .slot-reel {
+            width: 70px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .slot-reel-content {
+            position: absolute;
+            width: 100%;
+            font-size: 3rem;
+            line-height: 90px;
+            text-align: center;
+            transition: transform 0.1s linear;
+        }
+
+        .winner-reveal {
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+            transition: opacity 0.5s cubic-bezier(0.19,1,0.22,1), transform 0.5s cubic-bezier(0.19,1,0.22,1);
+        }
+
+        .winner-reveal.show {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .winner-name {
+            font-size: 3.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6B6B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 16px rgba(255, 215, 0, 0.4);
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.2); }
+        }
+
+        .winner-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-sec);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #FFD700;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+            opacity: 0;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<button class="back-btn" onclick="window.location.href='index.html'">← Zurück</button>
+
+<header>
+    <h1>🎲 Gamble</h1>
+    <div class="subtitle">Wer geht mit Kira raus?</div>
+</header>
+
+<div class="card">
+    <div class="person-list" id="personList">
+        <div class="person-checkbox" onclick="togglePerson(this, 'Aaron')">
+            <input type="checkbox" id="aaron" onchange="event.stopPropagation()">
+            <label for="aaron">Aaron</label>
+        </div>
+        <div class="person-checkbox" onclick="togglePerson(this, 'Ilja')">
+            <input type="checkbox" id="ilja" onchange="event.stopPropagation()">
+            <label for="ilja">Ilja</label>
+        </div>
+        <div class="person-checkbox" onclick="togglePerson(this, 'Wlad')">
+            <input type="checkbox" id="wlad" onchange="event.stopPropagation()">
+            <label for="wlad">Wlad</label>
+        </div>
+        <div class="person-checkbox" onclick="togglePerson(this, 'Mama')">
+            <input type="checkbox" id="mama" onchange="event.stopPropagation()">
+            <label for="mama">Mama</label>
+        </div>
+        <div class="person-checkbox" onclick="togglePerson(this, 'Dajen')">
+            <input type="checkbox" id="dajen" onchange="event.stopPropagation()">
+            <label for="dajen">Dajen</label>
+        </div>
+    </div>
+
+    <button class="spin-btn" id="spinBtn" onclick="startSpin()">🎰 Ziehen!</button>
+
+    <div class="result-area" id="resultArea">
+        <div class="slot-machine" id="slotMachine">
+            <div class="slot-reel"><div class="slot-reel-content" id="reel1">🎲</div></div>
+            <div class="slot-reel"><div class="slot-reel-content" id="reel2">🎲</div></div>
+            <div class="slot-reel"><div class="slot-reel-content" id="reel3">🎲</div></div>
+        </div>
+
+        <div class="winner-reveal" id="winnerReveal">
+            <div class="winner-name" id="winnerName">—</div>
+            <div class="winner-text">muss mit Kira raus! 🐕</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedPeople = [];
+
+    function togglePerson(el, name) {
+        const checkbox = el.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+
+        if (checkbox.checked) {
+            el.classList.add('selected');
+            if (!selectedPeople.includes(name)) {
+                selectedPeople.push(name);
+            }
+        } else {
+            el.classList.remove('selected');
+            selectedPeople = selectedPeople.filter(p => p !== name);
+        }
+    }
+
+    function startSpin() {
+        if (selectedPeople.length === 0) {
+            alert('Bitte mindestens eine Person auswählen!');
+            return;
+        }
+
+        const spinBtn = document.getElementById('spinBtn');
+        const slotMachine = document.getElementById('slotMachine');
+        const winnerReveal = document.getElementById('winnerReveal');
+
+        spinBtn.disabled = true;
+        slotMachine.classList.add('active');
+        winnerReveal.classList.remove('show');
+
+        const symbols = ['🎲', '🎰', '🎯', '🃏', '🎪', '🎨'];
+        const reels = [
+            document.getElementById('reel1'),
+            document.getElementById('reel2'),
+            document.getElementById('reel3')
+        ];
+
+        let spinCount = 0;
+        const maxSpins = 30;
+
+        const spinInterval = setInterval(() => {
+            reels.forEach(reel => {
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                reel.textContent = randomSymbol;
+                reel.style.transform = `translateY(-${(spinCount % 10) * 9}px)`;
+            });
+
+            spinCount++;
+
+            if (spinCount >= maxSpins) {
+                clearInterval(spinInterval);
+                setTimeout(() => {
+                    revealWinner();
+                }, 400);
+            }
+        }, 100);
+    }
+
+    function revealWinner() {
+        const winner = selectedPeople[Math.floor(Math.random() * selectedPeople.length)];
+
+        const slotMachine = document.getElementById('slotMachine');
+        const winnerReveal = document.getElementById('winnerReveal');
+        const winnerName = document.getElementById('winnerName');
+        const spinBtn = document.getElementById('spinBtn');
+
+        slotMachine.classList.remove('active');
+
+        setTimeout(() => {
+            winnerName.textContent = winner;
+            winnerReveal.classList.add('show');
+            createConfetti();
+            spinBtn.disabled = false;
+        }, 300);
+    }
+
+    function createConfetti() {
+        const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F7DC6F'];
+
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.width = (Math.random() * 8 + 6) + 'px';
+                confetti.style.height = confetti.style.width;
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 3000);
+            }, i * 30);
+        }
+    }
+</script>
+
+</body>
+</html>

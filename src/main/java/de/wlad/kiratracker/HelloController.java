@@ -124,11 +124,6 @@ public class HelloController {
         return ResponseEntity.ok(s.getLeaderboardSinceDays(days));
     }
 
-    @GetMapping("/admin")
-    public ModelAndView adminPage() {
-        return new ModelAndView("admin");
-    }
-
     // Vollständiger Status - nur wenn wirklich alle Daten gebraucht werden
     @GetMapping("/status")
     public ResponseEntity<StatusDto> status() {

@@ -273,7 +273,7 @@
         .btn-icon {
             background:transparent;
             border:none;
-            font-size:1.2rem;
+            font-size:1.1rem;
             cursor:pointer;
             display:none;
         }
@@ -325,6 +325,9 @@
         <div class="pill-opt active" id="dm-light">☀️</div>
         <div class="pill-opt" id="dm-dark">🌙</div>
     </div>
+    <div class="pill" onclick="toggleAdmin()">
+        <div class="pill-opt" id="admin-label">Admin</div>
+    </div>
 </div>
 
 <header>
@@ -368,6 +371,22 @@
         <button class="quick-btn" onclick="quickAdd('Ilja')">Ilja</button>
         <button class="quick-btn" onclick="quickAdd('Aaron')">Aaron</button>
         <button class="quick-btn" onclick="quickAdd('Dajen')">Dajen</button>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="font-size:1rem; margin-bottom:10px">🥣 Fütterung</h3>
+    <div id="foodList"></div>
+    <div class="input-area" style="margin-top:10px">
+        <input type="text" id="foodName" placeholder="Wer?" style="flex:1" />
+        <input type="text" id="foodDesc" placeholder="Was? (Optional)" style="flex:1.5" />
+        <button class="btn-circle" onclick="addFood()">✓</button>
+    </div>
+    <div class="quick-row">
+        <button class="quick-btn" onclick="quickFood('Mama')">Mama</button>
+        <button class="quick-btn" onclick="quickFood('Wlad')">Wlad</button>
+        <button class="quick-btn" onclick="quickFood('Ilja')">Ilja</button>
+        <button class="quick-btn" onclick="quickFood('Dajen')">Dajen</button>
     </div>
 </div>
 
@@ -503,6 +522,9 @@
 
         applyTranslations();
         loadStatus();
+        loadFood();
+        loadHistory();
+        loadLeaderboard(getCurrentLbDays());
     }
 
     function initLang() {
@@ -561,8 +583,7 @@
 
     async function loadStatus() {
         try {
-            // nutzt /status mit StatusDto (wasMorning/wasEvening).[file:1][file:2]
-            const data = await fetchJSON(API + '/status');
+            const data = await fetchJSON(API + '/status'); // StatusDto mit wasMorning/wasEvening.[file:1][file:2]
 
             const mBox = document.getElementById('morningBox');
             const eBox = document.getElementById('eveningBox');
@@ -611,8 +632,7 @@
         }
 
         try {
-            // nutzt /api/walk → s.addEntry(person); Einteilung nach Uhrzeit im Backend.[file:1]
-            await fetchJSON(API + '/api/walk', {
+            await fetchJSON(API + '/api/walk', { // s.addEntry(person).[file:1]
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ person })
@@ -630,6 +650,112 @@
     function quickAdd(name) {
         document.getElementById('nameInput').value = name;
         addWalk();
+    }
+
+    async function addFood() {
+        const person = document.getElementById('foodName').value.trim();
+        const food = document.getElementById('foodDesc').value.trim() || '';
+
+        if (!person) {
+            showError('Bitte Namen angeben!');
+            return;
+        }
+
+        try {
+            await fetchJSON(API + '/api/food', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ person, food })
+            });
+
+            document.getElementById('foodName').value = '';
+            document.getElementById('foodDesc').value = '';
+            await loadFood();
+            await loadStatus();
+        } catch (error) {
+            showError('Fehler beim Speichern');
+        }
+    }
+
+    function quickFood(name) {
+        document.getElementById('foodName').value = name;
+        document.getElementById('foodDesc').focus();
+    }
+
+    async function loadFood() {
+        try {
+            const data = await fetchJSON(API + '/api/food');
+            const list = document.getElementById('foodList');
+
+            if (!Array.isArray(data) || data.length === 0) {
+                list.innerHTML =
+                    '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">Noch keine Einträge heute</div>';
+                return;
+            }
+
+            list.innerHTML = data.map(f => {
+                let timestamp = '';
+                if (f.timestamp) {
+                    try {
+                        const date = new Date(f.timestamp);
+                        timestamp = date.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+                    } catch (e) {
+                        timestamp = '';
+                    }
+                }
+                const person = f.person || '';
+                const food = f.food || '';
+
+                return (
+                    '<div class="entry">' +
+                    '<div class="entry-info">' +
+                    '<div class="entry-time">' + timestamp + '</div>' +
+                    '<div class="entry-text">' + person + (food ? ': ' + food : '') + '</div>' +
+                    '</div>' +
+                    '<button class="btn-icon" onclick="editFood(' + f.id + ', \'' + person + '\', \'' + food.replace(/'/g, "\\'") + '\')">✏️</button>' +
+                    '<button class="btn-icon" onclick="deleteFood(' + f.id + ')">🗑️</button>' +
+                    '</div>'
+                );
+            }).join('');
+        } catch (error) {
+            document.getElementById('foodList').innerHTML =
+                '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
+        }
+    }
+
+    async function deleteFood(id) {
+        if (!document.body.classList.contains('admin-mode')) return;
+        if (!confirm('Wirklich löschen?')) return;
+
+        try {
+            await fetchJSON(API + '/admin/food/' + id, { method: 'DELETE' }); // Admin-Endpoint.[file:1]
+            await loadFood();
+            await loadStatus();
+        } catch (error) {
+            showError('Fehler beim Löschen');
+        }
+    }
+
+    function editFood(id, person, desc) {
+        if (!document.body.classList.contains('admin-mode')) return;
+
+        const newPerson = prompt('Wer?', person || '');
+        if (newPerson === null) return;
+
+        const newDesc = prompt('Was?', desc || '');
+        if (newDesc === null) return;
+
+        fetchJSON(API + '/admin/food/' + id, { method: 'DELETE' })
+            .then(() => fetchJSON(API + '/api/food', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ person: newPerson, food: newDesc })
+            }))
+            .then(() => {
+                loadFood();
+                loadStatus();
+            })
+            .catch(() => showError('Fehler beim Speichern'));
     }
 
     async function loadHistory() {
@@ -654,6 +780,7 @@
                     '<div class="entry-time">' + timestamp + '</div>' +
                     '<div class="entry-text">' + person + '</div>' +
                     '</div>' +
+                    '<button class="btn-icon" onclick="editWalk(' + w.id + ', \'' + person + '\', \'' + timestamp + '\')">✏️</button>' +
                     '<button class="btn-icon" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
                     '</div>'
                 );
@@ -686,6 +813,7 @@
                     '<div class="entry-time">' + timestamp + '</div>' +
                     '<div class="entry-text">' + person + '</div>' +
                     '</div>' +
+                    '<button class="btn-icon" onclick="editWalk(' + w.id + ', \'' + person + '\', \'' + timestamp + '\')">✏️</button>' +
                     '<button class="btn-icon" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
                     '</div>'
                 );
@@ -698,11 +826,37 @@
         }
     }
 
+    function editWalk(id, person, timeStr) {
+        if (!document.body.classList.contains('admin-mode')) return;
+
+        const newPerson = prompt('Name ändern:', person || '');
+        if (newPerson === null) return;
+
+        const newTime = prompt('Zeit ändern (HH:mm dd.MM.yy) oder leer lassen:', timeStr || '');
+        const payload = { person: newPerson };
+        if (newTime && newTime.trim() !== '') {
+            payload.time = newTime.trim();
+        }
+
+        fetchJSON(API + '/admin/walk/' + id, { // upd → updateEntry(id, person, time).[file:1]
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(() => {
+                loadHistory();
+                loadStatus();
+                loadLeaderboard(getCurrentLbDays());
+            })
+            .catch(() => showError('Fehler beim Speichern'));
+    }
+
     async function deleteWalk(id) {
+        if (!document.body.classList.contains('admin-mode')) return;
         if (!confirm('Wirklich löschen?')) return;
 
         try {
-            await fetchJSON(API + '/api/walk/' + id, {method: 'DELETE'});
+            await fetchJSON(API + '/admin/walk/' + id, { method: 'DELETE' }); // Admin-Endpoint.[file:1]
             await loadHistory();
             await loadStatus();
             await loadLeaderboard(getCurrentLbDays());
@@ -761,11 +915,38 @@
         window.location.href = 'v2.html';
     }
 
+    function toggleAdmin() {
+        if (document.body.classList.contains('admin-mode')) {
+            document.body.classList.remove('admin-mode');
+            document.getElementById('admin-label').classList.remove('active');
+            return;
+        }
+
+        fetch(API + '/admin', { method: 'GET' }) // geschützt durch Basic Auth.[file:1][file:84]
+            .then(resp => {
+                if (resp.ok) {
+                    document.body.classList.add('admin-mode');
+                    document.getElementById('admin-label').classList.add('active');
+                } else if (resp.status === 401) {
+                    // Browser zeigt Login-Popup, nach Erfolg erneut versuchen
+                    return fetch(API + '/admin', { method: 'GET' });
+                }
+            })
+            .then(resp2 => {
+                if (resp2 && resp2.ok) {
+                    document.body.classList.add('admin-mode');
+                    document.getElementById('admin-label').classList.add('active');
+                }
+            })
+            .catch(() => {});
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         initLang();
         initDarkMode();
         loadWeather();
         loadStatus();
+        loadFood();
         loadHistory();
         loadLeaderboard(3);
     });
@@ -773,6 +954,7 @@
     setInterval(() => {
         loadWeather();
         loadStatus();
+        loadFood();
         loadHistory();
     }, 60000);
 </script>

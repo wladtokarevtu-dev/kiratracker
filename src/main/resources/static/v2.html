@@ -299,7 +299,7 @@
     function sendWhatsapp() {
         const text = document.getElementById('customMsg').value.trim()
             || translations[lang].msgs[0];
-        fetch(API + '/api/walk-request', {method: 'POST'}).catch(() => {});
+        fetch(API + '/api/walk-request', {method: 'POST'}).catch(() => {}); // Backend behält deine Statistik.[file:1]
         window.open('https://wa.me/?text=' + encodeURIComponent(text));
     }
 

@@ -2,68 +2,335 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kira Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
     <meta name="theme-color" content="#F5F5F7">
     <style>
-        :root { --bg:#F5F5F7; --card:#FFFFFF; --primary:#007AFF; --text:#1D1D1F; --text-sec:#86868B; --radius:18px; --input-bg:#F2F2F7; }
-        body.dark-mode { --bg:#000000; --card:#1C1C1E; --primary:#0A84FF; --text:#F5F5F7; --text-sec:#8E8E93; --input-bg:#2C2C2E; }
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-        body { font-family:"Inter",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:20px; max-width:500px; margin:0 auto; padding-top:100px; transition:0.3s; }
+        :root {
+            --bg:#F5F5F7;
+            --card:#FFFFFF;
+            --primary:#007AFF;
+            --text:#1D1D1F;
+            --text-sec:#86868B;
+            --radius:18px;
+            --input-bg:#F2F2F7;
+        }
 
-        .controls { position:fixed; top:25px; right:20px; display:flex; gap:8px; z-index:10; }
-        .pill { background:var(--card); padding:4px; border-radius:100px; display:flex; gap:2px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
-        .pill-opt { padding:6px 12px; border-radius:100px; font-size:0.75rem; font-weight:600; color:var(--text-sec); transition:0.3s; }
-        .pill-opt.active { background:var(--text); color:var(--bg); }
+        body.dark-mode {
+            --bg:#000000;
+            --card:#1C1C1E;
+            --primary:#0A84FF;
+            --text:#F5F5F7;
+            --text-sec:#8E8E93;
+            --input-bg:#2C2C2E;
+        }
 
-        header { text-align:center; margin-bottom:30px; margin-top:20px; }
-        h1 { font-size:2rem; font-weight:700; margin-bottom:5px; }
-        .subtitle { color:var(--text-sec); font-size:0.95rem; }
+        * {
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            -webkit-tap-highlight-color:transparent;
+        }
 
-        .weather-card { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:var(--radius); padding:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
-        .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px; }
-        .status-box { background:var(--card); border-radius:var(--radius); padding:20px; text-align:center; height:120px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-        .status-box.done { background:#E4F9E8; color:#1E6F30; }
-        body.dark-mode .status-box.done { background:#11331B; color:#4CD964; }
-        .status-box.open { background:#FFF0F0; color:#D63031; }
-        body.dark-mode .status-box.open { background:#3A0F0F; color:#FF453A; }
+        body {
+            font-family:"Inter",sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            padding:20px;
+            max-width:500px;
+            margin:0 auto;
+            padding-top:100px;
+            transition:0.3s;
+        }
 
-        .card { background:var(--card); border-radius:var(--radius); padding:24px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
-        .input-area { display:flex; gap:10px; margin-top:15px; align-items:center; }
-        input { flex:1; padding:14px; border-radius:12px; border:none; background:var(--input-bg); color:var(--text); font-size:1rem; min-width:0; }
-        .btn-circle { width:50px; height:50px; border-radius:50%; background:var(--text); color:var(--bg); border:none; font-size:1.2rem; cursor:pointer; transition:0.2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .btn-circle:hover { transform:scale(1.1); background:var(--primary); }
-        .quick-row { display:flex; gap:8px; margin-top:15px; overflow-x:auto; }
-        .quick-btn { background:var(--input-bg); color:var(--primary); border:none; padding:8px 14px; border-radius:100px; font-weight:600; font-size:0.85rem; cursor:pointer; white-space:nowrap; }
+        .controls {
+            position:fixed;
+            top:25px;
+            right:20px;
+            display:flex;
+            gap:8px;
+            z-index:10;
+        }
 
-        .lb-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
-        .time-switch { background:var(--input-bg); border-radius:8px; padding:2px; display:flex; }
-        .time-opt { padding:4px 8px; font-size:0.7rem; font-weight:600; cursor:pointer; border-radius:6px; color:var(--text-sec); transition:0.3s; }
-        .time-opt.active { background:var(--card); color:var(--text); }
-        .lb-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--input-bg); font-size:0.9rem; }
+        .pill {
+            background:var(--card);
+            padding:4px;
+            border-radius:100px;
+            display:flex;
+            gap:2px;
+            cursor:pointer;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
 
-        .entry { display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--input-bg); }
-        .entry-info { flex:1; }
-        .entry-time { color:var(--text-sec); font-size:0.8rem; }
-        .entry-text { font-weight:500; }
-        .btn-icon { background:transparent; border:none; font-size:1.2rem; cursor:pointer; display:none; }
-        body.admin-mode .btn-icon { display:inline-block; }
+        .pill-opt {
+            padding:6px 12px;
+            border-radius:100px;
+            font-size:0.75rem;
+            font-weight:600;
+            color:var(--text-sec);
+            transition:0.3s;
+        }
 
-        .wa-card { background:#E9FCF2; color:#0C4A28; padding:18px; border-radius:var(--radius); margin-top:30px; text-align:center; cursor:pointer; }
-        body.dark-mode .wa-card { background:#063318; color:#4CD964; }
+        .pill-opt.active {
+            background:var(--text);
+            color:var(--bg);
+        }
 
-        .error-toast { position:fixed; top:80px; left:50%; transform:translateX(-50%); background:#FF453A; color:white; padding:12px 20px; border-radius:12px; font-size:0.9rem; z-index:100; display:none; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+        header {
+            text-align:center;
+            margin-bottom:30px;
+            margin-top:20px;
+        }
+
+        h1 {
+            font-size:2rem;
+            font-weight:700;
+            margin-bottom:5px;
+        }
+
+        .subtitle {
+            color:var(--text-sec);
+            font-size:0.95rem;
+        }
+
+        .weather-card {
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            color:white;
+            border-radius:var(--radius);
+            padding:20px;
+            margin-bottom:20px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .status-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:15px;
+            margin-bottom:20px;
+        }
+
+        .status-box {
+            background:var(--card);
+            border-radius:var(--radius);
+            padding:20px;
+            text-align:center;
+            height:120px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .status-box.done {
+            background:#E4F9E8;
+            color:#1E6F30;
+        }
+
+        body.dark-mode .status-box.done {
+            background:#11331B;
+            color:#4CD964;
+        }
+
+        .status-box.open {
+            background:#FFF0F0;
+            color:#D63031;
+        }
+
+        body.dark-mode .status-box.open {
+            background:#3A0F0F;
+            color:#FF453A;
+        }
+
+        .card {
+            background:var(--card);
+            border-radius:var(--radius);
+            padding:24px;
+            margin-bottom:20px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .input-area {
+            display:flex;
+            gap:10px;
+            margin-top:15px;
+            align-items:center;
+        }
+
+        input {
+            flex:1;
+            padding:14px;
+            border-radius:12px;
+            border:none;
+            background:var(--input-bg);
+            color:var(--text);
+            font-size:1rem;
+            min-width:0;
+        }
+
+        .btn-circle {
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            background:var(--text);
+            color:var(--bg);
+            border:none;
+            font-size:0.9rem;
+            cursor:pointer;
+            transition:0.2s;
+            flex-shrink:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .btn-circle:hover {
+            transform:scale(1.1);
+            background:var(--primary);
+        }
+
+        .quick-row {
+            display:flex;
+            gap:8px;
+            margin-top:15px;
+            overflow-x:auto;
+        }
+
+        .quick-btn {
+            background:var(--input-bg);
+            color:var(--primary);
+            border:none;
+            padding:8px 14px;
+            border-radius:100px;
+            font-weight:600;
+            font-size:0.85rem;
+            cursor:pointer;
+            white-space:nowrap;
+        }
+
+        .lb-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:15px;
+        }
+
+        .time-switch {
+            background:var(--input-bg);
+            border-radius:8px;
+            padding:2px;
+            display:flex;
+        }
+
+        .time-opt {
+            padding:4px 8px;
+            font-size:0.7rem;
+            font-weight:600;
+            cursor:pointer;
+            border-radius:6px;
+            color:var(--text-sec);
+            transition:0.3s;
+        }
+
+        .time-opt.active {
+            background:var(--card);
+            color:var(--text);
+        }
+
+        .lb-row {
+            display:flex;
+            justify-content:space-between;
+            padding:8px 0;
+            border-bottom:1px solid var(--input-bg);
+            font-size:0.9rem;
+        }
+
+        .entry {
+            display:flex;
+            align-items:center;
+            padding:14px 0;
+            border-bottom:1px solid var(--input-bg);
+        }
+
+        .entry-info {
+            flex:1;
+        }
+
+        .entry-time {
+            color:var(--text-sec);
+            font-size:0.8rem;
+        }
+
+        .entry-text {
+            font-weight:500;
+        }
+
+        .btn-icon {
+            background:transparent;
+            border:none;
+            font-size:1.2rem;
+            cursor:pointer;
+            display:none;
+        }
+
+        body.admin-mode .btn-icon {
+            display:inline-block;
+        }
+
+        .wa-card {
+            background:#E9FCF2;
+            color:#0C4A28;
+            padding:18px;
+            border-radius:var(--radius);
+            margin-top:30px;
+            text-align:center;
+            cursor:pointer;
+        }
+
+        body.dark-mode .wa-card {
+            background:#063318;
+            color:#4CD964;
+        }
+
+        .error-toast {
+            position:fixed;
+            top:80px;
+            left:50%;
+            transform:translateX(-50%);
+            background:#FF453A;
+            color:white;
+            padding:12px 20px;
+            border-radius:12px;
+            font-size:0.9rem;
+            z-index:100;
+            display:none;
+            box-shadow:0 4px 12px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
 <div class="error-toast" id="errorToast"></div>
 
 <div class="controls">
-    <div class="pill" onclick="toggleLang()"><div class="pill-opt active" id="l-de">DE</div><div class="pill-opt" id="l-ru">RU</div></div>
-    <div class="pill" onclick="toggleDark()"><div class="pill-opt active" id="dm-light">☀️</div><div class="pill-opt" id="dm-dark">🌙</div></div>
+    <div class="pill" onclick="toggleLang()">
+        <div class="pill-opt active" id="l-de">DE</div>
+        <div class="pill-opt" id="l-ru">RU</div>
+    </div>
+    <div class="pill" onclick="toggleDark()">
+        <div class="pill-opt active" id="dm-light">☀️</div>
+        <div class="pill-opt" id="dm-dark">🌙</div>
+    </div>
 </div>
-<header><h1>Kira Tracker</h1><div class="subtitle">Gassi & Futter</div></header>
+
+<header>
+    <h1>Kira Tracker</h1>
+    <div class="subtitle">Spaziergänge</div>
+</header>
 
 <div class="weather-card">
     <div style="font-size:2rem;font-weight:700" id="wTemp">--°</div>
@@ -71,43 +338,44 @@
 </div>
 
 <div class="status-grid">
-    <div class="status-box" id="morningBox">
-        <div style="font-size:2rem">🐕</div>
-        <div style="font-weight:600;font-size:0.8rem">Gassi</div>
-        <div id="morningStatus" style="font-weight:700">...</div>
+    <div class="status-box open" id="morningBox">
+        <div style="font-size:2rem">🌅</div>
+        <div style="font-weight:600;font-size:0.8rem"
+             data-i18n="status-morning-title">Morgens Spaziergang</div>
+        <div id="morningStatus" style="font-weight:700"
+             data-i18n-status-morning>Offen</div>
     </div>
-    <div class="status-box" id="eveningBox">
-        <div style="font-size:2rem">🍖</div>
-        <div style="font-weight:600;font-size:0.8rem">Futter</div>
-        <div id="eveningStatus" style="font-weight:700">...</div>
-    </div>
-</div>
-
-<div class="card">
-    <h3 style="font-size:1rem; margin-bottom:10px">🐕 Gassi eintragen</h3>
-    <div class="input-area"><input type="text" id="nameInput" placeholder="Name..." /><button class="btn-circle" onclick="addWalk()">+</button></div>
-    <div class="quick-row">
-        <button class="quick-btn" onclick="quickAdd('Wlad')">Wlad</button>
-        <button class="quick-btn" onclick="quickAdd('Mama')">Mama</button>
-        <button class="quick-btn" onclick="quickAdd('Ilja')">Ilja</button>
-        <button class="quick-btn" onclick="quickAdd('Aaron')">Aaron</button>
-        <button class="quick-btn" onclick="quickAdd('Dajen')">Dajen</button>
+    <div class="status-box open" id="eveningBox">
+        <div style="font-size:2rem">🌇</div>
+        <div style="font-weight:600;font-size:0.8rem"
+             data-i18n="status-evening-title">Abends Spaziergang</div>
+        <div id="eveningStatus" style="font-weight:700"
+             data-i18n-status-evening>Offen</div>
     </div>
 </div>
 
 <div class="card">
-    <h3 style="font-size:1rem; margin-bottom:10px">🥣 Fütterung</h3>
-    <div id="foodList"></div>
+    <h3 style="font-size:1rem; margin-bottom:10px"
+        data-i18n="walk-title">🐕 Spaziergang eintragen</h3>
+    <div class="input-area">
+        <input type="text" id="nameInput" placeholder="Name..."
+               data-i18n-placeholder="name-placeholder"/>
+    </div>
     <div class="input-area" style="margin-top:10px">
-        <input type="text" id="foodName" placeholder="Wer?" style="flex:1" />
-        <input type="text" id="foodDesc" placeholder="Was? (Optional)" style="flex:1.5" />
-        <button class="btn-circle" onclick="addFood()">✓</button>
+        <button class="btn-circle"
+                onclick="addWalk('MORNING')"
+                data-i18n="btn-morning">Morgens</button>
+        <button class="btn-circle"
+                onclick="addWalk('EVENING')"
+                data-i18n="btn-evening">Abends</button>
     </div>
     <div class="quick-row">
-        <button class="quick-btn" onclick="quickFood('Mama')">Mama</button>
-        <button class="quick-btn" onclick="quickFood('Wlad')">Wlad</button>
-        <button class="quick-btn" onclick="quickFood('Ilja')">Ilja</button>
-        <button class="quick-btn" onclick="quickFood('Dajen')">Dajen</button>
+        <button class="quick-btn" onclick="quickAdd('Wlad','MORNING')">Wlad AM</button>
+        <button class="quick-btn" onclick="quickAdd('Wlad','EVENING')">Wlad PM</button>
+        <button class="quick-btn" onclick="quickAdd('Mama','MORNING')">Mama AM</button>
+        <button class="quick-btn" onclick="quickAdd('Mama','EVENING')">Mama PM</button>
+        <button class="quick-btn" onclick="quickAdd('Ilja','MORNING')">Ilja AM</button>
+        <button class="quick-btn" onclick="quickAdd('Ilja','EVENING')">Ilja PM</button>
     </div>
 </div>
 
@@ -127,25 +395,70 @@
 <div style="font-weight:600;margin:30px 0 15px 5px">Verlauf</div>
 <div class="card" id="historyList" style="padding:10px 20px"></div>
 
-<div class="wa-card" onclick="sendWalkRequest()"><div style="font-weight:700">💬 WhatsApp Anfrage</div><div style="font-size:0.85rem;opacity:0.8">Benachrichtigung senden</div></div>
+<div class="wa-card" onclick="sendWalkRequest()">
+    <div style="font-weight:700" data-i18n="wa-title">💬 WhatsApp Anfrage</div>
+    <div style="font-size:0.85rem;opacity:0.8" data-i18n="wa-subtitle">
+        Benachrichtigung senden
+    </div>
+</div>
 
 <script>
     const API = window.location.origin;
     let lang = 'de';
 
+    const translations = {
+        de: {
+            title: 'Kira Tracker',
+            subtitle: 'Spaziergänge',
+            'status-morning-title': 'Morgens Spaziergang',
+            'status-evening-title': 'Abends Spaziergang',
+            'walk-title': '🐕 Spaziergang eintragen',
+            'name-placeholder': 'Name...',
+            'btn-morning': 'Morgens',
+            'btn-evening': 'Abends',
+            'toast-name-missing': 'Bitte Namen angeben!',
+            'toast-save-error': 'Fehler beim Speichern',
+            'toast-delete-error': 'Fehler beim Löschen',
+            'history-empty': 'Noch keine Einträge',
+            'lb-empty': 'Keine Daten',
+            'wa-title': '💬 WhatsApp Anfrage',
+            'wa-subtitle': 'Benachrichtigung senden',
+            'wa-msg': 'Kann jemand mit Kira Gassi gehen? 🐕',
+            'status-open': 'Offen',
+            'status-done': 'Erledigt ✓'
+        },
+        ru: {
+            title: 'Кира трекер',
+            subtitle: 'Прогулки',
+            'status-morning-title': 'Утренняя прогулка',
+            'status-evening-title': 'Вечерняя прогулка',
+            'walk-title': '🐕 Добавить прогулку',
+            'name-placeholder': 'Имя...',
+            'btn-morning': 'Утро',
+            'btn-evening': 'Вечер',
+            'toast-name-missing': 'Пожалуйста, укажите имя!',
+            'toast-save-error': 'Ошибка при сохранении',
+            'toast-delete-error': 'Ошибка при удалении',
+            'history-empty': 'Записей пока нет',
+            'lb-empty': 'Нет данных',
+            'wa-title': '💬 Запрос в WhatsApp',
+            'wa-subtitle': 'Отправить уведомление',
+            'wa-msg': 'Кто может погулять с Кирой? 🐕',
+            'status-open': 'Открыто',
+            'status-done': 'Сделано ✓'
+        }
+    };
+
     async function fetchJSON(url, options = {}) {
         try {
             const response = await fetch(url, options);
-
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
-
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
                 return await response.json();
             }
-
             return null;
         } catch (error) {
             console.error('Fetch Error:', error);
@@ -162,35 +475,94 @@
         }, 3000);
     }
 
-    function initDarkMode() {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const saved = localStorage.getItem('darkMode');
-        if (saved === 'dark' || (saved === null && prefersDark)) {
-            document.body.classList.add('dark-mode');
-            document.getElementById('dm-dark').classList.add('active');
-            document.getElementById('dm-light').classList.remove('active');
-        }
-    }
+    function applyTranslations() {
+        const t = translations[lang];
 
-    function toggleDark() {
-        document.body.classList.toggle('dark-mode');
-        document.getElementById('dm-dark').classList.toggle('active');
-        document.getElementById('dm-light').classList.toggle('active');
-        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        const h1 = document.querySelector('h1');
+        if (h1) h1.textContent = t.title;
+
+        const subtitle = document.querySelector('.subtitle');
+        if (subtitle) subtitle.textContent = t.subtitle;
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (t[key]) el.textContent = t[key];
+        });
+
+        const nameInput = document.getElementById('nameInput');
+        if (nameInput && t['name-placeholder']) {
+            nameInput.placeholder = t['name-placeholder'];
+        }
+
+        const mStatus = document.getElementById('morningStatus');
+        const eStatus = document.getElementById('eveningStatus');
+        if (mStatus && mStatus.dataset.state) {
+            mStatus.textContent = mStatus.dataset.state === 'done'
+                ? t['status-done']
+                : t['status-open'];
+        }
+        if (eStatus && eStatus.dataset.state) {
+            eStatus.textContent = eStatus.dataset.state === 'done'
+                ? t['status-done']
+                : t['status-open'];
+        }
     }
 
     function toggleLang() {
         lang = lang === 'de' ? 'ru' : 'de';
+        localStorage.setItem('lang', lang);
+
         document.getElementById('l-de').classList.toggle('active');
         document.getElementById('l-ru').classList.toggle('active');
+
+        applyTranslations();
+        loadStatus();
     }
+
+    function initLang() {
+        lang = localStorage.getItem('lang') || 'de';
+        if (lang === 'ru') {
+            document.getElementById('l-de').classList.remove('active');
+            document.getElementById('l-ru').classList.add('active');
+        }
+        applyTranslations();
+    }
+
+    function initDarkMode() {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const saved = localStorage.getItem('darkMode');
+        const useDark = saved ? saved === 'dark' : prefersDark;
+
+        document.body.classList.toggle('dark-mode', useDark);
+        document.getElementById('dm-dark').classList.toggle('active', useDark);
+        document.getElementById('dm-light').classList.toggle('active', !useDark);
+    }
+
+    function toggleDark() {
+        const isDark = !document.body.classList.contains('dark-mode');
+        document.body.classList.toggle('dark-mode', isDark);
+        document.getElementById('dm-dark').classList.toggle('active', isDark);
+        document.getElementById('dm-light').classList.toggle('active', !isDark);
+        localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('darkMode')) {
+            const isDark = e.matches;
+            document.body.classList.toggle('dark-mode', isDark);
+            document.getElementById('dm-dark').classList.toggle('active', isDark);
+            document.getElementById('dm-light').classList.toggle('active', !isDark);
+        }
+    });
 
     async function loadWeather() {
         try {
             const data = await fetchJSON(API + '/api/weather');
             if (data && data.temp !== undefined) {
-                document.getElementById('wTemp').textContent = Math.round(data.temp) + '°C';
-                document.getElementById('wDesc').textContent = data.description || 'Keine Daten';
+                document.getElementById('wTemp').textContent =
+                    Math.round(data.temp) + '°C';
+                document.getElementById('wDesc').textContent =
+                    data.description || 'Keine Daten';
             } else {
                 document.getElementById('wTemp').textContent = '--°';
                 document.getElementById('wDesc').textContent = 'Keine Daten';
@@ -203,120 +575,59 @@
 
     async function loadStatus() {
         try {
-            const data = await fetchJSON(API + '/api/status');
+            const data = await fetchJSON(API + '/status'); // StatusDto.[file:2]
+
             const mBox = document.getElementById('morningBox');
             const eBox = document.getElementById('eveningBox');
             const mStatus = document.getElementById('morningStatus');
             const eStatus = document.getElementById('eveningStatus');
 
-            if(data.walkDone) {
+            const t = translations[lang];
+
+            const wasMorning = !!data.wasMorning;
+            const wasEvening = !!data.wasEvening;
+
+            if (wasMorning) {
                 mBox.classList.add('done');
                 mBox.classList.remove('open');
-                mStatus.textContent = 'Erledigt ✓';
+                mStatus.dataset.state = 'done';
+                mStatus.textContent = t['status-done'];
             } else {
                 mBox.classList.add('open');
                 mBox.classList.remove('done');
-                mStatus.textContent = 'Offen';
+                mStatus.dataset.state = 'open';
+                mStatus.textContent = t['status-open'];
             }
 
-            if(data.foodDone) {
+            if (wasEvening) {
                 eBox.classList.add('done');
                 eBox.classList.remove('open');
-                eStatus.textContent = 'Erledigt ✓';
+                eStatus.dataset.state = 'done';
+                eStatus.textContent = t['status-done'];
             } else {
                 eBox.classList.add('open');
                 eBox.classList.remove('done');
-                eStatus.textContent = 'Offen';
+                eStatus.dataset.state = 'open';
+                eStatus.textContent = t['status-open'];
             }
         } catch (error) {
             console.log('Status Fehler:', error);
         }
     }
 
-    async function addFood() {
-        const person = document.getElementById('foodName').value.trim();
-        const food = document.getElementById('foodDesc').value.trim() || '';
-
-        if(!person) {
-            showError('Bitte Namen angeben!');
-            return;
-        }
-
-        try {
-            await fetchJSON(API + '/api/food', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({person, food})
-            });
-
-            document.getElementById('foodName').value = '';
-            document.getElementById('foodDesc').value = '';
-            await loadFood();
-            await loadStatus();
-        } catch (error) {
-            showError('Fehler beim Speichern');
-        }
-    }
-
-    async function loadFood() {
-        try {
-            const data = await fetchJSON(API + '/api/food');
-            const list = document.getElementById('foodList');
-
-            if(!Array.isArray(data) || data.length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">Noch keine Einträge heute</div>';
-                return;
-            }
-
-            list.innerHTML = data.map(f => {
-                let timestamp = '';
-                if (f.timestamp) {
-                    try {
-                        const date = new Date(f.timestamp);
-                        timestamp = date.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
-                    } catch (e) {
-                        timestamp = '';
-                    }
-                }
-
-                return '<div class="entry">' +
-                    '<div class="entry-info">' +
-                    '<div class="entry-time">' + timestamp + '</div>' +
-                    '<div class="entry-text">' + (f.person || '') + (f.food ? ': ' + f.food : '') + '</div>' +
-                    '</div>' +
-                    '<button class="btn-icon" onclick="deleteFood(' + f.id + ')">🗑️</button>' +
-                    '</div>';
-            }).join('');
-        } catch (error) {
-            document.getElementById('foodList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
-        }
-    }
-
-    async function deleteFood(id) {
-        if(!confirm('Wirklich löschen?')) return;
-
-        try {
-            await fetchJSON(API + '/api/food/' + id, {method: 'DELETE'});
-            await loadFood();
-            await loadStatus();
-        } catch (error) {
-            showError('Fehler beim Löschen');
-        }
-    }
-
-    async function addWalk() {
+    async function addWalk(timeOfDay) { // "MORNING" | "EVENING"
         const person = document.getElementById('nameInput').value.trim();
 
-        if(!person) {
-            showError('Bitte Namen angeben!');
+        if (!person) {
+            showError(translations[lang]['toast-name-missing']);
             return;
         }
 
         try {
-            await fetchJSON(API + '/api/walk', {
+            await fetchJSON(API + '/walk', { // nutzt s.addWalk(person,time).[file:1]
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({person, duration: 30})
+                body: JSON.stringify({person, time: timeOfDay})
             });
 
             document.getElementById('nameInput').value = '';
@@ -324,18 +635,13 @@
             await loadStatus();
             await loadLeaderboard(getCurrentLbDays());
         } catch (error) {
-            showError('Fehler beim Speichern');
+            showError(translations[lang]['toast-save-error']);
         }
     }
 
-    function quickAdd(name) {
+    function quickAdd(name, timeOfDay) {
         document.getElementById('nameInput').value = name;
-        addWalk();
-    }
-
-    function quickFood(name) {
-        document.getElementById('foodName').value = name;
-        document.getElementById('foodDesc').focus();
+        addWalk(timeOfDay);
     }
 
     async function loadHistory() {
@@ -343,60 +649,69 @@
             const data = await fetchJSON(API + '/api/walk');
             const list = document.getElementById('historyList');
 
-            if(!Array.isArray(data) || data.length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">Noch keine Einträge</div>';
+            if (!Array.isArray(data) || data.length === 0) {
+                list.innerHTML =
+                    '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">'
+                    + translations[lang]['history-empty'] + '</div>';
                 return;
             }
 
             const display = data.slice(0, 10);
             list.innerHTML = display.map(w => {
-                let timestamp = w.timestamp || '';
-
-                return '<div class="entry">' +
+                const timestamp = w.timestamp || '';
+                const person = w.person || '';
+                return (
+                    '<div class="entry">' +
                     '<div class="entry-info">' +
                     '<div class="entry-time">' + timestamp + '</div>' +
-                    '<div class="entry-text">' + (w.person || '') + '</div>' +
+                    '<div class="entry-text">' + person + '</div>' +
                     '</div>' +
                     '<button class="btn-icon" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
-                    '</div>';
+                    '</div>'
+                );
             }).join('');
 
-            if(data.length > 10) {
-                list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--primary);cursor:pointer;font-weight:600" onclick="showAllHistory()">+ ' + (data.length - 10) + ' weitere anzeigen</div>';
+            if (data.length > 10) {
+                list.innerHTML +=
+                    '<div style="text-align:center;padding:10px;color:var(--primary);cursor:pointer;font-weight:600" onclick="showAllHistory()">+ '
+                    + (data.length - 10) + ' weitere anzeigen</div>';
             }
         } catch (error) {
-            document.getElementById('historyList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
+            document.getElementById('historyList').innerHTML =
+                '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
         }
     }
 
-    let showingAll = false;
     async function showAllHistory() {
         try {
             const data = await fetchJSON(API + '/api/walk');
             const list = document.getElementById('historyList');
 
-            if(!Array.isArray(data)) return;
+            if (!Array.isArray(data)) return;
 
             list.innerHTML = data.map(w => {
-                let timestamp = w.timestamp || '';
-
-                return '<div class="entry">' +
+                const timestamp = w.timestamp || '';
+                const person = w.person || '';
+                return (
+                    '<div class="entry">' +
                     '<div class="entry-info">' +
                     '<div class="entry-time">' + timestamp + '</div>' +
-                    '<div class="entry-text">' + (w.person || '') + '</div>' +
+                    '<div class="entry-text">' + person + '</div>' +
                     '</div>' +
                     '<button class="btn-icon" onclick="deleteWalk(' + w.id + ')">🗑️</button>' +
-                    '</div>';
+                    '</div>'
+                );
             }).join('');
 
-            list.innerHTML += '<div style="text-align:center;padding:10px;color:var(--text-sec);cursor:pointer;font-weight:600" onclick="loadHistory()">Weniger anzeigen</div>';
+            list.innerHTML +=
+                '<div style="text-align:center;padding:10px;color:var(--text-sec);cursor:pointer;font-weight:600" onclick="loadHistory()">Weniger anzeigen</div>';
         } catch (error) {
             showError('Fehler beim Laden');
         }
     }
 
     async function deleteWalk(id) {
-        if(!confirm('Wirklich löschen?')) return;
+        if (!confirm('Wirklich löschen?')) return;
 
         try {
             await fetchJSON(API + '/api/walk/' + id, {method: 'DELETE'});
@@ -404,11 +719,12 @@
             await loadStatus();
             await loadLeaderboard(getCurrentLbDays());
         } catch (error) {
-            showError('Fehler beim Löschen');
+            showError(translations[lang]['toast-delete-error']);
         }
     }
 
     let currentLbDays = 3;
+
     function getCurrentLbDays() {
         return currentLbDays;
     }
@@ -419,59 +735,60 @@
             const data = await fetchJSON(API + '/api/leaderboard?days=' + days);
             const list = document.getElementById('leaderboardList');
 
-            if(!data || Object.keys(data).length === 0) {
-                list.innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">Keine Daten</div>';
+            if (!data || Object.keys(data).length === 0) {
+                list.innerHTML =
+                    '<div style="text-align:center;color:var(--text-sec);padding:10px;font-size:0.9rem">'
+                    + translations[lang]['lb-empty'] + '</div>';
                 return;
             }
 
             list.innerHTML = Object.entries(data)
                 .sort((a, b) => b[1] - a[1])
                 .map(([name, count], index) => {
-                    const medal = index === 0 ? '🥇 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : '';
-                    return '<div class="lb-row"><span>' + medal + name + '</span><span style="font-weight:700">' + count + '</span></div>';
+                    const medal =
+                        index === 0 ? '🥇 ' :
+                            index === 1 ? '🥈 ' :
+                                index === 2 ? '🥉 ' : '';
+                    return (
+                        '<div class="lb-row"><span>' + medal + name +
+                        '</span><span style="font-weight:700">' + count +
+                        '</span></div>'
+                    );
                 })
                 .join('');
         } catch (error) {
-            document.getElementById('leaderboardList').innerHTML = '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
+            document.getElementById('leaderboardList').innerHTML =
+                '<div style="text-align:center;color:var(--text-sec);padding:10px">Fehler beim Laden</div>';
         }
     }
 
     function setLbDays(days, el) {
-        document.querySelectorAll('.time-opt').forEach(o => o.classList.remove('active'));
+        document.querySelectorAll('.time-opt')
+            .forEach(o => o.classList.remove('active'));
         el.classList.add('active');
         loadLeaderboard(days);
     }
 
     function sendWalkRequest() {
-        const msg = 'Kann jemand mit Kira Gassi gehen? 🐕';
+        const msg = translations[lang]['wa-msg'];
         fetch(API + '/api/walk-request', {method: 'POST'}).catch(() => {});
         window.open('https://wa.me/?text=' + encodeURIComponent(msg));
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        initLang();
         initDarkMode();
         loadWeather();
         loadStatus();
-        loadFood();
         loadHistory();
         loadLeaderboard(3);
     });
 
-    // OPTIMIERT: Wegen Backend-Cache kann Intervall auf 60 Sekunden erhöht werden
     setInterval(() => {
         loadWeather();
         loadStatus();
-        loadFood();
         loadHistory();
     }, 60000);
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if(!localStorage.getItem('darkMode')) {
-            document.body.classList.toggle('dark-mode', e.matches);
-            document.getElementById('dm-dark').classList.toggle('active', e.matches);
-            document.getElementById('dm-light').classList.toggle('active', !e.matches);
-        }
-    });
 </script>
 </body>
 </html>

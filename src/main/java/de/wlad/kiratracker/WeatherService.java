@@ -17,7 +17,7 @@ public class WeatherService {
                 + "?q=Berlin,de"
                 + "&appid=" + apiKey
                 + "&units=metric"
-                + "&lang=de;
+                + "&lang=de";
 
         try {
             WeatherApiResponse response =

@@ -2,402 +2,311 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kira Tracker v2</title>
-    <!-- SF Pro ähnliche Schriftart -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kira Tracker – WhatsApp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+    <meta name="theme-color" content="#F5F5F7">
     <style>
         :root {
-            --bg: #F5F5F7; /* Apple Background Grey */
-            --card: #FFFFFF;
-            --primary: #007AFF; /* Apple Blue */
-            --text: #1D1D1F;
-            --text-sec: #86868B;
-            --shadow: 0 4px 12px rgba(0,0,0,0.06);
-            --radius: 18px;
+            --bg:#F5F5F7;
+            --card:#FFFFFF;
+            --primary:#007AFF;
+            --text:#1D1D1F;
+            --text-sec:#86868B;
+            --radius:18px;
+            --input-bg:#F2F2F7;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+        body.dark-mode {
+            --bg:#000000;
+            --card:#1C1C1E;
+            --primary:#0A84FF;
+            --text:#F5F5F7;
+            --text-sec:#8E8E93;
+            --input-bg:#2C2C2E;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
+            font-family:"Inter",sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            padding:20px;
+            max-width:500px;
+            margin:0 auto;
+            padding-top:80px;
+            transition:0.3s;
         }
-
-        /* HEADER */
-        header {
-            text-align: center;
-            margin: 30px 0 40px;
-            animation: fadeIn 0.8s ease;
+        .controls {
+            position:fixed;
+            top:25px;
+            right:20px;
+            display:flex;
+            gap:8px;
+            z-index:10;
         }
-        h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 5px; }
-        .subtitle { color: var(--text-sec); font-size: 1rem; }
-
-        /* LANGUAGE TOGGLE (Floating Pill) */
-        .lang-toggle {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(10px);
-            padding: 4px; border-radius: 100px;
-            display: flex; gap: 2px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            cursor: pointer;
+        .pill {
+            background:var(--card);
+            padding:4px;
+            border-radius:100px;
+            display:flex;
+            gap:2px;
+            cursor:pointer;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
         }
-        .lang-opt { padding: 6px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; color: var(--text-sec); transition: 0.3s; }
-        .lang-opt.active { background: var(--text); color: white; }
+        .pill-opt {
+            padding:6px 12px;
+            border-radius:100px;
+            font-size:0.75rem;
+            font-weight:600;
+            color:var(--text-sec);
+            transition:0.3s;
+        }
+        .pill-opt.active {
+            background:var(--text);
+            color:var(--bg);
+        }
+        header { text-align:center; margin-bottom:20px; }
+        h1 { font-size:1.6rem; font-weight:700; margin-bottom:5px; }
+        .subtitle { color:var(--text-sec); font-size:0.9rem; }
 
-        /* CARDS */
         .card {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s;
-        }
-        .card:active { transform: scale(0.98); }
-
-        /* STATUS GRID */
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .status-box {
-            background: var(--card); border-radius: var(--radius); padding: 20px;
-            text-align: center; box-shadow: var(--shadow);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 140px; transition: 0.3s;
-        }
-        .status-box.done { background: #E4F9E8; color: #1E6F30; } /* Soft Green */
-        .status-box.open { background: #FFF0F0; color: #D63031; } /* Soft Red */
-
-        .status-icon { font-size: 2.5rem; margin-bottom: 10px; }
-        .status-label { font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.7; }
-
-        /* INPUT AREA */
-        .input-area { display: flex; gap: 10px; margin-top: 15px; }
-        input {
-            flex: 1; padding: 16px; border-radius: 14px; border: 1px solid #E5E5EA;
-            font-size: 1rem; background: #F2F2F7; transition: 0.2s;
-        }
-        input:focus { outline: none; background: white; border-color: var(--primary); }
-
-        .btn-circle {
-            width: 54px; height: 54px; border-radius: 50%; border: none;
-            background: var(--text); color: white; font-size: 1.2rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s;
-        }
-        .btn-circle:hover { transform: scale(1.1); background: var(--primary); }
-
-        /* LIST */
-        .list-header { font-size: 1.1rem; font-weight: 600; margin: 30px 0 15px 5px; }
-        .entry {
-            display: flex; align-items: center; padding: 16px;
-            border-bottom: 1px solid #F2F2F7;
-        }
-        .entry:last-child { border-bottom: none; }
-
-        .avatar {
-            width: 42px; height: 42px; border-radius: 12px;
-            background: #E5E5EA; color: #1D1D1F;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600; margin-right: 15px; font-size: 1.1rem;
+            background:var(--card);
+            border-radius:var(--radius);
+            padding:20px;
+            margin-bottom:20px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.06);
         }
 
-        .meta { flex: 1; }
-        .name { font-weight: 600; font-size: 1rem; }
-        .time { font-size: 0.8rem; color: var(--text-sec); margin-top: 2px; }
-
-        /* APPLAUS */
-        .applause-tag {
-            background: #F2F2F7; padding: 6px 12px; border-radius: 100px;
-            font-size: 0.8rem; font-weight: 600; color: var(--text-sec);
-            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px;
+        .msg-list { display:flex; flex-direction:column; gap:10px; }
+        .msg-item {
+            background:var(--input-bg);
+            border-radius:12px;
+            padding:10px 12px;
+            cursor:pointer;
+            font-size:0.9rem;
         }
-        .applause-tag.active { background: #FFD60A; color: #333; transform: scale(1.1); }
 
-        /* ADMIN EDIT (Hidden) */
-        .edit-icon {
-            display: none; margin-left: 10px; opacity: 0.3; cursor: pointer; font-size: 1.1rem;
+        .msg-item.selected {
+            border:2px solid var(--primary);
+            background:#dbeafe;
         }
-        body.admin-mode .edit-icon { display: block; }
-        .edit-icon:hover { opacity: 1; color: var(--primary); }
-
-        /* WHATSAPP SECTION */
-        .wa-card {
-            background: #E9FCF2; border: 1px solid #C1EAD5; color: #0C4A28;
-            padding: 20px; border-radius: var(--radius); margin-top: 30px;
-            text-align: center; cursor: pointer; transition: 0.2s;
+        body.dark-mode .msg-item.selected {
+            background:#1d3b63;
         }
-        .wa-card:hover { transform: scale(1.02); }
-        .wa-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
-        .wa-sub { font-size: 0.9rem; opacity: 0.8; }
 
-        /* MODAL */
-        .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px);
-            z-index: 99; display: none; align-items: center; justify-content: center;
+        textarea {
+            width:100%;
+            min-height:120px;
+            border-radius:12px;
+            border:none;
+            padding:12px;
+            resize:vertical;
+            font-family:"Inter",sans-serif;
+            font-size:0.9rem;
+            background:var(--input-bg);
+            color:var(--text);
         }
-        .modal {
-            background: white; width: 85%; max-width: 320px; padding: 25px;
-            border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        .btn-row {
+            display:flex;
+            gap:10px;
+            margin-top:15px;
         }
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* ANIMATIONS */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-primary {
+            flex:1;
+            padding:12px;
+            border-radius:12px;
+            border:none;
+            background:var(--primary);
+            color:white;
+            font-weight:600;
+            cursor:pointer;
+        }
 
-        /* Footer Lock */
-        .footer-lock { text-align: center; margin-top: 50px; opacity: 0.2; font-size: 1.2rem; cursor: pointer; }
+        .btn-secondary {
+            flex:1;
+            padding:12px;
+            border-radius:12px;
+            border:none;
+            background:var(--card);
+            color:var(--text-sec);
+            font-weight:500;
+            cursor:pointer;
+            box-shadow:0 2px 6px rgba(0,0,0,0.06);
+        }
     </style>
 </head>
 <body>
-
-<div class="lang-toggle" onclick="toggleLang()">
-    <div class="lang-opt active" id="l-de">DE</div>
-    <div class="lang-opt" id="l-ru">RU</div>
+<div class="controls">
+    <div class="pill" onclick="toggleLang()">
+        <div class="pill-opt active" id="l-de">DE</div>
+        <div class="pill-opt" id="l-ru">RU</div>
+    </div>
+    <div class="pill" onclick="toggleDark()">
+        <div class="pill-opt active" id="dm-light">☀️</div>
+        <div class="pill-opt" id="dm-dark">🌙</div>
+    </div>
 </div>
 
 <header>
-    <h1>Kira Tracker</h1>
-    <div class="subtitle" data-key="subtitle">Der tägliche Gassibegleiter</div>
+    <h1 id="title">WhatsApp Nachricht</h1>
+    <div class="subtitle" id="subtitle">Wähle eine Nachricht oder schreibe deine eigene</div>
 </header>
 
-<div class="status-grid">
-    <div class="status-box" id="morningBox">
-        <div class="status-icon">🌅</div>
-        <div class="status-label" data-key="morning">Morgen</div>
-        <div id="morningStatus" style="font-weight:700; margin-top:5px;">...</div>
+<div class="card">
+    <div style="font-weight:600; margin-bottom:10px" id="suggestionsTitle">
+        Vorschläge
     </div>
-    <div class="status-box" id="eveningBox">
-        <div class="status-icon">🌙</div>
-        <div class="status-label" data-key="evening">Abend</div>
-        <div id="eveningStatus" style="font-weight:700; margin-top:5px;">...</div>
-    </div>
+    <div class="msg-list" id="msgList"></div>
 </div>
 
 <div class="card">
-    <h3 style="font-size:1.1rem; font-weight:600;" data-key="add_title">Eintragen</h3>
-    <div class="input-area">
-        <input type="text" id="nameInput" placeholder="Name..." />
-        <button class="btn-circle" onclick="addWalk()">+</button>
+    <div style="font-weight:600; margin-bottom:10px" id="customTitle">
+        Eigene Nachricht
     </div>
-</div>
-
-<div class="list-header" data-key="history">Verlauf</div>
-<div class="card" style="padding: 10px;" id="historyList">
-    <!-- Einträge -->
-</div>
-
-<!-- Random WhatsApp Button -->
-<div class="wa-card" onclick="openWhatsApp()">
-    <div class="wa-title">💬 WhatsApp Request</div>
-    <div class="wa-sub" data-key="wa_sub">Jemand anderen fragen?</div>
-</div>
-
-<div class="footer-lock" onclick="unlockAdmin()">🔒</div>
-
-<!-- EDIT MODAL -->
-<div class="overlay" id="editModal">
-    <div class="modal">
-        <h3 style="margin-bottom:15px;" data-key="edit">Bearbeiten</h3>
-        <input type="hidden" id="editId">
-        <input type="text" id="editName" style="width:100%; margin-bottom:10px;">
-        <input type="text" id="editTime" style="width:100%; margin-bottom:20px;">
-        <div style="display:flex; justify-content:space-between;">
-            <button onclick="deleteEntry()" style="background:#FF3B30; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:600;">Löschen</button>
-            <button onclick="saveEntry()" style="background:#007AFF; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:600;">Speichern</button>
-        </div>
-        <div style="text-align:center; margin-top:15px; color:#999; font-size:0.8rem;" onclick="closeModal()">Abbrechen</div>
+    <textarea id="customMsg"></textarea>
+    <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack()" id="backBtn">Zurück</button>
+        <button class="btn-primary" onclick="sendWhatsapp()" id="sendBtn">Zu WhatsApp</button>
     </div>
 </div>
 
 <script>
-    // --- TEXTE (DE/RU) ---
-    const texts = {
+    const API = window.location.origin;
+    let lang = 'de';
+
+    const translations = {
         de: {
-            subtitle: "Der tägliche Gassibegleiter",
-            morning: "Morgen", evening: "Abend",
-            add_title: "Eintragen",
-            history: "Verlauf Heute",
-            wa_sub: "Jemand anderen fragen?",
-            edit: "Bearbeiten",
-            placeholder: "Name...",
-            empty: "Noch leer"
+            title: 'WhatsApp Nachricht',
+            subtitle: 'Wähle eine Nachricht oder schreibe deine eigene',
+            suggestionsTitle: 'Vorschläge',
+            customTitle: 'Eigene Nachricht',
+            backBtn: 'Zurück',
+            sendBtn: 'Zu WhatsApp',
+            msgs: [
+                'Kann jemand mit Kira Gassi gehen? 🐕',
+                'Hat heute jemand Zeit für einen Spaziergang mit Kira? 🐶',
+                'Kira würde sich über einen Spaziergang freuen – wer mag? 🐕‍🦺',
+                'Ist jemand in der Nähe und kann kurz mit Kira raus? 🌳',
+                'Kira braucht eine Gassi-Runde – Freiwillige vor! 🙂',
+                'Wer hat Lust auf einen Spaziergang mit Kira? 🚶‍♂️🐕',
+                'Könnte heute jemand die Abendrunde mit Kira übernehmen? 🌙',
+                'Brauche Hilfe: Kira muss dringend raus. Wer kann? 🙏'
+            ]
         },
         ru: {
-            subtitle: "Ежедневный трекер прогулок",
-            morning: "Утро", evening: "Вечер",
-            add_title: "Добавить",
-            history: "История сегодня",
-            wa_sub: "Спросить другого?",
-            edit: "Изменить",
-            placeholder: "Имя...",
-            empty: "Пока пусто"
+            title: 'Сообщение в WhatsApp',
+            subtitle: 'Выберите сообщение или напишите своё',
+            suggestionsTitle: 'Предложения',
+            customTitle: 'Собственное сообщение',
+            backBtn: 'Назад',
+            sendBtn: 'Перейти в WhatsApp',
+            msgs: [
+                'Кто может погулять с Кирой? 🐕',
+                'У кого есть время погулять с Кирой сегодня? 🐶',
+                'Кира была бы рада прогулке – кто хочет? 🐕‍🦺',
+                'Кто рядом и может быстро вывести Киру? 🌳',
+                'Кире нужна прогулка – есть добровольцы? 🙂',
+                'Кто хочет прогуляться с Кирой? 🚶‍♂️🐕',
+                'Кто может сегодня взять вечернюю прогулку с Кирой? 🌙',
+                'Нужна помощь: Киру срочно нужно выгулять. Кто может? 🙏'
+            ]
         }
     };
-    let lang = 'de';
+
+    let selectedIndex = null;
+
+    function initDarkMode() {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const saved = localStorage.getItem('darkMode');
+        const useDark = saved ? saved === 'dark' : prefersDark;
+        document.body.classList.toggle('dark-mode', useDark);
+        document.getElementById('dm-dark').classList.toggle('active', useDark);
+        document.getElementById('dm-light').classList.toggle('active', !useDark);
+    }
+
+    function toggleDark() {
+        const isDark = !document.body.classList.contains('dark-mode');
+        document.body.classList.toggle('dark-mode', isDark);
+        document.getElementById('dm-dark').classList.toggle('active', isDark);
+        document.getElementById('dm-light').classList.toggle('active', !isDark);
+        localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('darkMode')) {
+            const isDark = e.matches;
+            document.body.classList.toggle('dark-mode', isDark);
+            document.getElementById('dm-dark').classList.toggle('active', isDark);
+            document.getElementById('dm-light').classList.toggle('active', !isDark);
+        }
+    });
+
+    function applyTranslations() {
+        const t = translations[lang];
+
+        document.getElementById('title').textContent = t.title;
+        document.getElementById('subtitle').textContent = t.subtitle;
+        document.getElementById('suggestionsTitle').textContent = t.suggestionsTitle;
+        document.getElementById('customTitle').textContent = t.customTitle;
+        document.getElementById('backBtn').textContent = t.backBtn;
+        document.getElementById('sendBtn').textContent = t.sendBtn;
+
+        const list = document.getElementById('msgList');
+        list.innerHTML = '';
+        t.msgs.forEach((m, idx) => {
+            const div = document.createElement('div');
+            div.className = 'msg-item';
+            div.textContent = m;
+            div.onclick = () => selectMsg(idx);
+            list.appendChild(div);
+        });
+    }
 
     function toggleLang() {
         lang = lang === 'de' ? 'ru' : 'de';
+        localStorage.setItem('lang', lang);
         document.getElementById('l-de').classList.toggle('active');
         document.getElementById('l-ru').classList.toggle('active');
-        updateTexts();
+        applyTranslations();
     }
 
-    function updateTexts() {
-        document.querySelectorAll('[data-key]').forEach(el => {
-            el.innerText = texts[lang][el.dataset.key];
-        });
-        document.getElementById('nameInput').placeholder = texts[lang].placeholder;
-    }
-
-    // --- RANDOM WHATSAPP SPRÜCHE ---
-    const waPhrases = [
-        "Hey, kannst du heute mit Kira gehen? 🐕",
-        "Kira muss mal raus! Wer hat Zeit? 🐾",
-        "Wuff! Ich bin's, Kira. Geht jemand mit mir Gassi? 🎾",
-        "Gassirunde steht an! Freiwillige vor! 🌳",
-        "Zeit für frische Luft! Wer schnappt sich die Leine? 🦮"
-    ];
-
-    function openWhatsApp() {
-        const randomPhrase = waPhrases[Math.floor(Math.random() * waPhrases.length)];
-        window.open(`https://wa.me/?text=${encodeURIComponent(randomPhrase)}`, '_blank');
-    }
-
-    // --- DATA & ADMIN ---
-    let auth = localStorage.getItem('adminAuth') || '';
-    if(auth) document.body.classList.add('admin-mode');
-
-    function unlockAdmin() {
-        const p = prompt("Admin Passwort:");
-        // Sehr simpler Check (besser wäre echter Login, aber für Single-Page ok)
-        // Hier wird einfach nur Basic Auth String gebaut. Der Server prüft ihn dann.
-        if(p) {
-            auth = 'Basic ' + btoa('admin:' + p);
-            // Test call
-            fetch('/admin/walk/99999', { headers: { 'Authorization': auth } }).then(res => {
-                if(res.status !== 401) {
-                    document.body.classList.add('admin-mode');
-                    localStorage.setItem('adminAuth', auth);
-                    alert("Admin Mode: Active");
-                } else {
-                    alert("Falsch!");
-                }
-            });
+    function initLang() {
+        lang = localStorage.getItem('lang') || 'de';
+        if (lang === 'ru') {
+            document.getElementById('l-de').classList.remove('active');
+            document.getElementById('l-ru').classList.add('active');
         }
+        applyTranslations();
     }
 
-    async function loadData() {
-        try {
-            const res = await fetch('/status');
-            const data = await res.json();
-
-            // Status Boxen
-            setStatus('morning', data.wasMorning);
-            setStatus('evening', data.wasEvening);
-
-            // Liste
-            const list = document.getElementById('historyList');
-            if(data.entries.length === 0) {
-                list.innerHTML = `<div style="text-align:center; padding:20px; color:#aaa;">${texts[lang].empty}</div>`;
-            } else {
-                list.innerHTML = data.entries.map(e => `
-                    <div class="entry">
-                        <div class="avatar">${e.person.charAt(0).toUpperCase()}</div>
-                        <div class="meta">
-                            <div class="name">${e.person}</div>
-                            <div class="time">${e.timeFormatted}</div>
-                        </div>
-                        <div class="applause-tag" onclick="applause(${e.id}, this)">
-                            👏 ${e.applauseCount}
-                        </div>
-                        <div class="edit-icon" onclick="openEdit(${e.id}, '${e.person}', '${e.timeFormatted}')">✏️</div>
-                    </div>
-                `).join('');
-            }
-        } catch(e) { console.error(e); }
-    }
-
-    function setStatus(time, done) {
-        const box = document.getElementById(time + 'Box');
-        const txt = document.getElementById(time + 'Status');
-        if(done) {
-            box.className = 'status-box done';
-            txt.innerText = "DONE"; // Oder Haken
-        } else {
-            box.className = 'status-box open';
-            txt.innerText = "OPEN";
-        }
-    }
-
-    // --- ACTIONS ---
-    async function addWalk() {
-        const p = document.getElementById('nameInput').value;
-        if(!p) return;
-        await fetch('/walk', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ person: p })
+    function selectMsg(idx) {
+        selectedIndex = idx;
+        const items = document.querySelectorAll('.msg-item');
+        items.forEach((el, i) => {
+            el.classList.toggle('selected', i === idx);
         });
-        document.getElementById('nameInput').value = '';
-        loadData();
+        document.getElementById('customMsg').value = translations[lang].msgs[idx];
     }
 
-    async function applause(id, el) {
-        el.classList.add('active');
-        // Optimistic UI update
-        let count = parseInt(el.innerText.split(' ')[1]);
-        el.innerHTML = `👏 ${count + 1}`;
-        await fetch(`/walk/${id}/applause`, { method: 'POST' });
+    function goBack() {
+        window.location.href = 'index.html'; // ggf. an deinen Dateinamen anpassen
     }
 
-    // --- EDIT MODAL ---
-    function openEdit(id, name, time) {
-        document.getElementById('editModal').style.display = 'flex';
-        document.getElementById('editId').value = id;
-        document.getElementById('editName').value = name;
-        document.getElementById('editTime').value = time;
+    function sendWhatsapp() {
+        const text = document.getElementById('customMsg').value.trim()
+            || translations[lang].msgs[0];
+        fetch(API + '/api/walk-request', {method: 'POST'}).catch(() => {});
+        window.open('https://wa.me/?text=' + encodeURIComponent(text));
     }
 
-    function closeModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-
-    async function saveEntry() {
-        const id = document.getElementById('editId').value;
-        const body = {
-            person: document.getElementById('editName').value,
-            time: document.getElementById('editTime').value
-        };
-        await fetch(`/admin/walk/${id}`, {
-            method: 'PUT',
-            headers: { 'Authorization': auth, 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-        closeModal();
-        loadData();
-    }
-
-    async function deleteEntry() {
-        if(!confirm("Löschen?")) return;
-        const id = document.getElementById('editId').value;
-        await fetch(`/admin/walk/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': auth }
-        });
-        closeModal();
-        loadData();
-    }
-
-    // Init
-    loadData();
-    setInterval(loadData, 10000); // 10s Poll
+    document.addEventListener('DOMContentLoaded', () => {
+        initLang();
+        initDarkMode();
+    });
 </script>
 </body>
 </html>

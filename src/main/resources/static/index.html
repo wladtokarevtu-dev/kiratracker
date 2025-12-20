@@ -180,7 +180,7 @@
             background:var(--text);
             color:var(--bg);
             border:none;
-            font-size:0.9rem;
+            font-size:1.2rem;
             cursor:pointer;
             transition:0.2s;
             flex-shrink:0;
@@ -360,22 +360,14 @@
     <div class="input-area">
         <input type="text" id="nameInput" placeholder="Name..."
                data-i18n-placeholder="name-placeholder"/>
-    </div>
-    <div class="input-area" style="margin-top:10px">
-        <button class="btn-circle"
-                onclick="addWalk('MORNING')"
-                data-i18n="btn-morning">Morgens</button>
-        <button class="btn-circle"
-                onclick="addWalk('EVENING')"
-                data-i18n="btn-evening">Abends</button>
+        <button class="btn-circle" onclick="addWalk()">+</button>
     </div>
     <div class="quick-row">
-        <button class="quick-btn" onclick="quickAdd('Wlad','MORNING')">Wlad AM</button>
-        <button class="quick-btn" onclick="quickAdd('Wlad','EVENING')">Wlad PM</button>
-        <button class="quick-btn" onclick="quickAdd('Mama','MORNING')">Mama AM</button>
-        <button class="quick-btn" onclick="quickAdd('Mama','EVENING')">Mama PM</button>
-        <button class="quick-btn" onclick="quickAdd('Ilja','MORNING')">Ilja AM</button>
-        <button class="quick-btn" onclick="quickAdd('Ilja','EVENING')">Ilja PM</button>
+        <button class="quick-btn" onclick="quickAdd('Wlad')">Wlad</button>
+        <button class="quick-btn" onclick="quickAdd('Mama')">Mama</button>
+        <button class="quick-btn" onclick="quickAdd('Ilja')">Ilja</button>
+        <button class="quick-btn" onclick="quickAdd('Aaron')">Aaron</button>
+        <button class="quick-btn" onclick="quickAdd('Dajen')">Dajen</button>
     </div>
 </div>
 
@@ -395,7 +387,7 @@
 <div style="font-weight:600;margin:30px 0 15px 5px">Verlauf</div>
 <div class="card" id="historyList" style="padding:10px 20px"></div>
 
-<div class="wa-card" onclick="sendWalkRequest()">
+<div class="wa-card" onclick="openWhatsappPage()">
     <div style="font-weight:700" data-i18n="wa-title">💬 WhatsApp Anfrage</div>
     <div style="font-size:0.85rem;opacity:0.8" data-i18n="wa-subtitle">
         Benachrichtigung senden
@@ -414,8 +406,6 @@
             'status-evening-title': 'Abends Spaziergang',
             'walk-title': '🐕 Spaziergang eintragen',
             'name-placeholder': 'Name...',
-            'btn-morning': 'Morgens',
-            'btn-evening': 'Abends',
             'toast-name-missing': 'Bitte Namen angeben!',
             'toast-save-error': 'Fehler beim Speichern',
             'toast-delete-error': 'Fehler beim Löschen',
@@ -423,7 +413,6 @@
             'lb-empty': 'Keine Daten',
             'wa-title': '💬 WhatsApp Anfrage',
             'wa-subtitle': 'Benachrichtigung senden',
-            'wa-msg': 'Kann jemand mit Kira Gassi gehen? 🐕',
             'status-open': 'Offen',
             'status-done': 'Erledigt ✓'
         },
@@ -434,8 +423,6 @@
             'status-evening-title': 'Вечерняя прогулка',
             'walk-title': '🐕 Добавить прогулку',
             'name-placeholder': 'Имя...',
-            'btn-morning': 'Утро',
-            'btn-evening': 'Вечер',
             'toast-name-missing': 'Пожалуйста, укажите имя!',
             'toast-save-error': 'Ошибка при сохранении',
             'toast-delete-error': 'Ошибка при удалении',
@@ -443,7 +430,6 @@
             'lb-empty': 'Нет данных',
             'wa-title': '💬 Запрос в WhatsApp',
             'wa-subtitle': 'Отправить уведомление',
-            'wa-msg': 'Кто может погулять с Кирой? 🐕',
             'status-open': 'Открыто',
             'status-done': 'Сделано ✓'
         }
@@ -575,7 +561,8 @@
 
     async function loadStatus() {
         try {
-            const data = await fetchJSON(API + '/status'); // StatusDto.[file:2]
+            // nutzt /status mit StatusDto (wasMorning/wasEvening).[file:1][file:2]
+            const data = await fetchJSON(API + '/status');
 
             const mBox = document.getElementById('morningBox');
             const eBox = document.getElementById('eveningBox');
@@ -615,7 +602,7 @@
         }
     }
 
-    async function addWalk(timeOfDay) { // "MORNING" | "EVENING"
+    async function addWalk() {
         const person = document.getElementById('nameInput').value.trim();
 
         if (!person) {
@@ -624,10 +611,11 @@
         }
 
         try {
-            await fetchJSON(API + '/walk', { // nutzt s.addWalk(person,time).[file:1]
+            // nutzt /api/walk → s.addEntry(person); Einteilung nach Uhrzeit im Backend.[file:1]
+            await fetchJSON(API + '/api/walk', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({person, time: timeOfDay})
+                body: JSON.stringify({ person })
             });
 
             document.getElementById('nameInput').value = '';
@@ -639,9 +627,9 @@
         }
     }
 
-    function quickAdd(name, timeOfDay) {
+    function quickAdd(name) {
         document.getElementById('nameInput').value = name;
-        addWalk(timeOfDay);
+        addWalk();
     }
 
     async function loadHistory() {
@@ -769,10 +757,8 @@
         loadLeaderboard(days);
     }
 
-    function sendWalkRequest() {
-        const msg = translations[lang]['wa-msg'];
-        fetch(API + '/api/walk-request', {method: 'POST'}).catch(() => {});
-        window.open('https://wa.me/?text=' + encodeURIComponent(msg));
+    function openWhatsappPage() {
+        window.location.href = 'v2.html';
     }
 
     document.addEventListener('DOMContentLoaded', () => {

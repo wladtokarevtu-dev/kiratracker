@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class WeatherService {
 
@@ -20,25 +23,39 @@ public class WeatherService {
                 + "&lang=de";
 
         try {
-            WeatherApiResponse response =
-                    restTemplate.getForObject(url, WeatherApiResponse.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> response =
+                    restTemplate.getForObject(url, Map.class);
 
-            return mapToDto(response);
+            // main.temp
+            Map<String, Object> main = (Map<String, Object>) response.get("main");
+            double temp = main != null && main.get("temp") != null
+                    ? ((Number) main.get("temp")).doubleValue()
+                    : 0.0;
+
+            // weather[0].description + weather[0].id
+            List<Map<String, Object>> weatherList =
+                    (List<Map<String, Object>>) response.get("weather");
+            String description = "Unbekannt";
+            int code = 0;
+            if (weatherList != null && !weatherList.isEmpty()) {
+                Map<String, Object> w = weatherList.get(0);
+                if (w.get("description") != null) {
+                    description = w.get("description").toString();
+                }
+                if (w.get("id") != null) {
+                    code = ((Number) w.get("id")).intValue();
+                }
+            }
+
+            return new WeatherDto(temp, description, code);
         } catch (Exception ex) {
-            // WICHTIG: Kein 500 mehr wegen Wetter-Fehlern
-            WeatherDto dto = new WeatherDto();
-            dto.setDescription("Wetter derzeit nicht verfügbar");
-            dto.setTemperature(0.0);
-            dto.setIcon("01d");
-            return dto;
+            // WICHTIG: Kein 500 bei Wetterfehlern
+            return new WeatherDto(
+                    0.0,
+                    "Wetter derzeit nicht verfügbar",
+                    0
+            );
         }
-    }
-
-    private WeatherDto mapToDto(WeatherApiResponse response) {
-        WeatherDto dto = new WeatherDto();
-        dto.setDescription(response.getWeather().get(0).getDescription());
-        dto.setTemperature(response.getMain().getTemp());
-        dto.setIcon(response.getWeather().get(0).getIcon());
-        return dto;
     }
 }

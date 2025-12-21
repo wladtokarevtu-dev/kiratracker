@@ -8,16 +8,16 @@
     <meta name="theme-color" content="#F5F5F7">
     <style>
         :root {
-            --bg-light: #FAFAFA;
+            --bg-light: #F8F8F8;
             --card-light: #FFFFFF;
             --primary-light: #667eea;
             --text-light: #1D1D1F;
             --text-sec-light: #86868B;
-            --input-bg-light: #F5F5F7;
+            --input-bg-light: #F2F2F7;
             --border-light: rgba(0,0,0,0.08);
 
-            --bg-dark: #0D0D0D;
-            --card-dark: #1A1A1A;
+            --bg-dark: #000000;
+            --card-dark: #1C1C1E;
             --primary-dark: #667eea;
             --text-dark: #F5F5F7;
             --text-sec-dark: #8E8E93;
@@ -31,7 +31,8 @@
             --text-sec: var(--text-sec-light);
             --input-bg: var(--input-bg-light);
             --border: var(--border-light);
-            --radius: 24px;
+            --radius: 20px;
+            --spacing: 16px;
         }
 
         body.dark-mode {
@@ -53,312 +54,203 @@
 
         body {
             font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background: radial-gradient(circle at 35% 18%, #FFFFFF 0%, #F0F0F5 35%, #E8E8ED 70%, #FAFAFA 100%);
+            font-size: 16px;
+            line-height: 1.5;
+            letter-spacing: -0.01em;
+            background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            padding: 20px;
+            padding: var(--spacing);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
-            position: relative;
-            transition: background 0.4s cubic-bezier(0.16,1,0.3,1), color 0.3s ease-out;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        body.dark-mode {
-            background: radial-gradient(circle at 35% 18%, #0d0d0d 0%, #000000 55%, #0a0a0a 100%);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: -50%;
-            background: radial-gradient(circle, rgba(102,126,234,0.06) 0%, transparent 65%);
-            animation: shimmer 14s infinite linear;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        body.dark-mode::before {
-            background: radial-gradient(circle, rgba(102,126,234,0.12) 0%, transparent 65%);
-        }
-
-        @keyframes shimmer {
-            0% { transform: translate(-25%, -25%) rotate(0deg); }
-            100% { transform: translate(25%, 25%) rotate(360deg); }
+        @media (max-width: 400px) {
+            body {
+                padding: 12px;
+            }
         }
 
         .controls {
             position: fixed;
-            top: 28px;
-            right: 24px;
+            top: 20px;
+            right: var(--spacing);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             z-index: 100;
         }
 
         .pill {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px) saturate(200%);
-            -webkit-backdrop-filter: blur(20px) saturate(200%);
-            padding: 6px;
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 4px;
             border-radius: 100px;
             display: flex;
-            gap: 4px;
+            gap: 2px;
             cursor: pointer;
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.12),
-            0 2px 8px rgba(0,0,0,0.06),
-            inset 0 1px 0 rgba(255,255,255,0.8);
-            transition: transform 0.2s cubic-bezier(0.19,1,0.22,1),
-            box-shadow 0.2s ease-out;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
         }
 
-        body.dark-mode .pill {
-            background: rgba(30,30,30,0.85);
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6),
-            inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-
-        .pill:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 16px 50px rgba(0,0,0,0.18),
-            inset 0 1px 0 rgba(255,255,255,0.9);
+        .pill:active {
+            transform: scale(0.96);
         }
 
         .pill-opt {
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 100px;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--text-sec);
-            transition: all 0.25s cubic-bezier(0.19,1,0.22,1);
+            transition: all 0.2s ease;
         }
 
         .pill-opt.active {
-            background: linear-gradient(135deg, var(--text) 0%, var(--text) 100%);
+            background: var(--text);
             color: var(--bg);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .back-btn {
             position: fixed;
-            top: 28px;
-            left: 24px;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px) saturate(200%);
-            -webkit-backdrop-filter: blur(20px) saturate(200%);
-            border: 1px solid rgba(0,0,0,0.08);
+            top: 20px;
+            left: var(--spacing);
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
             color: var(--text);
-            padding: 12px 22px;
+            padding: 10px 18px;
             border-radius: 100px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             z-index: 100;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.12),
-            0 2px 8px rgba(0,0,0,0.06),
-            inset 0 1px 0 rgba(255,255,255,0.8);
-            transition: transform 0.2s cubic-bezier(0.19,1,0.22,1),
-            box-shadow 0.2s ease-out,
-            background 0.2s ease-out;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
         }
 
-        body.dark-mode .back-btn {
-            background: rgba(30,30,30,0.85);
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6),
-            inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-
-        .back-btn:hover {
-            transform: translateY(-2px) translateX(-2px);
-            box-shadow: 0 16px 50px rgba(0,0,0,0.18),
-            inset 0 1px 0 rgba(255,255,255,0.9);
+        .back-btn:active {
+            transform: scale(0.96);
         }
 
         header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 32px;
             z-index: 1;
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 2.4rem;
             font-weight: 900;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 45%, #F093FB 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 12px;
-            letter-spacing: -0.04em;
-            filter: drop-shadow(0 4px 12px rgba(102,126,234,0.25));
+            margin-bottom: 8px;
+            letter-spacing: -0.03em;
+        }
+
+        @media (max-width: 400px) {
+            h1 { font-size: 2rem; }
         }
 
         .subtitle {
             color: var(--text-sec);
-            font-size: 1.05rem;
+            font-size: 0.95rem;
             font-weight: 600;
         }
 
         .card {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(32px) saturate(200%);
-            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            background: var(--card);
             border-radius: var(--radius);
-            padding: 40px;
+            padding: 28px;
             max-width: 520px;
             width: 100%;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.15),
-            0 8px 32px rgba(0,0,0,0.08),
-            inset 0 1px 0 rgba(255,255,255,1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             z-index: 1;
-            position: relative;
+            border: 1px solid var(--border);
         }
 
-        body.dark-mode .card {
-            background: rgba(26,26,26,0.85);
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8),
-            inset 0 1px 0 rgba(255,255,255,0.12);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: var(--radius);
-            padding: 1px;
-            background: linear-gradient(145deg, rgba(255,255,255,0.9), transparent 40%);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        body.dark-mode .card::before {
-            background: linear-gradient(145deg, rgba(255,255,255,0.25), transparent 50%);
-            opacity: 0.4;
+        @media (max-width: 400px) {
+            .card { padding: 20px; }
         }
 
         .section-title {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: var(--text-sec);
-            margin-bottom: 18px;
+            margin-bottom: 14px;
         }
 
         .person-list {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            margin-bottom: 35px;
+            gap: 12px;
+            margin-bottom: 28px;
         }
 
         .person-checkbox {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 18px 20px;
+            gap: 14px;
+            padding: 14px 16px;
             background: var(--input-bg);
             border: 2px solid transparent;
-            border-radius: 16px;
+            border-radius: 14px;
             cursor: pointer;
-            transition: background 0.2s ease-out,
-            border-color 0.2s ease-out,
-            transform 0.2s cubic-bezier(0.19,1,0.22,1),
-            box-shadow 0.2s ease-out;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04),
-            inset 0 1px 0 rgba(255,255,255,0.5);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
         }
 
-        body.dark-mode .person-checkbox {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.08);
-        }
-
-        .person-checkbox::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 5px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            transform: scaleY(0);
-            transition: transform 0.3s cubic-bezier(0.19,1,0.22,1);
-            border-radius: 16px 0 0 16px;
-        }
-
-        .person-checkbox:hover {
-            background: rgba(102,126,234,0.06);
-            border-color: rgba(102,126,234,0.2);
-            transform: translateX(4px);
-            box-shadow: 0 6px 20px rgba(102,126,234,0.12);
-        }
-
-        body.dark-mode .person-checkbox:hover {
-            background: rgba(102,126,234,0.12);
+        .person-checkbox:active {
+            transform: scale(0.98);
         }
 
         .person-checkbox.selected {
             background: rgba(102,126,234,0.12);
-            border-color: rgba(102,126,234,0.5);
-            box-shadow: 0 8px 28px rgba(102,126,234,0.25),
-            inset 0 1px 0 rgba(255,255,255,0.3);
-            transform: translateX(4px);
+            border-color: rgba(102,126,234,0.4);
         }
 
         body.dark-mode .person-checkbox.selected {
-            background: rgba(102,126,234,0.2);
-            border-color: rgba(102,126,234,0.6);
-        }
-
-        .person-checkbox.selected::before {
-            transform: scaleY(1);
+            background: rgba(102,126,234,0.18);
+            border-color: rgba(102,126,234,0.5);
         }
 
         .person-checkbox input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             accent-color: #667eea;
             cursor: pointer;
         }
 
         .person-checkbox label {
-            font-size: 1.08rem;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             flex: 1;
         }
 
         .custom-input-wrapper {
-            margin-bottom: 35px;
+            margin-bottom: 28px;
         }
 
         .custom-input {
             width: 100%;
-            padding: 18px 20px;
-            border-radius: 16px;
-            border: 2px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
             background: var(--input-bg);
             color: var(--text);
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 600;
             font-family: "Inter", sans-serif;
-            transition: box-shadow 0.2s ease-out,
-            border-color 0.2s ease-out,
-            transform 0.2s ease-out,
-            background 0.2s ease-out;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04),
-            inset 0 1px 0 rgba(255,255,255,0.5);
+            transition: border-color 0.2s ease, background 0.2s ease;
         }
 
         .custom-input::placeholder {
@@ -368,106 +260,70 @@
 
         .custom-input:focus {
             outline: none;
-            box-shadow: 0 0 0 4px rgba(102,126,234,0.2),
-            0 8px 24px rgba(102,126,234,0.15);
-            transform: translateY(-2px);
             border-color: rgba(102,126,234,0.6);
             background: var(--card);
         }
 
         .add-custom-btn {
             width: 100%;
-            padding: 14px;
-            margin-top: 12px;
+            padding: 12px;
+            margin-top: 10px;
             background: var(--input-bg);
             color: var(--primary);
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            font-size: 0.95rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.19,1,0.22,1),
-            box-shadow 0.2s ease-out,
-            background 0.2s ease-out;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, background 0.2s ease;
         }
 
-        .add-custom-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,122,255,0.2);
-            background: rgba(0,122,255,0.08);
+        .add-custom-btn:active {
+            transform: scale(0.96);
         }
 
         .spin-btn {
             width: 100%;
-            padding: 22px;
+            padding: 18px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 18px;
-            font-size: 1.25rem;
+            border-radius: 16px;
+            font-size: 1.15rem;
             font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 20px 60px rgba(102,126,234,0.45),
-            0 8px 24px rgba(102,126,234,0.3),
-            inset 0 2px 0 rgba(255,255,255,0.3);
-            transition: transform 0.25s cubic-bezier(0.19,1,0.22,1),
-            box-shadow 0.25s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .spin-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.25s ease-out;
-        }
-
-        .spin-btn:hover::before {
-            opacity: 1;
-        }
-
-        .spin-btn:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 28px 76px rgba(102,126,234,0.6),
-            inset 0 2px 0 rgba(255,255,255,0.4);
+            box-shadow: 0 8px 24px rgba(102,126,234,0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .spin-btn:active {
-            transform: translateY(-2px) scale(1);
-            box-shadow: 0 16px 40px rgba(102,126,234,0.5);
+            transform: scale(0.96);
         }
 
         .spin-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
         .result-area {
-            margin-top: 40px;
+            margin-top: 32px;
             text-align: center;
-            min-height: 240px;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
 
         .slot-machine {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
-            margin-bottom: 30px;
-            height: 100px;
+            margin-bottom: 24px;
+            height: 90px;
             opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 0.5s cubic-bezier(0.19,1,0.22,1),
-            transform 0.5s cubic-bezier(0.19,1,0.22,1);
+            transform: scale(0.95);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         .slot-machine.active {
@@ -476,36 +332,29 @@
         }
 
         .slot-reel {
-            width: 80px;
-            height: 100px;
+            width: 70px;
+            height: 90px;
             background: var(--input-bg);
-            border: 3px solid var(--border);
-            border-radius: 16px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12),
-            inset 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        body.dark-mode .slot-reel {
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5),
-            inset 0 2px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .slot-reel-content {
             position: absolute;
             width: 100%;
-            font-size: 3.5rem;
-            line-height: 100px;
+            font-size: 3rem;
+            line-height: 90px;
             text-align: center;
             transition: transform 0.1s linear;
         }
 
         .winner-reveal {
             opacity: 0;
-            transform: scale(0.85) translateY(15px);
-            transition: opacity 0.6s cubic-bezier(0.19,1,0.22,1),
-            transform 0.6s cubic-bezier(0.19,1,0.22,1);
+            transform: scale(0.9) translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
         .winner-reveal.show {
@@ -514,47 +363,44 @@
         }
 
         .winner-name {
-            font-size: 3.8rem;
+            font-size: 3.2rem;
             font-weight: 900;
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 45%, #FF6B6B 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 16px;
-            letter-spacing: -0.03em;
-            filter: drop-shadow(0 6px 20px rgba(255,215,0,0.5));
-            animation: glow 1.8s infinite alternate;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
         }
 
-        @keyframes glow {
-            0% { filter: drop-shadow(0 6px 20px rgba(255,215,0,0.4)) brightness(1); }
-            100% { filter: drop-shadow(0 8px 28px rgba(255,215,0,0.6)) brightness(1.15); }
+        @media (max-width: 400px) {
+            .winner-name { font-size: 2.6rem; }
         }
 
         .winner-text {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--text-sec);
         }
 
         .confetti {
             position: fixed;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background: #FFD700;
             position: absolute;
-            animation: confetti-fall 3.5s ease-out;
+            animation: confetti-fall 3s ease-out;
             opacity: 0;
             border-radius: 2px;
         }
 
         @keyframes confetti-fall {
             0% {
-                transform: translateY(-120vh) rotate(0deg);
+                transform: translateY(-100vh) rotate(0deg);
                 opacity: 1;
             }
             100% {
-                transform: translateY(120vh) rotate(800deg);
+                transform: translateY(100vh) rotate(720deg);
                 opacity: 0;
             }
         }
@@ -578,28 +424,7 @@
 
 <div class="card">
     <div class="section-title">Personen auswählen</div>
-    <div class="person-list" id="personList">
-        <div class="person-checkbox" onclick="togglePerson(this, 'Aaron')">
-            <input type="checkbox" id="aaron" onchange="event.stopPropagation()">
-            <label for="aaron">Aaron</label>
-        </div>
-        <div class="person-checkbox" onclick="togglePerson(this, 'Ilja')">
-            <input type="checkbox" id="ilja" onchange="event.stopPropagation()">
-            <label for="ilja">Ilja</label>
-        </div>
-        <div class="person-checkbox" onclick="togglePerson(this, 'Wlad')">
-            <input type="checkbox" id="wlad" onchange="event.stopPropagation()">
-            <label for="wlad">Wlad</label>
-        </div>
-        <div class="person-checkbox" onclick="togglePerson(this, 'Mama')">
-            <input type="checkbox" id="mama" onchange="event.stopPropagation()">
-            <label for="mama">Mama</label>
-        </div>
-        <div class="person-checkbox" onclick="togglePerson(this, 'Dajen')">
-            <input type="checkbox" id="dajen" onchange="event.stopPropagation()">
-            <label for="dajen">Dajen</label>
-        </div>
-    </div>
+    <div class="person-list" id="personList"></div>
 
     <div class="custom-input-wrapper">
         <div class="section-title">Weitere Person hinzufügen</div>
@@ -627,7 +452,8 @@
 </div>
 
 <script>
-    let selectedPeople = [];
+    const defaultPeople = ['Aaron', 'Ilja', 'Wlad', 'Mama', 'Dajen'];
+    let allPeople = [...defaultPeople];
     let customPeople = [];
 
     function initDarkMode() {
@@ -656,19 +482,39 @@
         }
     });
 
-    function togglePerson(el, name) {
-        const checkbox = el.querySelector('input[type="checkbox"]');
-        checkbox.checked = !checkbox.checked;
+    function renderPeople() {
+        const list = document.getElementById('personList');
+        list.innerHTML = '';
 
-        if (checkbox.checked) {
-            el.classList.add('selected');
-            if (!selectedPeople.includes(name)) {
-                selectedPeople.push(name);
+        allPeople.forEach(name => {
+            const div = document.createElement('div');
+            div.className = 'person-checkbox';
+            div.dataset.name = name;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = 'person-' + name.toLowerCase();
+
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = name;
+
+            div.appendChild(checkbox);
+            div.appendChild(label);
+            list.appendChild(div);
+        });
+
+        list.addEventListener('click', function(e) {
+            const box = e.target.closest('.person-checkbox');
+            if (!box) return;
+
+            const checkbox = box.querySelector('input[type="checkbox"]');
+            if (e.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
             }
-        } else {
-            el.classList.remove('selected');
-            selectedPeople = selectedPeople.filter(p => p !== name);
-        }
+
+            box.classList.toggle('selected', checkbox.checked);
+        });
     }
 
     function addCustomPerson() {
@@ -680,28 +526,28 @@
             return;
         }
 
-        if (customPeople.includes(name) || selectedPeople.includes(name)) {
+        if (allPeople.includes(name)) {
             alert('Diese Person wurde bereits hinzugefügt!');
             return;
         }
 
+        allPeople.push(name);
         customPeople.push(name);
-
-        const personList = document.getElementById('personList');
-        const newPerson = document.createElement('div');
-        newPerson.className = 'person-checkbox';
-        newPerson.onclick = () => togglePerson(newPerson, name);
-        newPerson.innerHTML = `
-            <input type="checkbox" onchange="event.stopPropagation()">
-            <label>${name}</label>
-        `;
-        personList.appendChild(newPerson);
-
         input.value = '';
+        renderPeople();
+    }
+
+    function getSelectedPeople() {
+        const checkboxes = document.querySelectorAll('.person-checkbox input[type="checkbox"]:checked');
+        return Array.from(checkboxes).map(cb => {
+            return cb.closest('.person-checkbox').dataset.name;
+        });
     }
 
     function startSpin() {
-        if (selectedPeople.length === 0) {
+        const selected = getSelectedPeople();
+
+        if (selected.length === 0) {
             alert('Bitte mindestens eine Person auswählen!');
             return;
         }
@@ -722,13 +568,12 @@
         ];
 
         let spinCount = 0;
-        const maxSpins = 35;
+        const maxSpins = 30;
 
         const spinInterval = setInterval(() => {
             reels.forEach(reel => {
                 const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
                 reel.textContent = randomSymbol;
-                reel.style.transform = `translateY(-${(spinCount % 12) * 8}px)`;
             });
 
             spinCount++;
@@ -736,14 +581,14 @@
             if (spinCount >= maxSpins) {
                 clearInterval(spinInterval);
                 setTimeout(() => {
-                    revealWinner();
-                }, 450);
+                    revealWinner(selected);
+                }, 400);
             }
-        }, 90);
+        }, 80);
     }
 
-    function revealWinner() {
-        const winner = selectedPeople[Math.floor(Math.random() * selectedPeople.length)];
+    function revealWinner(selected) {
+        const winner = selected[Math.floor(Math.random() * selected.length)];
 
         const slotMachine = document.getElementById('slotMachine');
         const winnerReveal = document.getElementById('winnerReveal');
@@ -757,30 +602,31 @@
             winnerReveal.classList.add('show');
             createConfetti();
             spinBtn.disabled = false;
-        }, 350);
+        }, 300);
     }
 
     function createConfetti() {
         const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#45B7D1', '#F7DC6F', '#E74C3C', '#9B59B6'];
 
-        for (let i = 0; i < 70; i++) {
+        for (let i = 0; i < 50; i++) {
             setTimeout(() => {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
                 confetti.style.left = Math.random() * 100 + 'vw';
                 confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 0.3 + 's';
-                confetti.style.width = (Math.random() * 10 + 8) + 'px';
+                confetti.style.animationDelay = Math.random() * 0.2 + 's';
+                confetti.style.width = (Math.random() * 8 + 6) + 'px';
                 confetti.style.height = confetti.style.width;
                 document.body.appendChild(confetti);
 
-                setTimeout(() => confetti.remove(), 3500);
-            }, i * 25);
+                setTimeout(() => confetti.remove(), 3000);
+            }, i * 20);
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         initDarkMode();
+        renderPeople();
     });
 </script>
 

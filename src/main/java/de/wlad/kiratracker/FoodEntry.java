@@ -1,9 +1,6 @@
 package de.wlad.kiratracker;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -14,16 +11,12 @@ public class FoodEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Person darf nicht leer sein")
-    @Size(max = 100)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String person;
 
-    @Size(max = 255)
-    @Column
+    @Column(length = 255)
     private String food;
 
-    @NotNull
     @Column(nullable = false)
     private ZonedDateTime timestamp;
 

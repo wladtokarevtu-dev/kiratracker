@@ -32,12 +32,12 @@ public class HelloController {
         return ResponseEntity.ok(statusDto);
     }
 
-    // Walk eintragen
-    @PostMapping("/walk")
-    public ResponseEntity<String> addWalk(@RequestBody WalkRequest request) {
-        walkService.addWalk(request.getPerson(), request.getTime());
-        return ResponseEntity.ok("Spaziergang eingetragen!");
+    @GetMapping("/walk")
+    public ResponseEntity<String> addWalkGet(@RequestParam String person) {
+        walkService.addEntry(person);
+        return ResponseEntity.ok("OK");
     }
+
 
     // Walk Request erstellen
     @PostMapping("/walk/request")

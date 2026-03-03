@@ -14,11 +14,13 @@ public class HelloController {
     private final WeatherService weatherService;
     private final WalkRequestService requestService;
     private final FoodService foodService;
+    private final PauseRepository pauseRepository;
 
     @Autowired
-    public HelloController(WalkService w, WeatherService we, WalkRequestService r, FoodService f) {
+    public HelloController(WalkService w, WeatherService we, WalkRequestService r, FoodService f, PauseRepository pr) {
         this.walkService = w; this.weatherService = we;
         this.requestService = r; this.foodService = f;
+        this.pauseRepository = pr;
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -34,9 +36,9 @@ public class HelloController {
     @GetMapping("/status")
     public ResponseEntity<StatusDto> status() {
         return ResponseEntity.ok(new StatusDto(
-            walkService.wasMorning(), walkService.wasEvening(),
-            walkService.getEntries(), walkService.getLeaderboardLast7Days(),
-            weatherService.getCurrentWeather(), requestService.getPendingRequestsCount()));
+                walkService.wasMorning(), walkService.wasEvening(),
+                walkService.getEntries(), walkService.getLeaderboardLast7Days(),
+                weatherService.getCurrentWeather(), requestService.getPendingRequestsCount()));
     }
 
     @PostMapping("/walk")
@@ -102,7 +104,7 @@ public class HelloController {
 
     @PutMapping("/admin/walk/{id}")
     public ResponseEntity<WalkEntry> updateWalk(@PathVariable Long id,
-            @RequestBody WalkLogRequest r) {
+                                                @RequestBody WalkLogRequest r) {
         return ResponseEntity.ok(walkService.updateEntry(id, r.getPerson(), r.getTime()));
     }
 
@@ -114,8 +116,33 @@ public class HelloController {
 
     @PutMapping("/admin/food/{id}")
     public ResponseEntity<FoodEntryDto> updateFood(@PathVariable Long id,
-            @RequestBody FoodRequest r) {
+                                                   @RequestBody FoodRequest r) {
         return ResponseEntity.ok(foodService.updateFood(id, r.getPerson(), r.getFood()));
+    }
+
+    @GetMapping("/pause")
+    public ResponseEntity<Map<String,Object>> getPause() {
+        PauseState state = pauseRepository.findById(1L).orElse(new PauseState());
+        Map<String,Object> result = new java.util.HashMap<>();
+        result.put("active", state.getPauseIndex() != null);
+        result.put("index", state.getPauseIndex());
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/admin/pause")
+    public ResponseEntity<String> setPause(@RequestBody Map<String,Integer> body) {
+        PauseState state = pauseRepository.findById(1L).orElse(new PauseState());
+        state.setPauseIndex(body.get("index"));
+        pauseRepository.save(state);
+        return ResponseEntity.ok("Pause gesetzt.");
+    }
+
+    @DeleteMapping("/admin/pause")
+    public ResponseEntity<String> clearPause() {
+        PauseState state = pauseRepository.findById(1L).orElse(new PauseState());
+        state.setPauseIndex(null);
+        pauseRepository.save(state);
+        return ResponseEntity.ok("Pause beendet.");
     }
 
     @GetMapping("/admin/cleanup")

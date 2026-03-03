@@ -29,23 +29,35 @@ public class WalkService {
 
     @Transactional
     public void addWalk(String person, String time) {
-        addEntry(person);
+        ZonedDateTime walkTime;
+        if (time != null && !time.isEmpty()) {
+            try {
+                walkTime = ZonedDateTime.parse(time);
+            } catch (Exception e) {
+                walkTime = ZonedDateTime.now(BERLIN_ZONE);
+            }
+        } else {
+            walkTime = ZonedDateTime.now(BERLIN_ZONE);
+        }
+        walkRepository.save(new WalkEntry(person, walkTime));
+    }
+
+    public List<WalkEntry> getTodayWalks() {
+        ZonedDateTime todayStart = ZonedDateTime.now(BERLIN_ZONE)
+                .toLocalDate().atStartOfDay(BERLIN_ZONE);
+        return walkRepository.findEntriesSince(todayStart);
     }
 
     public boolean wasMorning() {
-        ZonedDateTime now = ZonedDateTime.now(BERLIN_ZONE);
-        ZonedDateTime todayStart = now.toLocalDate().atStartOfDay(BERLIN_ZONE);
-        ZonedDateTime noon = todayStart.plusHours(12);
-        List<WalkEntry> todayWalks = walkRepository.findEntriesSince(todayStart);
-        return todayWalks.stream().anyMatch(w -> w.getTime().isBefore(noon));
+        ZonedDateTime noon = ZonedDateTime.now(BERLIN_ZONE)
+                .toLocalDate().atStartOfDay(BERLIN_ZONE).plusHours(12);
+        return getTodayWalks().stream().anyMatch(w -> w.getTime().isBefore(noon));
     }
 
     public boolean wasEvening() {
-        ZonedDateTime now = ZonedDateTime.now(BERLIN_ZONE);
-        ZonedDateTime todayStart = now.toLocalDate().atStartOfDay(BERLIN_ZONE);
-        ZonedDateTime noon = todayStart.plusHours(12);
-        List<WalkEntry> todayWalks = walkRepository.findEntriesSince(todayStart);
-        return todayWalks.stream().anyMatch(w -> !w.getTime().isBefore(noon));
+        ZonedDateTime noon = ZonedDateTime.now(BERLIN_ZONE)
+                .toLocalDate().atStartOfDay(BERLIN_ZONE).plusHours(12);
+        return getTodayWalks().stream().anyMatch(w -> !w.getTime().isBefore(noon));
     }
 
     public List<WalkEntryDto> getEntries() {
@@ -55,8 +67,12 @@ public class WalkService {
     }
 
     public Map<String, Long> getLeaderboardLast7Days() {
-        ZonedDateTime sevenDaysAgo = ZonedDateTime.now(BERLIN_ZONE).minusDays(7);
-        List<Object[]> results = walkRepository.getLeaderboardSince(sevenDaysAgo);
+        return getLeaderboardLastNDays(7);
+    }
+
+    public Map<String, Long> getLeaderboardLastNDays(int days) {
+        ZonedDateTime since = ZonedDateTime.now(BERLIN_ZONE).minusDays(days);
+        List<Object[]> results = walkRepository.getLeaderboardSince(since);
         Map<String, Long> leaderboard = new LinkedHashMap<>();
         for (Object[] result : results) {
             leaderboard.put((String) result[0], (Long) result[1]);
@@ -86,8 +102,11 @@ public class WalkService {
                 .orElseThrow(() -> new IllegalArgumentException("Entry not found: " + id));
         entry.setPerson(person);
         if (timeString != null && !timeString.isEmpty()) {
-            ZonedDateTime newTime = ZonedDateTime.parse(timeString);
-            entry.setTime(newTime);
+            try {
+                entry.setTime(ZonedDateTime.parse(timeString));
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Ungueltige Zeitformat: " + timeString);
+            }
         }
         return walkRepository.save(entry);
     }

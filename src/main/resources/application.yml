@@ -28,3 +28,7 @@ weather:
 
 server:
   port: ${PORT:8080}
+
+ntfy:
+  url: https://ntfy.sh
+  topic: ${NTFY_TOPIC}

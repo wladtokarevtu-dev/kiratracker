@@ -86,6 +86,18 @@ Pause state is checked at reminder time via `pauseRepository.findById(1L).orElse
 2. Subscribe to the topic name set in `NTFY_TOPIC`
 3. Done — notifications arrive natively
 
+## Admin: Walk-Eintrag bearbeiten (Person + Uhrzeit)
+
+In `index.html` existiert `editWalk(id, person)` bereits — fragt per `prompt` nach dem Namen und sendet `PUT /admin/walk/{id}`. Wird erweitert:
+
+1. Zusätzliches `prompt` für Uhrzeit im Format `HH:mm` (Vorausfüllung aus dem aktuellen `timeFormatted`)
+2. Datum wird aus dem aktuellen Eintrag übernommen (nur Uhrzeit änderbar — typischer Usecase: jemand hat vergessen sich einzutragen)
+3. Datum aus `curDate` (Teil von `timeFormatted`) + neue Uhrzeit → `"dd.MM.yy HH:mm"` als `time`-Feld mitgeschickt. Backend parst dieses Format als Berlin-Zeit. (Einfacher als ISO 8601 mit DST-Offset-Berechnung im Browser.)
+
+Das Backend (`WalkService.updateEntry`) parst bereits `ZonedDateTime.parse(timeString)` — funktioniert direkt.
+
+`editFood(id, person, food)` bekommt bereits heute Person + Was — keine Änderung nötig.
+
 ## Files Changed
 
 | File | Change |
@@ -95,3 +107,4 @@ Pause state is checked at reminder time via `pauseRepository.findById(1L).orElse
 | `FoodService.java` | Inject NotificationService, call after save |
 | `KiratrackerApplication.java` | Add `@EnableScheduling` and `@EnableAsync` |
 | `application.yml` | Add ntfy config block |
+| `index.html` | Extend `editWalk()` to also prompt for time (HH:mm) and send as ISO 8601 |

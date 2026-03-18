@@ -3,6 +3,7 @@ package de.wlad.kiratracker;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,8 @@ public class WalkService {
     private final NotificationService notificationService;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
     private static final ZoneId BERLIN_ZONE = ZoneId.of("Europe/Berlin");
+    private static final DateTimeFormatter INPUT_FORMATTER =
+            DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
     public WalkService(WalkRepository walkRepository, NotificationService notificationService) {
         this.walkRepository = walkRepository;
@@ -35,11 +38,7 @@ public class WalkService {
     public void addWalk(String person, String time) {
         ZonedDateTime walkTime;
         if (time != null && !time.isEmpty()) {
-            try {
-                walkTime = ZonedDateTime.parse(time);
-            } catch (Exception e) {
-                walkTime = ZonedDateTime.now(BERLIN_ZONE);
-            }
+            walkTime = parseTimeSoft(time);
         } else {
             walkTime = ZonedDateTime.now(BERLIN_ZONE);
         }
@@ -107,11 +106,7 @@ public class WalkService {
                 .orElseThrow(() -> new IllegalArgumentException("Entry not found: " + id));
         entry.setPerson(person);
         if (timeString != null && !timeString.isEmpty()) {
-            try {
-                entry.setTime(ZonedDateTime.parse(timeString));
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Ungueltige Zeitformat: " + timeString);
-            }
+            entry.setTime(parseTimeStrict(timeString));
         }
         return walkRepository.save(entry);
     }
@@ -140,5 +135,19 @@ public class WalkService {
                 entry.getTime().withZoneSameInstant(BERLIN_ZONE).format(FORMATTER),
                 entry.getApplauseCount()
         );
+    }
+
+    // Used in addWalk: falls back to now on bad input
+    private ZonedDateTime parseTimeSoft(String timeString) {
+        try { return ZonedDateTime.parse(timeString); } catch (Exception ignored) {}
+        try { return LocalDateTime.parse(timeString, INPUT_FORMATTER).atZone(BERLIN_ZONE); } catch (Exception ignored) {}
+        return ZonedDateTime.now(BERLIN_ZONE);
+    }
+
+    // Used in updateEntry: throws on bad input (returns HTTP 404 via @ExceptionHandler(IllegalArgumentException.class))
+    private ZonedDateTime parseTimeStrict(String timeString) {
+        try { return ZonedDateTime.parse(timeString); } catch (Exception ignored) {}
+        try { return LocalDateTime.parse(timeString, INPUT_FORMATTER).atZone(BERLIN_ZONE); } catch (Exception ignored) {}
+        throw new IllegalArgumentException("Ungueltige Zeitformat: " + timeString);
     }
 }

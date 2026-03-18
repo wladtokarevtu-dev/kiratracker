@@ -13,11 +13,13 @@ import java.util.stream.Collectors;
 public class FoodService {
 
     private final FoodRepository foodRepository;
+    private final NotificationService notificationService;
     private static final ZoneId BERLIN_ZONE = ZoneId.of("Europe/Berlin");
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
 
-    public FoodService(FoodRepository foodRepository) {
+    public FoodService(FoodRepository foodRepository, NotificationService notificationService) {
         this.foodRepository = foodRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -31,6 +33,7 @@ public class FoodService {
                 ZonedDateTime.now(BERLIN_ZONE)
         );
         FoodEntry saved = foodRepository.save(entry);
+        notificationService.sendFoodNotification(person.trim());
         return toDto(saved);
     }
 
@@ -78,7 +81,7 @@ public class FoodService {
                 entry.getId(),
                 entry.getPerson(),
                 entry.getFood(),
-                entry.getTimestamp().format(FORMATTER)
+                entry.getTimestamp().withZoneSameInstant(BERLIN_ZONE).format(FORMATTER)
         );
     }
 }

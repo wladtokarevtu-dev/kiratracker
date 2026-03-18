@@ -13,18 +13,22 @@ import java.util.stream.Collectors;
 public class WalkService {
 
     private final WalkRepository walkRepository;
+    private final NotificationService notificationService;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
     private static final ZoneId BERLIN_ZONE = ZoneId.of("Europe/Berlin");
 
-    public WalkService(WalkRepository walkRepository) {
+    public WalkService(WalkRepository walkRepository, NotificationService notificationService) {
         this.walkRepository = walkRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
     public WalkEntry addEntry(String person) {
         ZonedDateTime now = ZonedDateTime.now(BERLIN_ZONE);
         WalkEntry entry = new WalkEntry(person, now);
-        return walkRepository.save(entry);
+        walkRepository.save(entry);
+        notificationService.sendWalkNotification(person);
+        return entry;
     }
 
     @Transactional
@@ -40,6 +44,7 @@ public class WalkService {
             walkTime = ZonedDateTime.now(BERLIN_ZONE);
         }
         walkRepository.save(new WalkEntry(person, walkTime));
+        notificationService.sendWalkNotification(person);
     }
 
     public List<WalkEntry> getTodayWalks() {
@@ -132,7 +137,7 @@ public class WalkService {
         return new WalkEntryDto(
                 entry.getId(),
                 entry.getPerson(),
-                entry.getTime().format(FORMATTER),
+                entry.getTime().withZoneSameInstant(BERLIN_ZONE).format(FORMATTER),
                 entry.getApplauseCount()
         );
     }

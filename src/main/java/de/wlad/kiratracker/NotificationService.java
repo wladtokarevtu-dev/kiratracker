@@ -8,6 +8,9 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -73,6 +76,14 @@ public class NotificationService {
         // other pause types: silent
     }
 
+    @Scheduled(cron = "0 0 7 * * *", zone = "Europe/Berlin")
+    public void checkAaronReminder() {
+        if (getPauseIndex() != null) return; // skip during pause
+        if (!walkService.personWalkedInLastDays("Aaron", 3)) {
+            send("👀 Aaron war schon länger nicht mit Kira draußen...");
+        }
+    }
+
     private Integer getPauseIndex() {
         return pauseRepository.findById(1L)
                 .orElse(new PauseState())
@@ -81,7 +92,10 @@ public class NotificationService {
 
     private void send(String message) {
         try {
-            restTemplate.postForEntity(ntfyUrl + "/" + ntfyTopic, message, String.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.TEXT_PLAIN);
+            HttpEntity<String> request = new HttpEntity<>(message, headers);
+            restTemplate.postForEntity(ntfyUrl + "/" + ntfyTopic, request, String.class);
         } catch (Exception e) {
             log.warn("ntfy.sh notification failed: {}", e.getMessage());
         }

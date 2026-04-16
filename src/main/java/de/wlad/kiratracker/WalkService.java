@@ -64,6 +64,12 @@ public class WalkService {
         return getTodayWalks().stream().anyMatch(w -> !w.getTime().isBefore(noon));
     }
 
+    public boolean personWalkedInLastDays(String person, int days) {
+        ZonedDateTime since = ZonedDateTime.now(BERLIN_ZONE).minusDays(days);
+        return walkRepository.findEntriesSince(since).stream()
+                .anyMatch(w -> w.getPerson().equalsIgnoreCase(person));
+    }
+
     public List<WalkEntryDto> getEntries() {
         return walkRepository.findAllByOrderByTimeDesc().stream()
                 .map(this::convertToDto)

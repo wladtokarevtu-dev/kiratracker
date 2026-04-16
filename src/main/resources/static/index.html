@@ -343,8 +343,26 @@ function applyLang(){
 }
 function toggleLang(){haptic('l');lang=lang==='de'?'ru':'de';localStorage.setItem('lang',lang);applyLang();renderH();renderLb(_lb);renderFood(_food);}
 
-function initPause(){const s=localStorage.getItem('pi');if(s&&s!=='null'){_pi=parseInt(s);showBanner();}}
-function setPause(idx){_pi=idx;localStorage.setItem('pi',idx);idx===null?hideBanner():showBanner();closeM('pauseM');toast(idx===null?'Pause beendet':'Pause aktiv 🐾','success');}
+async function initPause(){
+    try{
+        const d=await api(API+'/pause');
+        if(d&&d.active&&d.index!==null){_pi=d.index;showBanner();}
+    }catch(e){
+        const s=localStorage.getItem('pi');
+        if(s&&s!=='null'){_pi=parseInt(s);showBanner();}
+    }
+}
+async function setPause(idx){
+    if(idx!==null&&!document.body.classList.contains('admin-mode')){toast('Nur Admin kann Pause setzen');return;}
+    try{
+        if(idx===null){
+            await api(API+'/admin/pause',{method:'DELETE',headers:ah()});
+        }else{
+            await api(API+'/admin/pause',{method:'POST',headers:ah(),body:JSON.stringify({index:idx})});
+        }
+        _pi=idx;localStorage.setItem('pi',idx);idx===null?hideBanner():showBanner();closeM('pauseM');toast(idx===null?'Pause beendet':'Pause aktiv 🐾','success');
+    }catch(e){toast('Fehler beim Setzen der Pause');}
+}
 function showBanner(){
     if(_pi===null)return;
     const o=POPTS[_pi];
@@ -378,7 +396,20 @@ async function loadWeather(){try{const d=await api(API+'/status');if(d&&d.weathe
 async function loadStatus(){try{const d=await api(API+'/status');setBox(document.getElementById('mBox'),document.getElementById('mVal'),d.wasMorning);setBox(document.getElementById('eBox'),document.getElementById('eVal'),d.wasEvening);}catch(e){}}
 function setBox(b,l,done){const w=b.classList.contains('done');b.classList.toggle('done',done);b.classList.toggle('open',!done);l.textContent=done?tr('done'):tr('open');if(done&&!w)haptic('s');}
 
-async function loadStats(){try{const data=await api(API+'/walk');if(!Array.isArray(data))return;const now=new Date();const dd=String(now.getDate()).padStart(2,'0')+'.'+String(now.getMonth()+1).padStart(2,'0');document.getElementById('stT').textContent=data.length;document.getElementById('stD').textContent=data.filter(w=>(w.timeFormatted||'').includes(dd)).length;document.getElementById('stW').textContent=data.filter((_,i)=>i<7).length;const days=new Set(data.map(w=>(w.timeFormatted||'').split(' ')[1]).filter(Boolean));const s=Math.min(days.size,30);if(s>=2){document.getElementById('strkEl').style.display='flex';document.getElementById('strkN').textContent=s;}}catch(e){}}
+async function loadStats(){try{const data=await api(API+'/walk');if(!Array.isArray(data))return;const now=new Date();const dd=String(now.getDate()).padStart(2,'0')+'.'+String(now.getMonth()+1).padStart(2,'0');document.getElementById('stT').textContent=data.length;document.getElementById('stD').textContent=data.filter(w=>(w.timeFormatted||'').includes(dd)).length;document.getElementById('stW').textContent=data.filter((_,i)=>i<7).length;const s=calcStreak(data);if(s>=2){document.getElementById('strkEl').style.display='flex';document.getElementById('strkN').textContent=s;}}catch(e){}}
+function calcStreak(data){
+    const dates=new Set(data.map(w=>{const p=(w.timeFormatted||'').split(' ')[1];if(!p)return null;const[d,m,y]=p.split('.');return '20'+y+'-'+m+'-'+d;}).filter(Boolean));
+    const today=new Date();let streak=0;let checkDate=new Date(today);
+    const hasTodayWalk=dates.has(checkDate.toISOString().slice(0,10).replace(/(\d{4})-(\d{2})-(\d{2})/,(m,y,mo,d)=>y+'-'+mo+'-'+d));
+    if(!hasTodayWalk&&_pi!==null){checkDate.setDate(checkDate.getDate()-1);}
+    for(let i=0;i<365;i++){
+        const ds=checkDate.toISOString().slice(0,10).replace(/(\d{4})-(\d{2})-(\d{2})/,(m,y,mo,d)=>y+'-'+mo+'-'+d);
+        if(dates.has(ds)){streak++;checkDate.setDate(checkDate.getDate()-1);}
+        else if(_pi!==null&&i<7){checkDate.setDate(checkDate.getDate()-1);}
+        else break;
+    }
+    return Math.min(streak,99);
+}
 
 async function addWalk(){const person=document.getElementById('nameI').value.trim();if(!person){toast(tr('e-n'));return;}haptic('m');const wasE=!hC.some(w=>(w.timeFormatted||'').includes(String(new Date().getDate()).padStart(2,'0')+'.'+String(new Date().getMonth()+1).padStart(2,'0')));try{await api(API+'/walk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person})});document.getElementById('nameI').value='';if(wasE){confetti();haptic('s');}toast('Spaziergang eingetragen! 🐕','success');await Promise.all([loadH(),loadStatus(),loadLb(),loadStats()]);}catch{toast(tr('e-s'));}}
 function qA(n){document.getElementById('nameI').value=n;addWalk();}

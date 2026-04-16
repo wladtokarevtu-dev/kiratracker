@@ -97,7 +97,7 @@ public class NotificationService {
     private void send(String message) {
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.TEXT_PLAIN);
+            headers.set("Content-Type", "text/plain; charset=utf-8");
             HttpEntity<String> request = new HttpEntity<>(message, headers);
             restTemplate.postForEntity(ntfyUrl + "/" + ntfyTopic, request, String.class);
         } catch (Exception e) {

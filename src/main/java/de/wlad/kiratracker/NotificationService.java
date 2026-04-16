@@ -52,6 +52,10 @@ public class NotificationService {
         send("🍖 " + person + " hat Kira gefüttert!");
     }
 
+    public void sendCustomNotification(String message) {
+        send(message);
+    }
+
     @Scheduled(cron = "0 0 10 * * *", zone = "Europe/Berlin")
     public void checkMorningReminder() {
         if (walkService.wasMorning()) return;

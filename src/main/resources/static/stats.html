@@ -149,13 +149,13 @@ function parseDate(tf){
         const dp=parts[0].split('.');
         const tp=parts[1].split(':');
         if(dp.length===3&&tp.length>=2){
-            return new Date(parseInt(dp[2]),parseInt(dp[1])-1,parseInt(dp[0]),parseInt(tp[0]),parseInt(tp[1]));
+            const y=parseInt(dp[2]);return new Date(y<100?y+2000:y,parseInt(dp[1])-1,parseInt(dp[0]),parseInt(tp[0]),parseInt(tp[1]));
         }
-        // try HH:mm dd.MM.yyyy
+        // try HH:mm dd.MM.yy
         const dp2=parts[1].split('.');
         const tp2=parts[0].split(':');
         if(dp2.length===3&&tp2.length>=2){
-            return new Date(parseInt(dp2[2]),parseInt(dp2[1])-1,parseInt(dp2[0]),parseInt(tp2[0]),parseInt(tp2[1]));
+            const y=parseInt(dp2[2]);return new Date(y<100?y+2000:y,parseInt(dp2[1])-1,parseInt(dp2[0]),parseInt(tp2[0]),parseInt(tp2[1]));
         }
     }catch(e){}
     return null;

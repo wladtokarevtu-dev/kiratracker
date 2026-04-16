@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Service
 public class WalkRequestService {
+
+    private static final ZoneId BERLIN_ZONE = ZoneId.of("Europe/Berlin");
 
     private final WalkRequestRepository requestRepository;
     private final WalkService walkService;
@@ -23,7 +26,7 @@ public class WalkRequestService {
         WalkRequest request = new WalkRequest();
         request.setPerson(person);
         request.setTime(time);
-        request.setRequestTime(ZonedDateTime.now());
+        request.setRequestTime(ZonedDateTime.now(BERLIN_ZONE));
         request.setStatus(WalkRequest.RequestStatus.PENDING);
         requestRepository.save(request);
     }

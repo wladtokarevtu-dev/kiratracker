@@ -15,7 +15,7 @@
         .reveal.visible{opacity:1;transform:translateY(0);}
         #confetti{position:fixed;inset:0;pointer-events:none;z-index:999;}
         /* Pause Banner */
-        #pauseBanner{display:none;position:fixed;top:54px;left:0;right:0;z-index:190;padding:6px 12px;}
+        #pauseBanner,#sleepBanner{display:none;position:fixed;top:54px;left:0;right:0;z-index:190;padding:6px 12px;}
         .pi{background:var(--gg);border:1px solid var(--gb);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--rs);padding:11px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 4px 24px rgba(218,165,32,.16),inset 0 1px 0 rgba(255,255,255,.12);animation:sld .4s cubic-bezier(.34,1.56,.64,1);}
         @keyframes sld{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
         .ptitle{font-weight:800;font-size:.85rem;background:linear-gradient(90deg,var(--gold),var(--gold3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -147,6 +147,16 @@
     </div>
 </div>
 
+<div id="sleepBanner" style="display:none">
+    <div class="pi" style="background:rgba(100,100,140,.13);border-color:rgba(100,100,140,.33)">
+        <div style="font-size:1.45rem;flex-shrink:0">😴</div>
+        <div style="flex:1">
+            <div class="ptitle" style="background:linear-gradient(90deg,#6B6B9B,#9B9BCB);-webkit-background-clip:text;background-clip:text;">Kira schläft</div>
+            <div class="psub">22:00 – 06:00 Uhr Nachtruhe</div>
+        </div>
+    </div>
+</div>
+
 <div class="mo" id="gambleM" onclick="moOut(event,'gambleM')">
     <div class="modal">
         <div class="mh"></div>
@@ -171,6 +181,31 @@
         <button class="po" id="po3" onclick="setPause(3)">😴 &nbsp;Kira schläft — nicht stören</button>
         <button class="po" id="po4" onclick="setPause(null)">❌ &nbsp;Pause beenden</button>
         <div class="macts" style="margin-top:13px"><button class="mb mbs" onclick="closeM('pauseM')">Schliessen</button></div>
+    </div>
+</div>
+
+<div class="mo" id="notifyM" onclick="moOut(event,'notifyM')">
+    <div class="modal">
+        <div class="mh"></div>
+        <div id="notifyStep1">
+            <div style="font-size:1.5rem">📲</div>
+            <div style="font-weight:800;font-size:1rem;margin-top:7px">Wen benachrichtigen?</div>
+            <button class="po" onclick="selectNotifyPerson('Wlad')">👤 &nbsp;Wlad</button>
+            <button class="po" onclick="selectNotifyPerson('Mama')">👤 &nbsp;Mama</button>
+            <button class="po" onclick="selectNotifyPerson('Ilja')">👤 &nbsp;Ilja</button>
+            <button class="po" onclick="selectNotifyPerson('Aaron')">👤 &nbsp;Aaron</button>
+            <button class="po" onclick="selectNotifyPerson('Dajen')">👤 &nbsp;Dajen</button>
+        </div>
+        <div id="notifyStep2" style="display:none">
+            <div style="font-size:1.5rem">💬</div>
+            <div style="font-weight:800;font-size:1rem;margin-top:7px">Nachricht an <span id="notifyTarget"></span></div>
+            <button class="po" onclick="sendNotify('walk')">🐕 &nbsp;Kannst du mit Kira Gassi gehen?</button>
+            <button class="po" onclick="sendNotify('urgent')">🐾 &nbsp;Kira will raus! Dringend!</button>
+            <button class="po" onclick="sendNotify('food')">🥣 &nbsp;Kira wurde noch nicht gefüttert!</button>
+            <button class="po" onclick="sendNotify('evening')">🌙 &nbsp;Abendrunde nicht vergessen!</button>
+            <button class="po" style="margin-top:8px;opacity:.7" onclick="backToStep1()">← Andere Person wählen</button>
+        </div>
+        <div class="macts" style="margin-top:13px"><button class="mb mbs" onclick="closeM('notifyM')">Schliessen</button></div>
     </div>
 </div>
 
@@ -265,21 +300,10 @@
     <div class="slc" id="hlbl">Verlauf</div>
     <div class="card reveal" id="histL" style="padding:10px 15px"></div>
 
-    <div class="slc">WhatsApp</div>
-    <div class="wac reveal">
-        <div class="ch">💬 Gassi-Reminder schicken</div>
-        <a class="wam" href="https://wa.me/?text=Hey%2C+k%C3%B6nntest+du+heute+mit+Kira+Gassi+gehen%3F+%F0%9F%90%95" target="_blank" onclick="haptic('medium')">
-            <span style="font-size:1.05rem">🐕</span><span class="wamt">Kannst du heute mit Kira Gassi gehen?</span><span style="opacity:.5">›</span>
-        </a>
-        <a class="wam" href="https://wa.me/?text=Kira+will+raus%21+Wer+hat+Zeit+f%C3%BCr+eine+Runde%3F+%F0%9F%90%BE" target="_blank" onclick="haptic('medium')">
-            <span style="font-size:1.05rem">🐾</span><span class="wamt">Kira will raus! Wer hat Zeit?</span><span style="opacity:.5">›</span>
-        </a>
-        <a class="wam" href="https://wa.me/?text=Kira+wurde+noch+nicht+gef%C3%BCttert+%F0%9F%A5%A3+Kannst+du+das+kurz+%C3%BCbernehmen%3F" target="_blank" onclick="haptic('medium')">
-            <span style="font-size:1.05rem">🥣</span><span class="wamt">Kira wurde noch nicht gefüttert!</span><span style="opacity:.5">›</span>
-        </a>
-        <a class="wam" href="https://wa.me/?text=Denk+daran%3A+Kira+braucht+heute+Abend+noch+ihre+Abendrunde+%F0%9F%8C%99" target="_blank" onclick="haptic('medium')">
-            <span style="font-size:1.05rem">🌙</span><span class="wamt">Abendrunde nicht vergessen!</span><span style="opacity:.5">›</span>
-        </a>
+    <div class="slc">Benachrichtigen</div>
+    <div class="wac reveal" onclick="openNotifyM()" style="cursor:pointer">
+        <div class="ch">📲 Jemanden benachrichtigen</div>
+        <div style="font-size:.78rem;color:var(--ts)">Wähle eine Person und sende einen Gassi-Reminder per Push</div>
     </div>
 
     <div class="gamble reveal" onclick="openGamble()">
@@ -310,7 +334,7 @@ const POPTS=[
     {i:'🏥',t:'Kira ist beim Tierarzt',s:'Kira ist in guten Händen'},
     {i:'😴',t:'Kira schläft',s:'Nicht stören — Kira erholt sich'}
 ];
-let lang='de',lbD=3,hC=[],showAll=false,_lb={},_food=[],_cr=null,_pi=null;
+let lang='de',lbD=3,hC=[],showAll=false,_lb={},_food=[],_cr=null,_pi=null,_sleep=false;
 const T={
     de:{sub:'Spaziergänge & Fütterung',mlbl:'Morgens',elbl:'Abends',wtitle:'Eintragen',ftitle:'Heute',wlbl:'Spaziergang',flbl:'Fütterung',hlbl:'Verlauf',strkT:'Tage in Folge',open:'Offen',done:'Erledigt ✓','e-n':'Bitte Namen!','e-s':'Fehler beim Speichern','e-d':'Fehler beim Löschen','eh':'Noch keine Einträge','elb':'Keine Daten','ef':'Noch keine Fütterung heute','tn':'☀️ Perfektes Wetter!','tc':'🧥 Warm anziehen!','tr':'☂️ Regenjacke!','th':'🥵 Kurze Runde!'},
     ru:{sub:'Прогулки и кормление',mlbl:'Утром',elbl:'Вечером',wtitle:'Добавить',ftitle:'Сегодня',wlbl:'Прогулка',flbl:'Кормление',hlbl:'История',strkT:'дней подряд',open:'Открыто',done:'Готово ✓','e-n':'Укажите имя!','e-s':'Ошибка сохранения','e-d':'Ошибка удаления','eh':'Записей пока нет','elb':'Нет данных','ef':'Кормлений сегодня нет','tn':'☀️ Отличная погода!','tc':'🧥 Одевайся теплее!','tr':'☂️ Возьми зонт!','th':'🥵 Недолго гулять!'}
@@ -352,6 +376,20 @@ async function initPause(){
         if(s&&s!=='null'){_pi=parseInt(s);showBanner();}
     }
 }
+function checkSleepTime(){
+    const h=new Date().getHours();
+    const isSleep=h>=22||h<6;
+    if(isSleep!==_sleep){
+        _sleep=isSleep;
+        if(_sleep&&_pi===null){
+            document.getElementById('sleepBanner').style.display='block';
+            document.getElementById('pg').classList.add('has-banner');
+        }else{
+            document.getElementById('sleepBanner').style.display='none';
+            if(_pi===null)document.getElementById('pg').classList.remove('has-banner');
+        }
+    }
+}
 async function setPause(idx){
     if(idx!==null&&!document.body.classList.contains('admin-mode')){toast('Nur Admin kann Pause setzen');return;}
     try{
@@ -365,6 +403,7 @@ async function setPause(idx){
 }
 function showBanner(){
     if(_pi===null)return;
+    document.getElementById('sleepBanner').style.display='none';
     const o=POPTS[_pi];
     document.getElementById('picon').textContent=o.i;
     document.getElementById('ptitle').textContent=o.t;
@@ -373,7 +412,15 @@ function showBanner(){
     if(document.body.classList.contains('admin-mode'))document.getElementById('pcloseBtn').style.display='block';
     document.getElementById('pg').classList.add('has-banner');
 }
-function hideBanner(){_pi=null;document.getElementById('pauseBanner').style.display='none';document.getElementById('pg').classList.remove('has-banner');}
+function hideBanner(){
+    _pi=null;
+    document.getElementById('pauseBanner').style.display='none';
+    if(_sleep){
+        document.getElementById('sleepBanner').style.display='block';
+    }else{
+        document.getElementById('pg').classList.remove('has-banner');
+    }
+}
 function openPauseM(){if(!document.body.classList.contains('admin-mode'))return;haptic('m');document.getElementById('pauseM').classList.add('open');}
 
 function toggleAdmin(){
@@ -433,18 +480,32 @@ function togH(){haptic('l');showAll=!showAll;renderH();}
 
 function openGamble(){haptic('m');document.getElementById('gambleM').classList.add('open');spin();}
 function closeM(id){document.getElementById(id).classList.remove('open');}
+
+let _notifyPerson=null;
+function openNotifyM(){haptic('m');_notifyPerson=null;document.getElementById('notifyStep1').style.display='block';document.getElementById('notifyStep2').style.display='none';document.getElementById('notifyM').classList.add('open');}
+function selectNotifyPerson(p){haptic('l');_notifyPerson=p;document.getElementById('notifyTarget').textContent=p;document.getElementById('notifyStep1').style.display='none';document.getElementById('notifyStep2').style.display='block';}
+function backToStep1(){haptic('l');document.getElementById('notifyStep1').style.display='block';document.getElementById('notifyStep2').style.display='none';}
+async function sendNotify(msgType){
+    if(!_notifyPerson)return;
+    haptic('m');
+    try{
+        await api(API+'/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person:_notifyPerson,message:msgType})});
+        toast('Benachrichtigung an '+_notifyPerson+' gesendet! 📲','success');
+        closeM('notifyM');
+    }catch{toast('Fehler beim Senden');}
+}
 function moOut(e,id){if(e.target===document.getElementById(id))closeM(id);}
 function spin(){haptic('l');const el=document.getElementById('spinR');let i=0;const iv=setInterval(()=>{el.textContent=NAMES[i++%NAMES.length];haptic('l');},80);setTimeout(()=>{clearInterval(iv);el.textContent=NAMES[Math.floor(Math.random()*NAMES.length)];haptic('s');},1200);}
 
 function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 document.addEventListener('DOMContentLoaded',()=>{
-    initDark();initLang();initPause();initReveal();
+    initDark();initLang();initPause();checkSleepTime();initReveal();
     loadWeather();loadStatus();loadFood();loadH();loadLb();loadStats();
     document.getElementById('nameI').addEventListener('keypress',e=>{if(e.key==='Enter')addWalk();});
     document.getElementById('fdI').addEventListener('keypress',e=>{if(e.key==='Enter')addFood();});
 });
-setInterval(()=>{loadWeather();loadStatus();loadFood();loadH();loadStats();},60000);
+setInterval(()=>{loadWeather();loadStatus();loadFood();loadH();loadStats();checkSleepTime();},60000);
 </script>
 </body>
 </html>

@@ -430,7 +430,7 @@ function setTheme(t){haptic('l');theme=t;localStorage.setItem('theme',t);applyTh
 function updateThemePills(){document.getElementById('themeClassic').classList.toggle('active',theme==='classic');document.getElementById('themeMinimal').classList.toggle('active',theme==='minimal');}
 function updateLogo(){document.getElementById('tlogo').innerHTML=theme==='minimal'?'Kira':'🐕 Kira';}
 function updateHeroGreeting(){const h1=document.querySelector('.hero h1');const sub=document.getElementById('sub');if(theme==='minimal'){const hr=new Date().getHours();let g=lang==='ru'?'Добрый день':'Guten Tag';if(hr<12)g=lang==='ru'?'Доброе утро':'Guten Morgen';else if(hr>=18)g=lang==='ru'?'Добрый вечер':'Guten Abend';h1.textContent=g;sub.textContent=lang==='ru'?'Кира ждёт прогулку':'Kira freut sich auf den nächsten Spaziergang';}else{h1.textContent='Kira Tracker';sub.textContent=tr('sub');}}
-function initDark(){const s=localStorage.getItem('dark'),sys=matchMedia('(prefers-color-scheme: dark)').matches;applyDark(s!==null?s==='1':sys);}
+function initDark(){const s=localStorage.getItem('dark');applyDark(s==='1');}
 function applyDark(d){document.body.classList.toggle('dark',d);updateDarkPills();}
 function setDark(d){haptic('l');localStorage.setItem('dark',d?'1':'0');applyDark(d);}
 function updateDarkPills(){const d=document.body.classList.contains('dark');document.getElementById('darkOff').classList.toggle('active',!d);document.getElementById('darkOn').classList.toggle('active',d);}

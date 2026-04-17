@@ -8,6 +8,9 @@
     <style>
         :root{--bg:#F2F2F7;--card:#fff;--card2:#F2F2F7;--primary:#007AFF;--green:#30D158;--red:#FF453A;--gold:#B8860B;--gold2:#DAA520;--gold3:#F5C842;--gg:rgba(218,165,32,.13);--gb:rgba(218,165,32,.33);--text:#000;--ts:#8E8E93;--sep:rgba(60,60,67,.12);--ibg:#F2F2F7;--r:22px;--rs:14px;--sh:0 2px 20px rgba(0,0,0,.07);}
         body.dark{--bg:#000;--card:#1C1C1E;--card2:#2C2C2E;--primary:#0A84FF;--gold:#DAA520;--gold2:#F5C842;--gold3:#FFE066;--gg:rgba(245,200,66,.1);--gb:rgba(245,200,66,.28);--text:#fff;--ts:#8E8E93;--sep:rgba(84,84,88,.6);--ibg:#2C2C2E;--sh:0 2px 20px rgba(0,0,0,.45);}
+        /* Minimal theme */
+        body.minimal{--bg:#FAFAF8;--card:#FFFFFF;--card2:#F5F5F3;--gold:#1A1A1A;--gold2:#1A1A1A;--gold3:#1A1A1A;--gg:rgba(26,26,26,.05);--gb:rgba(26,26,26,.12);--text:#1A1A1A;--ts:#6B6B6B;--sep:#E8E6E1;--ibg:#F5F5F3;--sh:0 1px 3px rgba(0,0,0,.06);--green:#2D8A4E;--red:#C43A31;}
+        body.minimal.dark{--bg:#0F0F0E;--card:#1A1A18;--card2:#2A2A28;--gold:#FFFFFF;--gold2:#FFFFFF;--gold3:#FFFFFF;--gg:rgba(255,255,255,.05);--gb:rgba(255,255,255,.12);--text:#F5F5F3;--ts:#A0A0A0;--sep:#2A2A28;--ibg:#2A2A28;--sh:0 1px 3px rgba(0,0,0,.2);}
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
         html{scroll-behavior:smooth;}
         body{font-family:"Inter",-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .4s,color .4s;}
@@ -125,11 +128,49 @@
         .po{display:flex;align-items:center;gap:9px;background:var(--card2);border:1.5px solid var(--sep);border-radius:var(--rs);padding:12px 14px;cursor:pointer;font-size:.86rem;font-weight:600;font-family:inherit;text-align:left;margin-top:7px;transition:transform .15s cubic-bezier(.34,1.56,.64,1),border-color .15s;}
         .po:active{transform:scale(.97);}
         .po.apo{border-color:var(--gold2);background:var(--gg);color:var(--gold2);}
+        /* Settings modal */
+        .srow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--sep);}
+        .srow:last-of-type{border-bottom:none;}
+        .slabel{font-weight:600;font-size:.88rem;color:var(--text);}
+        .spill{display:flex;background:var(--ibg);border-radius:10px;padding:3px;border:1px solid var(--sep);}
+        .spb{padding:7px 14px;font-size:.78rem;font-weight:700;cursor:pointer;border-radius:8px;color:var(--ts);background:transparent;border:none;font-family:inherit;transition:all .2s;}
+        .spb.active{background:var(--card);color:var(--text);box-shadow:var(--sh);}
         /* Toast */
         .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);padding:10px 19px;border-radius:100px;font-size:.83rem;font-weight:700;z-index:600;box-shadow:0 6px 18px rgba(0,0,0,.2);opacity:0;pointer-events:none;white-space:nowrap;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;}
         .toast.error{background:var(--red);color:#fff;}.toast.success{background:var(--green);color:#fff;}
         .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
         .empty{text-align:center;color:var(--ts);padding:15px;font-size:.85rem;}
+        /* Minimal Theme Overrides */
+        body.minimal .tlogo{background:none;-webkit-text-fill-color:var(--text);font-weight:800;color:var(--text);}
+        body.minimal .ibtn{background:var(--bg);border:1px solid var(--sep);box-shadow:none;}
+        body.minimal .ibtn.gold{background:var(--gg);border-color:var(--gb);color:var(--text);}
+        body.minimal .ibtn.active{background:var(--text);color:var(--bg);}
+        body.minimal .av{display:none;}
+        body.minimal .hero{text-align:left;padding:16px 0;}
+        body.minimal h1{background:none;-webkit-text-fill-color:var(--text);color:var(--text);}
+        body.minimal .streak{background:var(--card);border:1px solid var(--sep);box-shadow:var(--sh);}
+        body.minimal .snum{background:none;-webkit-text-fill-color:var(--text);color:var(--text);}
+        body.minimal .wth{background:var(--card);border:1px solid var(--sep);box-shadow:var(--sh);}
+        body.minimal .wth::after{display:none;}
+        body.minimal .wtemp{background:none;-webkit-text-fill-color:var(--text);color:var(--text);}
+        body.minimal .wtip{background:var(--gg);border-color:var(--gb);color:var(--text);}
+        body.minimal .sbox{border-left:3px solid var(--sep);border-radius:var(--rs);}
+        body.minimal .sbox.done{background:var(--card);border-color:var(--green);border-left-color:var(--green);}
+        body.minimal .sbox.open{background:var(--card);border-color:var(--sep);border-left-color:var(--red);}
+        body.minimal .stat{border-left:3px solid var(--sep);border-radius:var(--rs);}
+        body.minimal .stn{background:none;-webkit-text-fill-color:var(--text);color:var(--text);}
+        body.minimal .bc{background:var(--text);box-shadow:none;}
+        body.minimal .qb{background:var(--gg);color:var(--text);border-color:var(--gb);}
+        body.minimal .qb:active{background:var(--text);color:var(--bg);}
+        body.minimal .lbb{background:var(--text);}
+        body.minimal .ed{background:var(--text);}
+        body.minimal .wac{background:var(--card);border:1px solid var(--sep);box-shadow:var(--sh);}
+        body.minimal .gamble{background:var(--card);border:1px solid var(--sep);box-shadow:var(--sh);}
+        body.minimal .gamble>div:first-child>div:first-child{background:none;-webkit-text-fill-color:var(--text);color:var(--text);}
+        body.minimal .pi{background:var(--card);border:1px solid var(--sep);box-shadow:var(--sh);}
+        body.minimal .ptitle{background:none;-webkit-text-fill-color:var(--text);color:var(--text);}
+        body.minimal .mb.mbg{background:var(--text);box-shadow:none;}
+        body.minimal .spinr{background:none;-webkit-text-fill-color:var(--text);color:var(--text);}
         @media(max-width:400px){h1{font-size:1.85rem;}.page{padding:62px 11px 44px;}}
     </style>
 </head>
@@ -209,13 +250,42 @@
     </div>
 </div>
 
+<div class="mo" id="settingsM" onclick="moOut(event,'settingsM')">
+    <div class="modal">
+        <div class="mh"></div>
+        <div style="font-size:1.5rem">⚙️</div>
+        <div style="font-weight:800;font-size:1rem;margin-top:7px;margin-bottom:16px">Einstellungen</div>
+        <div class="srow">
+            <span class="slabel">Design</span>
+            <div class="spill">
+                <button class="spb active" id="themeClassic" onclick="setTheme('classic')">Classic</button>
+                <button class="spb" id="themeMinimal" onclick="setTheme('minimal')">Minimal</button>
+            </div>
+        </div>
+        <div class="srow">
+            <span class="slabel">Dark Mode</span>
+            <div class="spill">
+                <button class="spb" id="darkOff" onclick="setDark(false)">Aus</button>
+                <button class="spb active" id="darkOn" onclick="setDark(true)">An</button>
+            </div>
+        </div>
+        <div class="srow">
+            <span class="slabel">Sprache</span>
+            <div class="spill">
+                <button class="spb active" id="langDe" onclick="setLang('de')">DE</button>
+                <button class="spb" id="langRu" onclick="setLang('ru')">RU</button>
+            </div>
+        </div>
+        <div class="macts" style="margin-top:18px"><button class="mb mbs" onclick="closeM('settingsM')">Schliessen</button></div>
+    </div>
+</div>
+
 <div class="topbar">
-    <div class="tlogo">🐕 Kira</div>
+    <div class="tlogo" id="tlogo">🐕 Kira</div>
     <div class="tacts">
-        <button class="ibtn" id="langB" onclick="toggleLang()">DE</button>
-        <button class="ibtn" id="darkB" onclick="toggleDark()">🌙</button>
+        <button class="ibtn" id="settingsB" onclick="openSettings()">⚙️</button>
         <button class="ibtn gold" id="pauseB" onclick="openPauseM()" style="display:none">🐾</button>
-        <button class="ibtn" id="adminB" onclick="toggleAdmin()">⚙️</button>
+        <button class="ibtn" id="adminB" onclick="toggleAdmin()">🔐</button>
     </div>
 </div>
 
@@ -334,7 +404,7 @@ const POPTS=[
     {i:'🏥',t:'Kira ist beim Tierarzt',s:'Kira ist in guten Händen'},
     {i:'😴',t:'Kira schläft',s:'Nicht stören — Kira erholt sich'}
 ];
-let lang='de',lbD=3,hC=[],showAll=false,_lb={},_food=[],_cr=null,_pi=null,_sleep=false;
+let lang='de',theme='classic',lbD=3,hC=[],showAll=false,_lb={},_food=[],_cr=null,_pi=null,_sleep=false;
 const T={
     de:{sub:'Spaziergänge & Fütterung',mlbl:'Morgens',elbl:'Abends',wtitle:'Eintragen',ftitle:'Heute',wlbl:'Spaziergang',flbl:'Fütterung',hlbl:'Verlauf',strkT:'Tage in Folge',open:'Offen',done:'Erledigt ✓','e-n':'Bitte Namen!','e-s':'Fehler beim Speichern','e-d':'Fehler beim Löschen','eh':'Noch keine Einträge','elb':'Keine Daten','ef':'Noch keine Fütterung heute','tn':'☀️ Perfektes Wetter!','tc':'🧥 Warm anziehen!','tr':'☂️ Regenjacke!','th':'🥵 Kurze Runde!'},
     ru:{sub:'Прогулки и кормление',mlbl:'Утром',elbl:'Вечером',wtitle:'Добавить',ftitle:'Сегодня',wlbl:'Прогулка',flbl:'Кормление',hlbl:'История',strkT:'дней подряд',open:'Открыто',done:'Готово ✓','e-n':'Укажите имя!','e-s':'Ошибка сохранения','e-d':'Ошибка удаления','eh':'Записей пока нет','elb':'Нет данных','ef':'Кормлений сегодня нет','tn':'☀️ Отличная погода!','tc':'🧥 Одевайся теплее!','tr':'☂️ Возьми зонт!','th':'🥵 Недолго гулять!'}
@@ -354,18 +424,28 @@ function confetti(){
 
 function initReveal(){const io=new IntersectionObserver(es=>{es.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*50);io.unobserve(e.target);}});},{threshold:.07});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));}
 
+function initTheme(){theme=localStorage.getItem('theme')||'classic';applyTheme();}
+function applyTheme(){document.body.classList.toggle('minimal',theme==='minimal');updateThemePills();updateLogo();updateHeroGreeting();}
+function setTheme(t){haptic('l');theme=t;localStorage.setItem('theme',t);applyTheme();}
+function updateThemePills(){document.getElementById('themeClassic').classList.toggle('active',theme==='classic');document.getElementById('themeMinimal').classList.toggle('active',theme==='minimal');}
+function updateLogo(){document.getElementById('tlogo').innerHTML=theme==='minimal'?'Kira':'🐕 Kira';}
+function updateHeroGreeting(){const h1=document.querySelector('.hero h1');const sub=document.getElementById('sub');if(theme==='minimal'){const hr=new Date().getHours();let g=lang==='ru'?'Добрый день':'Guten Tag';if(hr<12)g=lang==='ru'?'Доброе утро':'Guten Morgen';else if(hr>=18)g=lang==='ru'?'Добрый вечер':'Guten Abend';h1.textContent=g;sub.textContent=lang==='ru'?'Кира ждёт прогулку':'Kira freut sich auf den nächsten Spaziergang';}else{h1.textContent='Kira Tracker';sub.textContent=tr('sub');}}
 function initDark(){const s=localStorage.getItem('dark'),sys=matchMedia('(prefers-color-scheme: dark)').matches;applyDark(s!==null?s==='1':sys);}
-function applyDark(d){document.body.classList.toggle('dark',d);document.getElementById('darkB').textContent=d?'☀️':'🌙';}
-function toggleDark(){haptic('l');const d=!document.body.classList.contains('dark');localStorage.setItem('dark',d?'1':'0');applyDark(d);}
+function applyDark(d){document.body.classList.toggle('dark',d);updateDarkPills();}
+function setDark(d){haptic('l');localStorage.setItem('dark',d?'1':'0');applyDark(d);}
+function updateDarkPills(){const d=document.body.classList.contains('dark');document.getElementById('darkOff').classList.toggle('active',!d);document.getElementById('darkOn').classList.toggle('active',d);}
+function openSettings(){haptic('m');updateThemePills();updateDarkPills();updateLangPills();document.getElementById('settingsM').classList.add('open');}
 
 function initLang(){lang=localStorage.getItem('lang')||'de';applyLang();}
 function applyLang(){
-    document.getElementById('langB').textContent=lang==='de'?'DE':'RU';
     ['sub','mlbl','elbl','wtitle','ftitle','wlbl','flbl','hlbl','strkT'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr(id);});
     document.getElementById('mVal').textContent=document.getElementById('mBox').classList.contains('done')?tr('done'):tr('open');
     document.getElementById('eVal').textContent=document.getElementById('eBox').classList.contains('done')?tr('done'):tr('open');
+    updateLangPills();
+    if(theme==='minimal')updateHeroGreeting();
 }
-function toggleLang(){haptic('l');lang=lang==='de'?'ru':'de';localStorage.setItem('lang',lang);applyLang();renderH();renderLb(_lb);renderFood(_food);}
+function setLang(l){haptic('l');lang=l;localStorage.setItem('lang',l);applyLang();renderH();renderLb(_lb);renderFood(_food);}
+function updateLangPills(){document.getElementById('langDe').classList.toggle('active',lang==='de');document.getElementById('langRu').classList.toggle('active',lang==='ru');}
 
 async function initPause(){
     try{
@@ -500,7 +580,7 @@ function spin(){haptic('l');const el=document.getElementById('spinR');let i=0;co
 function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 document.addEventListener('DOMContentLoaded',()=>{
-    initDark();initLang();initPause();checkSleepTime();initReveal();
+    initTheme();initDark();initLang();initPause();checkSleepTime();initReveal();
     loadWeather();loadStatus();loadFood();loadH();loadLb();loadStats();
     document.getElementById('nameI').addEventListener('keypress',e=>{if(e.key==='Enter')addWalk();});
     document.getElementById('fdI').addEventListener('keypress',e=>{if(e.key==='Enter')addFood();});

@@ -52,6 +52,7 @@ public class NotificationService {
         send("🍖 " + person + " hat Kira gefüttert!");
     }
 
+    @Async
     public void sendCustomNotification(String message) {
         send(message);
     }

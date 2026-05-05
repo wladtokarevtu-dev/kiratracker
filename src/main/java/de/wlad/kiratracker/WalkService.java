@@ -37,13 +37,16 @@ public class WalkService {
     @Transactional
     public void addWalk(String person, String time) {
         ZonedDateTime walkTime;
-        if (time != null && !time.isEmpty()) {
+        boolean fresh = (time == null || time.isEmpty());
+        if (!fresh) {
             walkTime = parseTimeSoft(time);
         } else {
             walkTime = ZonedDateTime.now(BERLIN_ZONE);
         }
         walkRepository.save(new WalkEntry(person, walkTime));
-        notificationService.sendWalkNotification(person);
+        if (fresh) {
+            notificationService.sendWalkNotification(person);
+        }
     }
 
     public List<WalkEntry> getTodayWalks() {

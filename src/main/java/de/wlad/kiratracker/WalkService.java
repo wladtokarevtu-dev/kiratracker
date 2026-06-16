@@ -26,15 +26,6 @@ public class WalkService {
     }
 
     @Transactional
-    public WalkEntry addEntry(String person) {
-        ZonedDateTime now = ZonedDateTime.now(BERLIN_ZONE);
-        WalkEntry entry = new WalkEntry(person, now);
-        walkRepository.save(entry);
-        notificationService.sendWalkNotification(person);
-        return entry;
-    }
-
-    @Transactional
     public void addWalk(String person, String time) {
         ZonedDateTime walkTime;
         boolean fresh = (time == null || time.isEmpty());
@@ -131,10 +122,6 @@ public class WalkService {
     @Transactional
     public void addApplause(Long id) {
         incrementApplause(id);
-    }
-
-    public Optional<WalkEntry> findById(Long id) {
-        return walkRepository.findById(id);
     }
 
     private WalkEntryDto convertToDto(WalkEntry entry) {

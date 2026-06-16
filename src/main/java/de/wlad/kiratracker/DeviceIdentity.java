@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "device_identities")
+@Table(name = "device_identities", indexes = {
+    @Index(name = "idx_device_full_hash", columnList = "full_hash"),
+    @Index(name = "idx_device_stable_hash", columnList = "stable_hash")
+})
 public class DeviceIdentity {
 
     @Id

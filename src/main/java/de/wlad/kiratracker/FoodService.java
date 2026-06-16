@@ -48,13 +48,6 @@ public class FoodService {
                 .collect(Collectors.toList());
     }
 
-    public List<FoodEntryDto> getAllFood() {
-        return foodRepository.findAllByOrderByTimestampDesc()
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
     public void deleteFood(Long id) {
         if (!foodRepository.existsById(id)) {

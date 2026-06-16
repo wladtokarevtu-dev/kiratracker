@@ -1,6 +1,7 @@
 package de.wlad.kiratracker;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientException;
@@ -25,7 +26,10 @@ public class WeatherService {
     private final RestTemplate restTemplate;
 
     public WeatherService() {
-        this.restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(3000);
+        factory.setReadTimeout(5000);
+        this.restTemplate = new RestTemplate(factory);
     }
 
     public WeatherDto getCurrentWeather() {

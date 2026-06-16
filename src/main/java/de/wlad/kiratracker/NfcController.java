@@ -22,44 +22,6 @@ public class NfcController {
     }
 
     /**
-     * Identifiziert ein Gerät anhand seines Fingerprints.
-     *
-     * Logik:
-     * - fullHash trifft → sicher bekannt, Person zurückgeben
-     * - stableHash trifft → Gerät bekannt, Browser/OS hat sich geändert → fullHash aktualisieren, Person zurückgeben
-     * - kein Match → "unknown", Benutzer muss Namen eingeben
-     */
-    @PostMapping("/identify")
-    public ResponseEntity<Map<String, Object>> identify(@RequestBody FingerprintRequest req) {
-        if (req.getFullHash() == null || req.getStableHash() == null) {
-            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Fingerprint fehlt"));
-        }
-
-        // 1. Exakter Match (full hash)
-        Optional<DeviceIdentity> byFull = deviceRepo.findByFullHash(req.getFullHash());
-        if (byFull.isPresent()) {
-            DeviceIdentity identity = byFull.get();
-            identity.setLastSeen(ZonedDateTime.now());
-            deviceRepo.save(identity);
-            return ResponseEntity.ok(Map.of("status", "known", "person", identity.getPerson(), "confidence", "high"));
-        }
-
-        // 2. Stabiler Match (stable hash) – Browser/OS Update
-        Optional<DeviceIdentity> byStable = deviceRepo.findByStableHash(req.getStableHash());
-        if (byStable.isPresent()) {
-            DeviceIdentity identity = byStable.get();
-            // fullHash aktualisieren (neuer Browser/OS)
-            identity.setFullHash(req.getFullHash());
-            identity.setLastSeen(ZonedDateTime.now());
-            deviceRepo.save(identity);
-            return ResponseEntity.ok(Map.of("status", "known", "person", identity.getPerson(), "confidence", "medium"));
-        }
-
-        // 3. Unbekanntes Gerät
-        return ResponseEntity.ok(Map.of("status", "unknown"));
-    }
-
-    /**
      * Registriert ein Gerät mit einer Person.
      * Wird aufgerufen wenn der Nutzer seinen Namen eingegeben hat.
      */

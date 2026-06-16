@@ -34,7 +34,7 @@ public class WalkRequestService {
         request.setRequestTime(ZonedDateTime.now(BERLIN_ZONE));
         request.setStatus(WalkRequest.RequestStatus.PENDING);
         requestRepository.save(request);
-        notificationService.sendWalkNotification(person);
+        notificationService.sendWalkRequestNotification(person);
     }
 
     @Transactional

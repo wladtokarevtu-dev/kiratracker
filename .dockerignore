@@ -1,8 +1,6 @@
 .git
 .github
-src
-.mvn
-*.md
-.gitignore
 .idea
 *.iml
+*.md
+target

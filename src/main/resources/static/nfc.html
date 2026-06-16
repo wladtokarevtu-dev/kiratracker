@@ -143,31 +143,6 @@ html,body{
   cursor:pointer;
 }
 
-/* ===== ALREADY LOGGED ===== */
-.already-card{
-  background:var(--done-soft);
-  border:1.5px solid var(--done-border);
-  border-radius:var(--r-lg);
-  padding:24px;
-  width:100%;
-}
-.already-title{font-size:1.1rem;font-weight:700;color:var(--done)}
-.already-sub{font-size:.85rem;color:var(--ink-3);margin-top:4px}
-.force-btn{
-  margin-top:16px;
-  width:100%;
-  background:var(--card);
-  border:1.5px solid var(--rule);
-  border-radius:999px;
-  padding:12px;
-  font-size:.88rem;
-  font-weight:600;
-  color:var(--ink-2);
-  cursor:pointer;
-  box-shadow:var(--sh);
-}
-.force-btn:active{background:var(--ink);color:var(--bg)}
-
 /* ===== DARK TOGGLE ===== */
 .dark-toggle{
   position:fixed;top:16px;right:16px;
@@ -198,16 +173,6 @@ html,body{
     <div class="success-name" id="success-name"></div>
     <div class="success-sub">hat Kira rausgebracht</div>
     <div class="success-time" id="success-time"></div>
-  </div>
-
-  <!-- Already logged today -->
-  <div id="v-already" class="view">
-    <div class="big-emoji">✅</div>
-    <div class="already-card">
-      <div class="already-title" id="already-title"></div>
-      <div class="already-sub" id="already-sub"></div>
-      <button class="force-btn" id="force-btn">Trotzdem nochmal eintragen</button>
-    </div>
   </div>
 
   <!-- Pick person (Erstregistrierung oder Fingerprint unbekannt) -->
@@ -251,53 +216,39 @@ function show(id) {
 
 // ===== Fingerprinting =====
 
-// Stabile Komponenten (kaum veränderlich): Canvas, Screen-Auflösung, Timezone, CPU-Kerne, Sprache
-async function stableComponents() {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = 200; canvas.height = 50;
-  ctx.textBaseline = 'top';
-  ctx.font = '14px Arial';
-  ctx.fillStyle = '#f60';
-  ctx.fillRect(125, 1, 62, 20);
-  ctx.fillStyle = '#069';
-  ctx.fillText('Fingerprint 🐾', 2, 15);
-  ctx.fillStyle = 'rgba(102,204,0,0.7)';
-  ctx.fillText('Fingerprint 🐾', 4, 17);
-  const canvasData = canvas.toDataURL();
-
+// Stabile Komponenten: NUR Hardware-Merkmale, kein Canvas (iOS Safari randomisiert Canvas seit 16.4)
+function stableComponents() {
   return [
-    canvasData,
-    screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+    screen.width + 'x' + screen.height,
+    screen.colorDepth,
     Intl.DateTimeFormat().resolvedOptions().timeZone,
     navigator.hardwareConcurrency || '?',
     navigator.language || '?',
     navigator.deviceMemory || '?',
+    navigator.maxTouchPoints || '0',
   ].join('|');
 }
 
-// Volle Komponenten (inkl. UserAgent der sich ändern kann)
-async function fullComponents() {
-  const stable = await stableComponents();
-  return stable + '|' + navigator.userAgent + '|' + navigator.platform;
+// Volle Komponenten: stable + UserAgent (kann sich bei Browser-Updates ändern)
+function fullComponents() {
+  return stableComponents() + '|' + navigator.userAgent;
 }
 
-// Einfacher Hash (djb2)
+// Hash (djb2, 32-bit)
 function hash(str) {
   let h = 5381;
   for (let i = 0; i < str.length; i++) {
     h = ((h << 5) + h) ^ str.charCodeAt(i);
-    h = h >>> 0; // unsigned 32bit
+    h = h >>> 0;
   }
   return h.toString(16).padStart(8, '0');
 }
 
-async function getFingerprints() {
-  const stable = await stableComponents();
-  const full = await fullComponents();
+function getFingerprints() {
+  const stable = stableComponents();
   return {
     stableHash: hash(stable),
-    fullHash: hash(full)
+    fullHash: hash(fullComponents())
   };
 }
 
@@ -349,13 +300,7 @@ async function logWalk(person) {
     body: JSON.stringify({person, time: null})
   });
   if (!r.ok) {
-    const text = await r.text();
-    // "Bereits eingetragen" Logik
-    if (r.status === 409 || text.toLowerCase().includes('bereits')) {
-      showAlready(person, text);
-    } else {
-      showError(text || 'Unbekannter Fehler beim Eintragen.');
-    }
+    showError(await r.text() || 'Unbekannter Fehler beim Eintragen.');
     return;
   }
   showSuccess(person);
@@ -368,28 +313,6 @@ function showSuccess(person) {
   show('v-success');
 }
 
-function showAlready(person, msg) {
-  document.getElementById('already-title').textContent = `${person} hat Kira heute schon rausgebracht!`;
-  document.getElementById('already-sub').textContent = msg || 'Heute wurde Kira bereits für diese Person eingetragen.';
-  document.getElementById('force-btn').onclick = () => forceWalk(person);
-  show('v-already');
-}
-
-async function forceWalk(person) {
-  show('v-loading');
-  // Direkt eintragen ohne Konflikt-Check
-  const r = await fetch('/walk', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({person, time: null})
-  });
-  if (r.ok) {
-    showSuccess(person);
-  } else {
-    showError('Eintragen fehlgeschlagen.');
-  }
-}
-
 function showError(msg) {
   document.getElementById('err-sub').textContent = msg;
   show('v-error');
@@ -397,9 +320,8 @@ function showError(msg) {
 
 // ===== Main =====
 async function main() {
+  const fp = getFingerprints();
   try {
-    const fp = await getFingerprints();
-
     const r = await fetch('/nfc/walk', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -417,15 +339,7 @@ async function main() {
       showError('Unbekannte Antwort vom Server.');
     }
   } catch(e) {
-    // Netzwerkfehler → trotzdem Personenauswahl zeigen
-    try {
-      const fp = await getFingerprints();
-      buildNameGrid(fp, false);
-      document.getElementById('pick-sub').textContent = 'Kein Server erreichbar – bitte Namen wählen zum späteren Eintragen.';
-      show('v-pick');
-    } catch(_) {
-      showError('Verbindung zum Server nicht möglich. Bitte prüfe deine Internetverbindung.');
-    }
+    showError('Verbindung zum Server nicht möglich. Bitte prüfe deine Internetverbindung.');
   }
 }
 

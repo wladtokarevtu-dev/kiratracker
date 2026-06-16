@@ -69,10 +69,15 @@ public class NfcController {
             return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Fehlende Daten"));
         }
 
-        // Prüfen ob dieses Gerät schon registriert ist (z.B. doppelter Request)
+        // Prüfen ob dieses Gerät schon registriert ist (fullHash oder stableHash)
         Optional<DeviceIdentity> existing = deviceRepo.findByFullHash(req.getFullHash());
+        if (existing.isEmpty()) {
+            existing = deviceRepo.findByStableHash(req.getStableHash());
+        }
         if (existing.isPresent()) {
             existing.get().setPerson(req.getPerson());
+            existing.get().setFullHash(req.getFullHash());
+            existing.get().setStableHash(req.getStableHash());
             existing.get().setLastSeen(ZonedDateTime.now());
             deviceRepo.save(existing.get());
         } else {

@@ -1,0 +1,138 @@
+package de.wlad.kiratracker;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.ZonedDateTime;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/nfc")
+public class NfcController {
+
+    private final DeviceIdentityRepository deviceRepo;
+    private final WalkService walkService;
+
+    @Autowired
+    public NfcController(DeviceIdentityRepository deviceRepo, WalkService walkService) {
+        this.deviceRepo = deviceRepo;
+        this.walkService = walkService;
+    }
+
+    /**
+     * Identifiziert ein Gerät anhand seines Fingerprints.
+     *
+     * Logik:
+     * - fullHash trifft → sicher bekannt, Person zurückgeben
+     * - stableHash trifft → Gerät bekannt, Browser/OS hat sich geändert → fullHash aktualisieren, Person zurückgeben
+     * - kein Match → "unknown", Benutzer muss Namen eingeben
+     */
+    @PostMapping("/identify")
+    public ResponseEntity<Map<String, Object>> identify(@RequestBody FingerprintRequest req) {
+        if (req.getFullHash() == null || req.getStableHash() == null) {
+            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Fingerprint fehlt"));
+        }
+
+        // 1. Exakter Match (full hash)
+        Optional<DeviceIdentity> byFull = deviceRepo.findByFullHash(req.getFullHash());
+        if (byFull.isPresent()) {
+            DeviceIdentity identity = byFull.get();
+            identity.setLastSeen(ZonedDateTime.now());
+            deviceRepo.save(identity);
+            return ResponseEntity.ok(Map.of("status", "known", "person", identity.getPerson(), "confidence", "high"));
+        }
+
+        // 2. Stabiler Match (stable hash) – Browser/OS Update
+        Optional<DeviceIdentity> byStable = deviceRepo.findByStableHash(req.getStableHash());
+        if (byStable.isPresent()) {
+            DeviceIdentity identity = byStable.get();
+            // fullHash aktualisieren (neuer Browser/OS)
+            identity.setFullHash(req.getFullHash());
+            identity.setLastSeen(ZonedDateTime.now());
+            deviceRepo.save(identity);
+            return ResponseEntity.ok(Map.of("status", "known", "person", identity.getPerson(), "confidence", "medium"));
+        }
+
+        // 3. Unbekanntes Gerät
+        return ResponseEntity.ok(Map.of("status", "unknown"));
+    }
+
+    /**
+     * Registriert ein Gerät mit einer Person.
+     * Wird aufgerufen wenn der Nutzer seinen Namen eingegeben hat.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest req) {
+        if (req.getFullHash() == null || req.getStableHash() == null || req.getPerson() == null || req.getPerson().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Fehlende Daten"));
+        }
+
+        // Prüfen ob dieses Gerät schon registriert ist (z.B. doppelter Request)
+        Optional<DeviceIdentity> existing = deviceRepo.findByFullHash(req.getFullHash());
+        if (existing.isPresent()) {
+            existing.get().setPerson(req.getPerson());
+            existing.get().setLastSeen(ZonedDateTime.now());
+            deviceRepo.save(existing.get());
+        } else {
+            deviceRepo.save(new DeviceIdentity(req.getFullHash(), req.getStableHash(), req.getPerson()));
+        }
+
+        return ResponseEntity.ok(Map.of("status", "registered", "person", req.getPerson()));
+    }
+
+    /**
+     * Trägt Gassi ein. Fingerprint identifiziert die Person automatisch.
+     * Gibt zurück ob Eintrag erfolgt oder Person erst noch gewählt werden muss.
+     */
+    @PostMapping("/walk")
+    public ResponseEntity<Map<String, Object>> nfcWalk(@RequestBody FingerprintRequest req) {
+        if (req.getFullHash() == null || req.getStableHash() == null) {
+            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Fingerprint fehlt"));
+        }
+
+        // Gerät identifizieren
+        Optional<DeviceIdentity> identity = deviceRepo.findByFullHash(req.getFullHash());
+        if (identity.isEmpty()) {
+            identity = deviceRepo.findByStableHash(req.getStableHash());
+            if (identity.isPresent()) {
+                // fullHash aktualisieren
+                identity.get().setFullHash(req.getFullHash());
+                deviceRepo.save(identity.get());
+            }
+        }
+
+        if (identity.isEmpty()) {
+            return ResponseEntity.ok(Map.of("status", "unknown"));
+        }
+
+        String person = identity.get().getPerson();
+        identity.get().setLastSeen(ZonedDateTime.now());
+        deviceRepo.save(identity.get());
+
+        walkService.addWalk(person, null);
+        return ResponseEntity.ok(Map.of("status", "logged", "person", person));
+    }
+
+    static class FingerprintRequest {
+        private String fullHash;
+        private String stableHash;
+        public String getFullHash() { return fullHash; }
+        public void setFullHash(String fullHash) { this.fullHash = fullHash; }
+        public String getStableHash() { return stableHash; }
+        public void setStableHash(String stableHash) { this.stableHash = stableHash; }
+    }
+
+    static class RegisterRequest {
+        private String fullHash;
+        private String stableHash;
+        private String person;
+        public String getFullHash() { return fullHash; }
+        public void setFullHash(String fullHash) { this.fullHash = fullHash; }
+        public String getStableHash() { return stableHash; }
+        public void setStableHash(String stableHash) { this.stableHash = stableHash; }
+        public String getPerson() { return person; }
+        public void setPerson(String person) { this.person = person; }
+    }
+}

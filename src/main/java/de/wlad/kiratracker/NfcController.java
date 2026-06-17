@@ -94,7 +94,19 @@ public class NfcController {
         identity.get().setLastSeen(ZonedDateTime.now(BERLIN));
         deviceRepo.save(identity.get());
 
-        // Duplikatschutz: gleiche Person in den letzten 30 Minuten?
+        // Harte Sperre: gleiche Person in den letzten 10 Sekunden → stiller Doppeleintrag-Schutz
+        ZonedDateTime tenSecAgo = ZonedDateTime.now(BERLIN).minusSeconds(10);
+        boolean duplicate = walkRepository.findEntriesSince(tenSecAgo).stream()
+                .anyMatch(w -> w.getPerson().equalsIgnoreCase(person));
+        if (duplicate) {
+            // Letzten Eintrag zurückgeben ohne neu anzulegen
+            var last = walkRepository.findEntriesSince(tenSecAgo).stream()
+                    .filter(w -> w.getPerson().equalsIgnoreCase(person))
+                    .findFirst().orElseThrow();
+            return ResponseEntity.ok(Map.of("status", "logged", "person", person, "walkId", last.getId()));
+        }
+
+        // Weicher Hinweis: gleiche Person in den letzten 30 Minuten
         ZonedDateTime cooldownSince = ZonedDateTime.now(BERLIN).minusMinutes(COOLDOWN_MINUTES);
         boolean recentWalk = walkRepository.findEntriesSince(cooldownSince).stream()
                 .anyMatch(w -> w.getPerson().equalsIgnoreCase(person));

@@ -304,6 +304,8 @@ function buildNameGrid(fp, isReregister) {
 
 // ===== Register + Walk =====
 async function registerAndWalk(fp, person) {
+  if (_processing) return;  // Doppelklick verhindern
+  _processing = true;
   show('v-loading');
   try {
     await fetch('/nfc/register', {
@@ -313,6 +315,7 @@ async function registerAndWalk(fp, person) {
     });
     await logWalk(person);
   } catch(e) {
+    _processing = false;
     showError('Verbindung fehlgeschlagen. Bitte prüfe deine Internetverbindung.');
   }
 }
@@ -346,6 +349,7 @@ function showError(msg) {
 // ===== Globaler State =====
 let _currentPerson = null;
 let _lastWalkId = null;
+let _processing = false;  // verhindert Doppel-Requests
 
 // ===== Views =====
 async function wrongPerson() {
@@ -381,6 +385,8 @@ async function forceLog() {
 
 // ===== Main =====
 async function main() {
+  if (_processing) return;
+  _processing = true;
   const fp = getFingerprints();
   try {
     const r = await fetch('/nfc/walk', {
@@ -412,6 +418,7 @@ async function main() {
       showError('Unbekannte Antwort vom Server.');
     }
   } catch(e) {
+    _processing = false;
     showError('Verbindung zum Server nicht möglich. Bitte prüfe deine Internetverbindung.');
   }
 }

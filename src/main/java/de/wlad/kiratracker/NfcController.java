@@ -1,6 +1,7 @@
 package de.wlad.kiratracker;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,13 @@ public class NfcController {
     public NfcController(DeviceIdentityRepository deviceRepo, WalkService walkService) {
         this.deviceRepo = deviceRepo;
         this.walkService = walkService;
+    }
+
+    @GetMapping({"", "/"})
+    public ResponseEntity<Void> nfcPage() {
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", "/nfc.html")
+                .build();
     }
 
     /**

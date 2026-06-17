@@ -385,27 +385,21 @@
     let adminCredentials = null;
     let currentEditId = null;
 
+    function authHeaders() {
+        return { 'Authorization': 'Basic ' + adminCredentials };
+    }
+
     async function login() {
         const username = document.getElementById('adminUsername').value;
         const password = document.getElementById('adminPassword').value;
-
-        if (!username || !password) {
-            alert('Bitte Benutzername und Passwort eingeben!');
-            return;
-        }
+        if (!username || !password) { alert('Bitte Benutzername und Passwort eingeben!'); return; }
 
         adminCredentials = btoa(username + ':' + password);
 
-        // Test credentials
+        // Credentials testen mit einem sicheren Read-Endpoint
         try {
-            const response = await fetch('/admin/cleanup?days=999', {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok || response.status === 200) {
+            const r = await fetch('/admin/walk/request', { headers: authHeaders() });
+            if (r.ok) {
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 loadRequests();
@@ -414,7 +408,7 @@
                 alert('Ungültige Zugangsdaten!');
                 adminCredentials = null;
             }
-        } catch (error) {
+        } catch (e) {
             alert('Login fehlgeschlagen!');
             adminCredentials = null;
         }
@@ -422,164 +416,89 @@
 
     async function loadRequests() {
         try {
-            const response = await fetch('/requests');
-            const requests = await response.json();
-
+            const r = await fetch('/admin/walk/request', { headers: authHeaders() });
+            const requests = await r.json();
             const tbody = document.getElementById('requestsBody');
-
-            if (requests.length === 0) {
+            if (!requests.length) {
                 tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Keine Anfragen vorhanden</td></tr>';
                 return;
             }
-
             tbody.innerHTML = requests.map(req => `
                 <tr>
-                    <td><strong>${req.requester}</strong></td>
-                    <td>${req.message || '-'}</td>
-                    <td>${req.requestTimeFormatted}</td>
+                    <td><strong>${esc(req.person)}</strong></td>
+                    <td>${esc(req.time || '—')}</td>
+                    <td>${esc(req.requestTimeFormatted)}</td>
                     <td><span class="status-badge status-${req.status.toLowerCase()}">${getStatusText(req.status)}</span></td>
                     <td>
                         ${req.status === 'PENDING' ? `
-                            <button class="btn btn-accept" onclick="acceptRequest(${req.id})">✓ Akzeptieren</button>
+                            <button class="btn btn-accept" onclick="approveRequest(${req.id})">✓ Genehmigen</button>
                             <button class="btn btn-reject" onclick="rejectRequest(${req.id})">✗ Ablehnen</button>
                         ` : ''}
                         <button class="btn btn-delete" onclick="deleteRequest(${req.id})">🗑️ Löschen</button>
                     </td>
                 </tr>
             `).join('');
-        } catch (error) {
-            console.error('Fehler beim Laden der Anfragen:', error);
+        } catch (e) {
+            console.error('Fehler beim Laden der Anfragen:', e);
         }
     }
 
     async function loadEntries() {
         try {
-            const response = await fetch('/status');
-            const data = await response.json();
-
+            const r = await fetch('/walk');
+            const entries = await r.json();
             const tbody = document.getElementById('entriesBody');
-
-            if (data.entries.length === 0) {
+            if (!entries.length) {
                 tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Keine Einträge vorhanden</td></tr>';
                 return;
             }
-
-            tbody.innerHTML = data.entries.map(entry => `
+            tbody.innerHTML = entries.map(e => `
                 <tr>
-                    <td>${entry.id}</td>
-                    <td><strong>${entry.person}</strong></td>
-                    <td>${entry.timeFormatted}</td>
-                    <td>👏 ${entry.applauseCount || 0}</td>
+                    <td>${e.id}</td>
+                    <td><strong>${esc(e.person)}</strong></td>
+                    <td>${esc(e.timeFormatted)}</td>
+                    <td>👏 ${e.applauseCount || 0}</td>
                     <td>
-                        <button class="btn btn-edit" onclick="openEditModal(${entry.id}, '${entry.person}')">✏️ Bearbeiten</button>
-                        <button class="btn btn-delete" onclick="deleteEntry(${entry.id})">🗑️ Löschen</button>
+                        <button class="btn btn-edit" onclick="openEditModal(${e.id}, '${esc(e.person)}')">✏️ Bearbeiten</button>
+                        <button class="btn btn-delete" onclick="deleteEntry(${e.id})">🗑️ Löschen</button>
                     </td>
                 </tr>
             `).join('');
-        } catch (error) {
-            console.error('Fehler beim Laden der Einträge:', error);
+        } catch (e) {
+            console.error('Fehler beim Laden der Einträge:', e);
         }
+    }
+
+    function esc(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
     function getStatusText(status) {
-        const texts = {
-            'PENDING': 'Ausstehend',
-            'ACCEPTED': 'Akzeptiert',
-            'REJECTED': 'Abgelehnt'
-        };
-        return texts[status] || status;
+        return { PENDING: 'Ausstehend', APPROVED: 'Genehmigt', REJECTED: 'Abgelehnt' }[status] || status;
     }
 
-    async function acceptRequest(id) {
-        if (!confirm('Anfrage akzeptieren?')) return;
-
-        try {
-            const response = await fetch(`/admin/request/${id}/accept`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok) {
-                alert('Anfrage akzeptiert!');
-                loadRequests();
-            } else {
-                alert('Fehler beim Akzeptieren!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Akzeptieren!');
-        }
+    async function approveRequest(id) {
+        if (!confirm('Anfrage genehmigen?')) return;
+        const r = await fetch(`/admin/walk/request/${id}/approve`, { method: 'POST', headers: authHeaders() });
+        r.ok ? (alert('Genehmigt!'), loadRequests()) : alert('Fehler beim Genehmigen!');
     }
 
     async function rejectRequest(id) {
         if (!confirm('Anfrage ablehnen?')) return;
-
-        try {
-            const response = await fetch(`/admin/request/${id}/reject`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok) {
-                alert('Anfrage abgelehnt!');
-                loadRequests();
-            } else {
-                alert('Fehler beim Ablehnen!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Ablehnen!');
-        }
+        const r = await fetch(`/admin/walk/request/${id}/reject`, { method: 'POST', headers: authHeaders() });
+        r.ok ? (alert('Abgelehnt!'), loadRequests()) : alert('Fehler!');
     }
 
     async function deleteRequest(id) {
         if (!confirm('Anfrage wirklich löschen?')) return;
-
-        try {
-            const response = await fetch(`/admin/request/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok) {
-                alert('Anfrage gelöscht!');
-                loadRequests();
-            } else {
-                alert('Fehler beim Löschen!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Löschen!');
-        }
+        const r = await fetch(`/admin/walk/request/${id}`, { method: 'DELETE', headers: authHeaders() });
+        r.ok ? (alert('Gelöscht!'), loadRequests()) : alert('Fehler!');
     }
 
     async function deleteEntry(id) {
         if (!confirm('Eintrag wirklich löschen?')) return;
-
-        try {
-            const response = await fetch(`/admin/entry/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok) {
-                alert('Eintrag gelöscht!');
-                loadEntries();
-            } else {
-                alert('Fehler beim Löschen!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Löschen!');
-        }
+        const r = await fetch(`/admin/walk/${id}`, { method: 'DELETE', headers: authHeaders() });
+        r.ok ? (alert('Gelöscht!'), loadEntries()) : alert('Fehler!');
     }
 
     function openEditModal(id, person) {
@@ -596,34 +515,27 @@
 
     async function saveEdit() {
         const person = document.getElementById('editPerson').value.trim();
-        const time = document.getElementById('editTime').value;
+        const timeVal = document.getElementById('editTime').value;
+        if (!person) { alert('Person darf nicht leer sein!'); return; }
 
-        if (!person) {
-            alert('Person darf nicht leer sein!');
-            return;
+        const body = { person };
+        if (timeVal) {
+            // datetime-local → "dd.MM.yy HH:mm" format das Backend versteht
+            const d = new Date(timeVal);
+            const pad = n => String(n).padStart(2,'0');
+            body.time = `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(2)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         }
 
-        try {
-            const url = `/admin/entry/${currentEditId}?person=${encodeURIComponent(person)}${time ? '&time=' + new Date(time).toISOString() : ''}`;
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'Basic ' + adminCredentials
-                }
-            });
-
-            if (response.ok) {
-                alert('Eintrag aktualisiert!');
-                closeEditModal();
-                loadEntries();
-            } else {
-                alert('Fehler beim Aktualisieren!');
-            }
-        } catch (error) {
-            console.error('Fehler:', error);
-            alert('Fehler beim Aktualisieren!');
-        }
+        const r = await fetch(`/admin/walk/${currentEditId}`, {
+            method: 'PUT',
+            headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        r.ok ? (alert('Gespeichert!'), closeEditModal(), loadEntries()) : alert('Fehler beim Speichern!');
     }
+
+    document.getElementById('adminUsername').addEventListener('keypress', e => { if(e.key==='Enter') login(); });
+    document.getElementById('adminPassword').addEventListener('keypress', e => { if(e.key==='Enter') login(); });
 </script>
 </body>
 </html>

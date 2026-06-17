@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -13,13 +16,18 @@ import java.util.Optional;
 @RequestMapping("/nfc")
 public class NfcController {
 
+    private static final int COOLDOWN_MINUTES = 30;
+    private static final ZoneId BERLIN = ZoneId.of("Europe/Berlin");
+
     private final DeviceIdentityRepository deviceRepo;
     private final WalkService walkService;
+    private final WalkRepository walkRepository;
 
     @Autowired
-    public NfcController(DeviceIdentityRepository deviceRepo, WalkService walkService) {
+    public NfcController(DeviceIdentityRepository deviceRepo, WalkService walkService, WalkRepository walkRepository) {
         this.deviceRepo = deviceRepo;
         this.walkService = walkService;
+        this.walkRepository = walkRepository;
     }
 
     @GetMapping({"", "/"})
@@ -83,8 +91,16 @@ public class NfcController {
         }
 
         String person = identity.get().getPerson();
-        identity.get().setLastSeen(ZonedDateTime.now());
+        identity.get().setLastSeen(ZonedDateTime.now(BERLIN));
         deviceRepo.save(identity.get());
+
+        // Duplikatschutz: gleiche Person in den letzten 30 Minuten?
+        ZonedDateTime cooldownSince = ZonedDateTime.now(BERLIN).minusMinutes(COOLDOWN_MINUTES);
+        boolean recentWalk = walkRepository.findEntriesSince(cooldownSince).stream()
+                .anyMatch(w -> w.getPerson().equalsIgnoreCase(person));
+        if (recentWalk) {
+            return ResponseEntity.ok(Map.of("status", "recent", "person", person));
+        }
 
         walkService.addWalk(person, null);
         return ResponseEntity.ok(Map.of("status", "logged", "person", person));

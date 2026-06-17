@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 public class WalkRequestService {
@@ -64,5 +65,17 @@ public class WalkRequestService {
 
     public int getPendingRequestsCount() {
         return (int) requestRepository.countByStatus(WalkRequest.RequestStatus.PENDING);
+    }
+
+    public List<WalkRequest> getAllRequests() {
+        return requestRepository.findAllByOrderByRequestTimeDesc();
+    }
+
+    @Transactional
+    public void deleteRequest(Long id) {
+        if (!requestRepository.existsById(id)) {
+            throw new IllegalArgumentException("Anfrage nicht gefunden: " + id);
+        }
+        requestRepository.deleteById(id);
     }
 }

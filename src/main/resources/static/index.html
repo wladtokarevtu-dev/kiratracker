@@ -591,8 +591,30 @@ function toggleAdmin(){
   else{document.body.classList.add('admin-mode');btn.classList.add('on');toast('Admin an','success');}
   paintLog();
 }
-function delWalk(id){if(!document.body.classList.contains('admin-mode'))return; walks=walks.filter(w=>w.id!==id); paintLog(); toast('Gelöscht');}
-function editWalk(id,p){if(!document.body.classList.contains('admin-mode'))return; const n=prompt('Name:',p); if(!n)return; const w=walks.find(x=>x.id===id); if(w){w.person=n; paintLog(); toast('Gespeichert','success');}}
+function getAdminAuth(){
+  let cred = sessionStorage.getItem('adminCred');
+  if(!cred){
+    const u=prompt('Admin-Benutzername:'); if(!u)return null;
+    const p=prompt('Admin-Passwort:'); if(!p)return null;
+    cred=btoa(u+':'+p); sessionStorage.setItem('adminCred',cred);
+  }
+  return cred;
+}
+async function delWalk(id){
+  if(!document.body.classList.contains('admin-mode'))return;
+  const cred=getAdminAuth(); if(!cred)return;
+  const r=await fetch('/admin/walk/'+id,{method:'DELETE',headers:{'Authorization':'Basic '+cred}});
+  if(r.ok){walks=walks.filter(w=>w.id!==id); paintLog(); toast('Gelöscht');}
+  else{sessionStorage.removeItem('adminCred'); toast('Fehler – falsches Passwort?');}
+}
+async function editWalk(id,p){
+  if(!document.body.classList.contains('admin-mode'))return;
+  const n=prompt('Name:',p); if(!n)return;
+  const cred=getAdminAuth(); if(!cred)return;
+  const r=await fetch('/admin/walk/'+id,{method:'PUT',headers:{'Authorization':'Basic '+cred,'Content-Type':'application/json'},body:JSON.stringify({person:n})});
+  if(r.ok){const w=walks.find(x=>x.id===id); if(w){w.person=n; paintLog();} toast('Gespeichert','success');}
+  else{sessionStorage.removeItem('adminCred'); toast('Fehler – falsches Passwort?');}
+}
 
 /* ===== MODALS ===== */
 function closeModal(id){document.getElementById(id).classList.remove('open');}

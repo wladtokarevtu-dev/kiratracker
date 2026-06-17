@@ -143,6 +143,19 @@ html,body{
   cursor:pointer;
 }
 
+/* ===== WRONG PERSON ===== */
+.wrong-btn{
+  margin-top:4px;
+  background:none;
+  border:0;
+  color:var(--ink-4);
+  font-size:.82rem;
+  cursor:pointer;
+  padding:8px 16px;
+  border-radius:999px;
+}
+.wrong-btn:hover{color:var(--ink-3);background:var(--pill)}
+
 /* ===== DARK TOGGLE ===== */
 .dark-toggle{
   position:fixed;top:16px;right:16px;
@@ -173,6 +186,18 @@ html,body{
     <div class="success-name" id="success-name"></div>
     <div class="success-sub">hat Kira rausgebracht</div>
     <div class="success-time" id="success-time"></div>
+    <button class="wrong-btn" id="wrong-btn" onclick="wrongPerson()">Nicht ich →</button>
+  </div>
+
+  <!-- Recent / Duplikat -->
+  <div id="v-recent" class="view">
+    <div class="big-emoji">⏱️</div>
+    <div class="pick-title" id="recent-title"></div>
+    <div class="pick-sub">wurde in den letzten 30 Minuten bereits eingetragen.</div>
+    <div style="display:flex;gap:10px;width:100%;margin-top:8px">
+      <button class="retry-btn" style="flex:1;margin:0" onclick="forceLog()">Trotzdem eintragen</button>
+      <button class="retry-btn" style="flex:1;margin:0;background:var(--pill);color:var(--ink-2)" onclick="show('v-success')">Zurück</button>
+    </div>
   </div>
 
   <!-- Pick person (Erstregistrierung oder Fingerprint unbekannt) -->
@@ -318,6 +343,28 @@ function showError(msg) {
   show('v-error');
 }
 
+// ===== Globaler State für Force-Log =====
+let _currentPerson = null;
+
+// ===== Views =====
+function wrongPerson() {
+  // Fingerprint neu berechnen und Namensauswahl zeigen (Re-Registrierung)
+  const fp = getFingerprints();
+  buildNameGrid(fp, true);
+  show('v-pick');
+}
+
+async function forceLog() {
+  if (!_currentPerson) return;
+  show('v-loading');
+  const r = await fetch('/walk', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({person: _currentPerson, time: null})
+  });
+  r.ok ? showSuccess(_currentPerson) : showError(await r.text() || 'Fehler');
+}
+
 // ===== Main =====
 async function main() {
   const fp = getFingerprints();
@@ -331,7 +378,18 @@ async function main() {
     const data = await r.json();
 
     if (data.status === 'logged') {
+      _currentPerson = data.person;
       showSuccess(data.person);
+    } else if (data.status === 'recent') {
+      _currentPerson = data.person;
+      document.getElementById('recent-title').textContent = data.person;
+      // Erfolgs-Screen trotzdem zeigen (wird schon eingetragen gehabt)
+      showSuccess(data.person);
+      // Kurz danach auf recent wechseln
+      setTimeout(() => {
+        document.getElementById('recent-title').textContent = data.person;
+        show('v-recent');
+      }, 300);
     } else if (data.status === 'unknown') {
       buildNameGrid(fp, false);
       show('v-pick');

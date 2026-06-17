@@ -88,6 +88,20 @@ public class HelloController {
         return ResponseEntity.ok(foodService.addFood(request.getPerson(), request.getFood()));
     }
 
+    @GetMapping("/admin/walk/request")
+    public ResponseEntity<List<WalkRequestResponseDto>> getRequests() {
+        List<WalkRequestResponseDto> dtos = requestService.getAllRequests().stream()
+                .map(WalkRequestResponseDto::new)
+                .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @DeleteMapping("/admin/walk/request/{id}")
+    public ResponseEntity<String> deleteRequest(@PathVariable Long id) {
+        requestService.deleteRequest(id);
+        return ResponseEntity.ok("Anfrage gelöscht.");
+    }
+
     @PostMapping("/admin/walk/request/{id}/approve")
     public ResponseEntity<String> approveRequest(@PathVariable Long id) {
         requestService.approveRequest(id);

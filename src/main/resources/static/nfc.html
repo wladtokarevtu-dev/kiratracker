@@ -343,12 +343,20 @@ function showError(msg) {
   show('v-error');
 }
 
-// ===== Globaler State für Force-Log =====
+// ===== Globaler State =====
 let _currentPerson = null;
+let _lastWalkId = null;
 
 // ===== Views =====
-function wrongPerson() {
-  // Fingerprint neu berechnen und Namensauswahl zeigen (Re-Registrierung)
+async function wrongPerson() {
+  // Letzten Eintrag löschen falls vorhanden
+  if (_lastWalkId) {
+    try {
+      await fetch('/nfc/walk/' + _lastWalkId, { method: 'DELETE' });
+    } catch(e) { /* ignorieren */ }
+    _lastWalkId = null;
+  }
+  // Namensauswahl mit Re-Registrierung
   const fp = getFingerprints();
   buildNameGrid(fp, true);
   show('v-pick');
@@ -362,7 +370,13 @@ async function forceLog() {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({person: _currentPerson, time: null})
   });
-  r.ok ? showSuccess(_currentPerson) : showError(await r.text() || 'Fehler');
+  if (r.ok) {
+    const data = await r.json().catch(() => ({}));
+    _lastWalkId = data.id || null;
+    showSuccess(_currentPerson);
+  } else {
+    showError(await r.text() || 'Fehler');
+  }
 }
 
 // ===== Main =====
@@ -379,6 +393,7 @@ async function main() {
 
     if (data.status === 'logged') {
       _currentPerson = data.person;
+      _lastWalkId = data.walkId || null;
       showSuccess(data.person);
     } else if (data.status === 'recent') {
       _currentPerson = data.person;

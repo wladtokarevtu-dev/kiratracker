@@ -102,8 +102,26 @@ public class NfcController {
             return ResponseEntity.ok(Map.of("status", "recent", "person", person));
         }
 
-        walkService.addWalk(person, null);
-        return ResponseEntity.ok(Map.of("status", "logged", "person", person));
+        WalkEntry entry = walkService.addWalk(person, null);
+        return ResponseEntity.ok(Map.of("status", "logged", "person", person, "walkId", entry.getId()));
+    }
+
+    /**
+     * Macht den letzten NFC-Eintrag rückgängig — nur wenn er jünger als 2 Minuten ist.
+     * Kein Auth nötig, da zeitlich stark begrenzt.
+     */
+    @DeleteMapping("/walk/{walkId}")
+    public ResponseEntity<String> undoWalk(@PathVariable Long walkId) {
+        var entry = walkRepository.findById(walkId);
+        if (entry.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Eintrag nicht gefunden.");
+        }
+        ZonedDateTime cutoff = ZonedDateTime.now(BERLIN).minusMinutes(2);
+        if (entry.get().getTime().isBefore(cutoff)) {
+            return ResponseEntity.status(HttpStatus.GONE).body("Eintrag zu alt zum Rückgängigmachen.");
+        }
+        walkRepository.deleteById(walkId);
+        return ResponseEntity.ok("Eintrag gelöscht.");
     }
 
     static class FingerprintRequest {

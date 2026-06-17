@@ -26,7 +26,7 @@ public class WalkService {
     }
 
     @Transactional
-    public void addWalk(String person, String time) {
+    public WalkEntry addWalk(String person, String time) {
         ZonedDateTime walkTime;
         boolean fresh = (time == null || time.isEmpty());
         if (!fresh) {
@@ -34,10 +34,11 @@ public class WalkService {
         } else {
             walkTime = ZonedDateTime.now(BERLIN_ZONE);
         }
-        walkRepository.save(new WalkEntry(person, walkTime));
+        WalkEntry saved = walkRepository.save(new WalkEntry(person, walkTime));
         if (fresh) {
             notificationService.sendWalkNotification(person);
         }
+        return saved;
     }
 
     public List<WalkEntry> getTodayWalks() {

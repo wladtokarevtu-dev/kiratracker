@@ -23,15 +23,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ===== PHONE ===== */
 .phone{position:relative;width:390px;max-width:100vw;height:min(844px,calc(100vh - 44px));background:var(--bg);border-radius:46px;box-shadow:0 40px 90px rgba(0,0,0,.38),0 0 0 11px #0a0a0c,0 0 0 12px #2a2a2e;overflow:hidden;color:var(--ink);transition:background .4s,color .4s}
 @media(max-width:430px){body{padding:0}.phone{height:100vh;border-radius:0;box-shadow:none}}
-.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:108px;height:30px;background:#0a0a0c;border-radius:100px;z-index:60}
-.statusbar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;font-size:.82rem;font-weight:700;z-index:50;letter-spacing:-.01em}
-.statusbar .ic{display:flex;gap:6px;align-items:center}
-
-.screen{position:absolute;inset:0;padding-top:52px;overflow-y:auto;overflow-x:hidden}
-.pad{padding:8px 22px 120px}
+.screen{position:absolute;inset:0;padding-top:14px;overflow-y:auto;overflow-x:hidden}
+.pad{padding:16px 24px 128px}
 
 /* ===== TOP ROW ===== */
-.toprow{display:flex;align-items:center;justify-content:space-between;padding:10px 0 16px;gap:10px}
+.toprow{display:flex;align-items:center;justify-content:space-between;padding:6px 0 22px;gap:10px}
 .wx-top{display:flex;align-items:center;gap:8px;min-width:0;color:var(--ink2);font-size:.88rem;font-weight:500}
 .wx-top svg{display:block;flex-shrink:0}
 .wx-top .wt{font-weight:800;color:var(--ink);font-size:.94rem}
@@ -57,7 +53,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .vacbanner .vd{color:var(--ink2);font-weight:500;margin-top:2px;line-height:1.4}
 
 /* ===== WEEK ===== */
-.week{display:flex;justify-content:space-between;margin:30px 0 26px}
+.week{display:flex;justify-content:space-between;margin:40px 0 34px}
 .day{display:flex;flex-direction:column;align-items:center;gap:8px;width:13%;color:var(--ink3);font-size:.72rem;font-weight:700}
 .day .num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.96rem;font-weight:700;color:var(--ink2)}
 .day.today .num{border:1.5px solid var(--ink);color:var(--ink)}
@@ -66,7 +62,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .day.today .daydots i{background:var(--ink)}
 
 /* ===== RITUALS ===== */
-.rituals{display:grid;grid-template-columns:1fr 1fr;gap:13px;transition:opacity .3s,filter .3s}
+.rituals{display:grid;grid-template-columns:1fr 1fr;gap:14px;transition:opacity .3s,filter .3s}
 .phone.vac .rituals{opacity:.4;filter:grayscale(1);pointer-events:none}
 .ritual{background:var(--card);border-radius:24px;padding:20px 18px;min-height:188px;display:flex;flex-direction:column}
 .ritual .rl{font-size:.74rem;font-weight:700;color:var(--ink3);margin-bottom:auto}
@@ -79,7 +75,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .donechip{padding:6px 12px;background:var(--soft);border-radius:100px;font-size:.76rem;font-weight:600;color:var(--ink2)}
 
 /* ===== FEATURED ===== */
-.feat{background:var(--card);border-radius:24px;padding:22px 20px;margin-top:13px;transition:opacity .3s}
+.feat{background:var(--card);border-radius:24px;padding:24px 22px;margin-top:18px;transition:opacity .3s}
 .phone.vac .feat{opacity:.4;pointer-events:none}
 .feat .fl{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
 .feat .fq{font-size:1.18rem;font-weight:700;letter-spacing:-.025em;line-height:1.2;margin-bottom:18px}
@@ -106,7 +102,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .fairrow{display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
 .fairrow:first-of-type{border-top:0}
 .fairrow .fn{font-weight:700;font-size:.95rem}
-.fairrow.next .fn::after{content:" · dran";color:var(--ink3);font-weight:600;font-size:.78rem}
+.fairrow.due .fn::after{content:" · dran";color:var(--ink3);font-weight:600;font-size:.78rem}
 .fairrow .fc{font-weight:800;font-variant-numeric:tabular-nums;font-size:.92rem}
 .fairrow .fc small{color:var(--ink3);font-weight:600;font-size:.66rem;margin-left:3px}
 .fairrow .fbar{grid-column:1/-1;height:3px;background:var(--line);border-radius:3px;overflow:hidden}
@@ -132,6 +128,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .rankrow .rc{font-weight:800;font-variant-numeric:tabular-nums;font-size:.92rem}
 .rankrow .rc small{color:var(--ink3);font-weight:600;font-size:.66rem;margin-left:3px}
 .emptyhint{color:var(--ink3);font-weight:600;font-size:.86rem;padding:18px 4px}
+.showmore{display:block;width:100%;margin:4px 0 2px;padding:13px;border:1.5px solid var(--line);border-radius:16px;color:var(--ink2);font-weight:700;font-size:.86rem;background:var(--card);transition:background .15s}
+.showmore:active{background:var(--soft)}
 
 /* ===== NACHTRAGEN (leicht rot, unter Kalender) ===== */
 #latelist:not(:empty){display:flex;flex-direction:column;gap:10px;margin:-2px 0 18px}
@@ -178,7 +176,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tabadd:active{transform:scale(.93)}
 
 /* ===== TAKEOVER ===== */
-.over{position:absolute;inset:0;background:var(--bg);z-index:100;display:none;flex-direction:column;padding:52px 22px 30px}
+.over{position:absolute;inset:0;background:var(--bg);z-index:100;display:none;flex-direction:column;padding:26px 24px 30px}
 .over.open{display:flex;animation:fade .25s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 .over-top{display:flex;align-items:center;gap:12px;padding:14px 0 8px}
@@ -214,15 +212,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 </head>
 <body>
 <div class="phone" id="phone">
-  <div class="island"></div>
-  <div class="statusbar">
-    <span id="clock">9:41</span>
-    <span class="ic">
-      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
-      <svg width="22" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1.5" width="19" height="9" rx="2.5" stroke="currentColor" stroke-width="1.2"/><rect x="2.6" y="3" width="14" height="6" rx="1.2" fill="currentColor"/><rect x="21" y="4" width="2" height="4" rx="1" fill="currentColor"/></svg>
-    </span>
-  </div>
-
   <!-- ===== HOME ===== -->
   <div class="screen" id="home">
     <div class="pad">
@@ -294,9 +283,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       </div>
 
       <div class="morelinks">
-        <a href="/stats.html">Statistik</a>
         <a href="/admin.html">Admin</a>
-        <a href="/nfc.html">NFC</a>
       </div>
     </div>
   </div>
@@ -469,7 +456,7 @@ function showScreen(name){
   $('verlauf').style.display=name==='verlauf'?'block':'none';
   $('tab-home').classList.toggle('on',name==='home');
   $('tab-verlauf').classList.toggle('on',name==='verlauf');
-  if(name==='verlauf')paintVerlauf();
+  if(name==='verlauf'){verlaufLimit=VERLAUF_MIN;paintVerlauf();}
 }
 function dayLabelFor(d){
   const now=new Date();const y=new Date();y.setDate(now.getDate()-1);
@@ -477,25 +464,38 @@ function dayLabelFor(d){
   if(sameDay(d,y))return 'Gestern';
   return pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.';
 }
-function groupWalks(){
-  const groups=[];const map={};
-  (STATE.walks||[]).forEach(w=>{
-    const dt=parseWalk(w.timeFormatted);const k=dayKey(dt);
-    if(!map[k]){map[k]={label:dayLabelFor(dt),items:[]};groups.push(map[k]);}
-    map[k].items.push({id:w.id,person:w.person,time:fmtHM(dt),slot:dt.getHours()<12?'Morgens':'Abends'});
+const VERLAUF_MIN=4, VERLAUF_MAX=10;
+let verlaufLimit=VERLAUF_MIN;
+function flatWalks(){
+  return (STATE.walks||[]).map(w=>{
+    const dt=parseWalk(w.timeFormatted);
+    return {id:w.id,person:w.person,time:fmtHM(dt),slot:dt.getHours()<12?'Morgens':'Abends',label:dayLabelFor(dt)};
   });
-  return groups;
+}
+function ventryHtml(e){
+  return `<div class="ventry"><span class="vd"></span><span class="vn">${e.person}</span><span class="vslot">${e.slot}</span><span class="vt">${e.time}</span>${admin?`<span class="vadm"><button onclick="startEditTime(${e.id})" aria-label="Uhrzeit">✎</button><button onclick="delEntry(${e.id})" aria-label="Löschen">✕</button></span>`:''}</div>`;
 }
 function paintVerlauf(){
-  const groups=groupWalks();
-  if(!groups.length){$('vlog').innerHTML='<div class="emptyhint">Noch keine Runden eingetragen.</div>';}
-  else $('vlog').innerHTML=groups.map(g=>`
-    <div class="dayhead">${g.label}</div>
-    ${g.items.map(e=>`<div class="ventry"><span class="vd"></span><span class="vn">${e.person}</span><span class="vslot">${e.slot}</span><span class="vt">${e.time}</span>${admin?`<span class="vadm"><button onclick="startEditTime(${e.id})" aria-label="Uhrzeit">✎</button><button onclick="delEntry(${e.id})" aria-label="Löschen">✕</button></span>`:''}</div>`).join('')}
-  `).join('');
+  const all=flatWalks();
+  const shown=all.slice(0,verlaufLimit);
+  if(!shown.length){
+    $('vlog').innerHTML='<div class="emptyhint">Noch keine Runden eingetragen.</div>';
+  }else{
+    let h='',lastLabel=null;
+    shown.forEach(e=>{
+      if(e.label!==lastLabel){h+=`<div class="dayhead">${e.label}</div>`;lastLabel=e.label;}
+      h+=ventryHtml(e);
+    });
+    if(all.length>verlaufLimit && verlaufLimit<VERLAUF_MAX){
+      const rest=Math.min(all.length,VERLAUF_MAX)-verlaufLimit;
+      h+=`<button class="showmore" onclick="expandVerlauf()">mehr anzeigen · ${rest}</button>`;
+    }
+    $('vlog').innerHTML=h;
+  }
   paintRank();
   paintFair();
 }
+function expandVerlauf(){verlaufLimit=VERLAUF_MAX;paintVerlauf();}
 async function delEntry(id){
   try{await api('/admin/walk/'+id,{method:'DELETE'});toast('Eintrag gelöscht');await loadAll();paintVerlauf();}
   catch(e){toast(e.message==='401'?'Admin-Zugang nötig':'Löschen fehlgeschlagen');}
@@ -531,7 +531,7 @@ function paintFair(){
   const rows=ppl.map(p=>{
     const bs=p.blocked||[];const blocked=bs.length>0;
     const note=blocked?`<span class="blocknote">blockiert · ${bs.map(slotLabel).join(' & ')}${blockNoteFor(p.name,bs[0])?` — „${blockNoteFor(p.name,bs[0])}"`:''}</span>`:'';
-    return `<div class="fairrow ${p.name===dran?'next':''} ${blocked?'blocked':''}">
+    return `<div class="fairrow ${p.name===dran?'due':''} ${blocked?'blocked':''}">
       <span class="fn">${p.name}</span>
       <span class="fc">${p.count}<small>RUNDEN / 14T</small></span>
       <span class="fbar"><i style="width:${Math.round(p.count/max*100)}%"></i></span>
@@ -770,7 +770,6 @@ function finishDone(f){closeOver();if(f==='block'){showScreen('verlauf');}else{s
 /* ============== INIT ============== */
 document.addEventListener('DOMContentLoaded',()=>{
   if(localStorage.getItem('mk3-dark')==='1')$('phone').classList.add('dark');
-  const now=new Date();$('clock').textContent=`${now.getHours()}:${pad2(now.getMinutes())}`;
   paintGreet();
   loadAll();
 });

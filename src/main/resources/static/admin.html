@@ -1,541 +1,216 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Kira Tracker</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>admin — kiratracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ececef;--card:#ffffff;--ink:#0d0d0f;--ink2:#6c6c74;--ink3:#a3a3ab;--line:#e4e4e8;--fill:#0d0d0f;--onfill:#ffffff;--soft:#f4f4f6;--danger:#9a3636;--dangerbg:#fdecec;--dangerln:#f3d0d0}
+.dark{--bg:#000000;--card:#151517;--ink:#f4f4f6;--ink2:#9b9ba3;--ink3:#65656d;--line:#262629;--fill:#f4f4f6;--onfill:#0d0d0f;--soft:#1d1d20;--danger:#e6a5a5;--dangerbg:#291616;--dangerln:#492525}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:"Inter",-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;transition:background .4s,color .4s}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding:28px 22px 80px}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.back{display:inline-flex;align-items:center;gap:7px;color:var(--ink2);font-weight:700;font-size:.9rem;text-decoration:none}
+.back:active{color:var(--ink)}
+.icbtn{color:var(--ink2);display:flex}.icbtn:active{color:var(--ink)}
+h1.title{font-size:2.15rem;font-weight:800;letter-spacing:-.045em;line-height:1.02;margin:8px 0 2px}
+.sub{color:var(--ink2);font-weight:500;font-size:.95rem;margin-bottom:26px}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+/* login */
+.login{background:var(--card);border-radius:24px;padding:26px 22px;max-width:380px;margin:30px auto 0}
+.eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+.field{width:100%;padding:14px 16px;margin-bottom:12px;background:var(--soft);border:1.5px solid transparent;border-radius:14px;font-size:1rem;color:var(--ink);font-family:inherit}
+.field:focus{outline:none;border-color:var(--ink)}
+.btn-fill{width:100%;padding:15px;background:var(--fill);color:var(--onfill);border-radius:100px;font-weight:700;font-size:.95rem;transition:opacity .15s}
+.btn-fill:active{opacity:.85}
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
+/* sections */
+.section{margin-top:30px}
+.section .eyebrow{margin:0 4px 12px}
+.card{background:var(--card);border-radius:24px;padding:6px 18px}
+.row{display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:center;padding:15px 2px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .nm{font-weight:700;font-size:.98rem}
+.row .meta{color:var(--ink3);font-weight:600;font-size:.8rem;font-variant-numeric:tabular-nums}
+.row .acts{display:flex;gap:7px;grid-column:2;grid-row:1/3;align-self:center}
+.row .acts button{width:32px;height:32px;border-radius:50%;background:var(--soft);color:var(--ink2);font-size:.82rem;display:flex;align-items:center;justify-content:center}
+.row .acts button:active{background:var(--line);color:var(--ink)}
+.row .acts .ok:active{background:var(--fill);color:var(--onfill)}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;background:var(--soft);color:var(--ink2)}
+.badge.pending{background:var(--soft);color:var(--ink2)}
+.badge.approved{background:var(--fill);color:var(--onfill)}
+.badge.rejected{background:var(--soft);color:var(--ink3)}
+.empty{color:var(--ink3);font-weight:600;font-size:.86rem;padding:18px 2px}
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+/* danger */
+.danger{margin-top:30px;background:var(--dangerbg);border:1px solid var(--dangerln);color:var(--danger);border-radius:20px;padding:18px 18px}
+.danger .dt{font-weight:800;font-size:.95rem}
+.danger .dd{font-weight:600;font-size:.82rem;margin:3px 0 14px;line-height:1.4;opacity:.95}
+.danger button{padding:11px 20px;border:1.5px solid currentColor;border-radius:100px;font-weight:700;font-size:.85rem;color:inherit}
+.danger button:active{background:var(--danger);color:var(--dangerbg)}
 
-        .back-link {
-            display: inline-block;
-            background: white;
-            color: #667eea;
-            padding: 12px 25px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-bottom: 20px;
-            transition: transform 0.2s ease;
-        }
+/* modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:560px;border-radius:28px 28px 0 0;padding:26px 22px 30px;animation:rise .25s ease}
+@keyframes rise{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
+.sheet h2{font-size:1.5rem;font-weight:800;letter-spacing:-.035em;margin-bottom:20px}
+.sheet label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin:0 2px 7px}
+.sheet .field{margin-bottom:18px}
+.sheet-acts{display:flex;gap:10px;margin-top:6px}
+.sheet-acts button{flex:1;padding:14px;border-radius:100px;font-weight:700}
+.btn-ghost{border:1.5px solid var(--line);color:var(--ink2)}
 
-        .back-link:hover {
-            transform: scale(1.05);
-        }
-
-        .section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-        }
-
-        .section h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        .section.danger h2 {
-            color: #dc3545;
-            border-bottom-color: #dc3545;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        th {
-            background: #f8f9fa;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: bold;
-            transition: transform 0.2s ease;
-            margin-right: 5px;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-edit {
-            background: #ffc107;
-            color: #856404;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-accept {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-reject {
-            background: #6c757d;
-            color: white;
-        }
-
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: #ffc107;
-            color: #856404;
-        }
-
-        .status-accepted {
-            background: #28a745;
-            color: white;
-        }
-
-        .status-rejected {
-            background: #6c757d;
-            color: white;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-style: italic;
-        }
-
-        .edit-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .edit-modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-        }
-
-        .modal-content h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #666;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .modal-actions button:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-save {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-cancel {
-            background: #6c757d;
-            color: white;
-        }
-
-        .login-section {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .login-section h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .login-section input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-        }
-
-        .login-section button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .table-container {
-                font-size: 0.9em;
-            }
-
-            .btn {
-                padding: 6px 10px;
-                font-size: 0.8em;
-            }
-        }
-    </style>
+/* toast */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--fill);color:var(--onfill);padding:12px 22px;border-radius:100px;font-size:.84rem;font-weight:700;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>⚙️ Admin Dashboard</h1>
-        <a href="/index.html" class="back-link">← Zurück zur Hauptseite</a>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="/index.html">‹ zurück</a>
+    <button class="icbtn" onclick="toggleDark()" aria-label="Theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M16 11.5A6.5 6.5 0 0 1 8.5 4c0-.5.06-1 .17-1.46A7 7 0 1 0 17.5 11.3c-.47.13-.97.2-1.5.2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <h1 class="title">admin.</h1>
+  <div class="sub">Einträge & Anfragen verwalten</div>
+
+  <!-- Login -->
+  <div id="loginSection" class="login">
+    <div class="eyebrow">Anmeldung</div>
+    <input class="field" type="text" id="adminUsername" placeholder="Benutzername" autocomplete="username">
+    <input class="field" type="password" id="adminPassword" placeholder="Passwort" autocomplete="current-password">
+    <button class="btn-fill" onclick="login()">Anmelden</button>
+  </div>
+
+  <!-- Content -->
+  <div id="adminContent" style="display:none">
+    <div class="section">
+      <div class="eyebrow">Anfragen</div>
+      <div class="card" id="requestsBody"><div class="empty">Lade Anfragen …</div></div>
     </div>
 
-    <!-- Login Section -->
-    <div id="loginSection" class="login-section">
-        <h2>🔐 Admin Login</h2>
-        <input type="text" id="adminUsername" placeholder="Benutzername">
-        <input type="password" id="adminPassword" placeholder="Passwort">
-        <button onclick="login()">Login</button>
+    <div class="section">
+      <div class="eyebrow">Einträge</div>
+      <div class="card" id="entriesBody"><div class="empty">Lade Einträge …</div></div>
     </div>
 
-    <!-- Admin Content (hidden until logged in) -->
-    <div id="adminContent" style="display: none;">
-
-        <!-- Walk Requests Management -->
-        <div class="section">
-            <h2>📬 Anfragen verwalten</h2>
-            <div class="table-container">
-                <table id="requestsTable">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Nachricht</th>
-                        <th>Zeitpunkt</th>
-                        <th>Status</th>
-                        <th>Aktionen</th>
-                    </tr>
-                    </thead>
-                    <tbody id="requestsBody">
-                    <tr>
-                        <td colspan="5" class="empty-state">Lade Anfragen...</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Walk Entries Management -->
-        <div class="section">
-            <h2>📝 Einträge verwalten</h2>
-            <div class="table-container">
-                <table id="entriesTable">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Person</th>
-                        <th>Zeitpunkt</th>
-                        <th>Applaus</th>
-                        <th>Aktionen</th>
-                    </tr>
-                    </thead>
-                    <tbody id="entriesBody">
-                    <tr>
-                        <td colspan="5" class="empty-state">Lade Einträge...</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+    <div class="danger">
+      <div class="dt">Verlauf zurücksetzen</div>
+      <div class="dd">Löscht alle Runden unwiderruflich und setzt den Verlauf auf 0.</div>
+      <button onclick="resetWalks()">Verlauf auf 0 setzen</button>
     </div>
+  </div>
 </div>
 
 <!-- Edit Modal -->
-<div id="editModal" class="edit-modal">
-    <div class="modal-content">
-        <h3>Eintrag bearbeiten</h3>
-        <div class="form-group">
-            <label>Person:</label>
-            <input type="text" id="editPerson">
-        </div>
-        <div class="form-group">
-            <label>Zeitpunkt (leer lassen für keine Änderung):</label>
-            <input type="datetime-local" id="editTime">
-        </div>
-        <div class="modal-actions">
-            <button class="btn-save" onclick="saveEdit()">Speichern</button>
-            <button class="btn-cancel" onclick="closeEditModal()">Abbrechen</button>
-        </div>
+<div id="editModal" class="modal">
+  <div class="sheet">
+    <h2>Eintrag bearbeiten</h2>
+    <label>Person</label>
+    <input class="field" type="text" id="editPerson">
+    <label>Zeitpunkt (leer = unverändert)</label>
+    <input class="field" type="datetime-local" id="editTime">
+    <div class="sheet-acts">
+      <button class="btn-ghost" onclick="closeEditModal()">Abbrechen</button>
+      <button class="btn-fill" onclick="saveEdit()">Speichern</button>
     </div>
+  </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-    let adminCredentials = null;
-    let currentEditId = null;
+let adminCredentials=null, currentEditId=null;
+const $=id=>document.getElementById(id);
+function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)}
+function toggleDark(){const d=document.body.classList.toggle('dark');localStorage.setItem('mk3-dark',d?'1':'0')}
+function authHeaders(){return {'Authorization':'Basic '+adminCredentials}}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function statusText(s){return {PENDING:'Ausstehend',APPROVED:'Genehmigt',REJECTED:'Abgelehnt'}[s]||s}
 
-    function authHeaders() {
-        return { 'Authorization': 'Basic ' + adminCredentials };
-    }
+async function login(){
+  const u=$('adminUsername').value, p=$('adminPassword').value;
+  if(!u||!p){toast('Benutzername und Passwort eingeben');return;}
+  adminCredentials=btoa(u+':'+p);
+  try{
+    const r=await fetch('/admin/walk/request',{headers:authHeaders()});
+    if(r.ok){$('loginSection').style.display='none';$('adminContent').style.display='block';loadRequests();loadEntries();}
+    else{toast('Ungültige Zugangsdaten');adminCredentials=null;}
+  }catch(e){toast('Anmeldung fehlgeschlagen');adminCredentials=null;}
+}
 
-    async function login() {
-        const username = document.getElementById('adminUsername').value;
-        const password = document.getElementById('adminPassword').value;
-        if (!username || !password) { alert('Bitte Benutzername und Passwort eingeben!'); return; }
+async function loadRequests(){
+  try{
+    const r=await fetch('/admin/walk/request',{headers:authHeaders()});
+    const reqs=await r.json();
+    const box=$('requestsBody');
+    if(!reqs.length){box.innerHTML='<div class="empty">Keine Anfragen.</div>';return;}
+    box.innerHTML=reqs.map(q=>`
+      <div class="row">
+        <span class="nm">${esc(q.person)} <span class="badge ${q.status.toLowerCase()}">${statusText(q.status)}</span></span>
+        <span class="acts">
+          ${q.status==='PENDING'?`<button class="ok" onclick="approveRequest(${q.id})" aria-label="Genehmigen">✓</button><button onclick="rejectRequest(${q.id})" aria-label="Ablehnen">✕</button>`:''}
+          <button onclick="deleteRequest(${q.id})" aria-label="Löschen">🗑</button>
+        </span>
+        <span class="meta">${esc(q.time||'—')} · ${esc(q.requestTimeFormatted)}</span>
+      </div>`).join('');
+  }catch(e){$('requestsBody').innerHTML='<div class="empty">Fehler beim Laden.</div>';}
+}
 
-        adminCredentials = btoa(username + ':' + password);
+async function loadEntries(){
+  try{
+    const r=await fetch('/walk');
+    const entries=await r.json();
+    const box=$('entriesBody');
+    if(!entries.length){box.innerHTML='<div class="empty">Keine Einträge.</div>';return;}
+    box.innerHTML=entries.map(e=>`
+      <div class="row">
+        <span class="nm">${esc(e.person)}</span>
+        <span class="acts">
+          <button onclick="openEditModal(${e.id},'${esc(e.person)}')" aria-label="Bearbeiten">✎</button>
+          <button onclick="deleteEntry(${e.id})" aria-label="Löschen">🗑</button>
+        </span>
+        <span class="meta">${esc(e.timeFormatted)} · 👏 ${e.applauseCount||0} · #${e.id}</span>
+      </div>`).join('');
+  }catch(e){$('entriesBody').innerHTML='<div class="empty">Fehler beim Laden.</div>';}
+}
 
-        // Credentials testen mit einem sicheren Read-Endpoint
-        try {
-            const r = await fetch('/admin/walk/request', { headers: authHeaders() });
-            if (r.ok) {
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                loadRequests();
-                loadEntries();
-            } else {
-                alert('Ungültige Zugangsdaten!');
-                adminCredentials = null;
-            }
-        } catch (e) {
-            alert('Login fehlgeschlagen!');
-            adminCredentials = null;
-        }
-    }
+async function approveRequest(id){const r=await fetch(`/admin/walk/request/${id}/approve`,{method:'POST',headers:authHeaders()});r.ok?(toast('Genehmigt'),loadRequests()):toast('Fehler');}
+async function rejectRequest(id){const r=await fetch(`/admin/walk/request/${id}/reject`,{method:'POST',headers:authHeaders()});r.ok?(toast('Abgelehnt'),loadRequests()):toast('Fehler');}
+async function deleteRequest(id){if(!confirm('Anfrage löschen?'))return;const r=await fetch(`/admin/walk/request/${id}`,{method:'DELETE',headers:authHeaders()});r.ok?(toast('Gelöscht'),loadRequests()):toast('Fehler');}
+async function deleteEntry(id){if(!confirm('Eintrag löschen?'))return;const r=await fetch(`/admin/walk/${id}`,{method:'DELETE',headers:authHeaders()});r.ok?(toast('Gelöscht'),loadEntries()):toast('Fehler');}
 
-    async function loadRequests() {
-        try {
-            const r = await fetch('/admin/walk/request', { headers: authHeaders() });
-            const requests = await r.json();
-            const tbody = document.getElementById('requestsBody');
-            if (!requests.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Keine Anfragen vorhanden</td></tr>';
-                return;
-            }
-            tbody.innerHTML = requests.map(req => `
-                <tr>
-                    <td><strong>${esc(req.person)}</strong></td>
-                    <td>${esc(req.time || '—')}</td>
-                    <td>${esc(req.requestTimeFormatted)}</td>
-                    <td><span class="status-badge status-${req.status.toLowerCase()}">${getStatusText(req.status)}</span></td>
-                    <td>
-                        ${req.status === 'PENDING' ? `
-                            <button class="btn btn-accept" onclick="approveRequest(${req.id})">✓ Genehmigen</button>
-                            <button class="btn btn-reject" onclick="rejectRequest(${req.id})">✗ Ablehnen</button>
-                        ` : ''}
-                        <button class="btn btn-delete" onclick="deleteRequest(${req.id})">🗑️ Löschen</button>
-                    </td>
-                </tr>
-            `).join('');
-        } catch (e) {
-            console.error('Fehler beim Laden der Anfragen:', e);
-        }
-    }
+async function resetWalks(){
+  if(!confirm('Wirklich ALLE Runden löschen? Das kann nicht rückgängig gemacht werden.'))return;
+  const r=await fetch('/admin/reset',{method:'POST',headers:authHeaders()});
+  r.ok?(toast('Verlauf auf 0 gesetzt'),loadEntries()):toast('Fehler');
+}
 
-    async function loadEntries() {
-        try {
-            const r = await fetch('/walk');
-            const entries = await r.json();
-            const tbody = document.getElementById('entriesBody');
-            if (!entries.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Keine Einträge vorhanden</td></tr>';
-                return;
-            }
-            tbody.innerHTML = entries.map(e => `
-                <tr>
-                    <td>${e.id}</td>
-                    <td><strong>${esc(e.person)}</strong></td>
-                    <td>${esc(e.timeFormatted)}</td>
-                    <td>👏 ${e.applauseCount || 0}</td>
-                    <td>
-                        <button class="btn btn-edit" onclick="openEditModal(${e.id}, '${esc(e.person)}')">✏️ Bearbeiten</button>
-                        <button class="btn btn-delete" onclick="deleteEntry(${e.id})">🗑️ Löschen</button>
-                    </td>
-                </tr>
-            `).join('');
-        } catch (e) {
-            console.error('Fehler beim Laden der Einträge:', e);
-        }
-    }
+function openEditModal(id,person){currentEditId=id;$('editPerson').value=person;$('editTime').value='';$('editModal').classList.add('open');}
+function closeEditModal(){$('editModal').classList.remove('open');currentEditId=null;}
+async function saveEdit(){
+  const person=$('editPerson').value.trim();
+  const timeVal=$('editTime').value;
+  if(!person){toast('Person darf nicht leer sein');return;}
+  const body={person};
+  if(timeVal){const d=new Date(timeVal);const p=n=>String(n).padStart(2,'0');body.time=`${p(d.getDate())}.${p(d.getMonth()+1)}.${String(d.getFullYear()).slice(2)} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+  const r=await fetch(`/admin/walk/${currentEditId}`,{method:'PUT',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+  r.ok?(toast('Gespeichert'),closeEditModal(),loadEntries()):toast('Fehler beim Speichern');
+}
 
-    function esc(s) {
-        return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    }
-
-    function getStatusText(status) {
-        return { PENDING: 'Ausstehend', APPROVED: 'Genehmigt', REJECTED: 'Abgelehnt' }[status] || status;
-    }
-
-    async function approveRequest(id) {
-        if (!confirm('Anfrage genehmigen?')) return;
-        const r = await fetch(`/admin/walk/request/${id}/approve`, { method: 'POST', headers: authHeaders() });
-        r.ok ? (alert('Genehmigt!'), loadRequests()) : alert('Fehler beim Genehmigen!');
-    }
-
-    async function rejectRequest(id) {
-        if (!confirm('Anfrage ablehnen?')) return;
-        const r = await fetch(`/admin/walk/request/${id}/reject`, { method: 'POST', headers: authHeaders() });
-        r.ok ? (alert('Abgelehnt!'), loadRequests()) : alert('Fehler!');
-    }
-
-    async function deleteRequest(id) {
-        if (!confirm('Anfrage wirklich löschen?')) return;
-        const r = await fetch(`/admin/walk/request/${id}`, { method: 'DELETE', headers: authHeaders() });
-        r.ok ? (alert('Gelöscht!'), loadRequests()) : alert('Fehler!');
-    }
-
-    async function deleteEntry(id) {
-        if (!confirm('Eintrag wirklich löschen?')) return;
-        const r = await fetch(`/admin/walk/${id}`, { method: 'DELETE', headers: authHeaders() });
-        r.ok ? (alert('Gelöscht!'), loadEntries()) : alert('Fehler!');
-    }
-
-    function openEditModal(id, person) {
-        currentEditId = id;
-        document.getElementById('editPerson').value = person;
-        document.getElementById('editTime').value = '';
-        document.getElementById('editModal').classList.add('active');
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').classList.remove('active');
-        currentEditId = null;
-    }
-
-    async function saveEdit() {
-        const person = document.getElementById('editPerson').value.trim();
-        const timeVal = document.getElementById('editTime').value;
-        if (!person) { alert('Person darf nicht leer sein!'); return; }
-
-        const body = { person };
-        if (timeVal) {
-            // datetime-local → "dd.MM.yy HH:mm" format das Backend versteht
-            const d = new Date(timeVal);
-            const pad = n => String(n).padStart(2,'0');
-            body.time = `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(2)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        }
-
-        const r = await fetch(`/admin/walk/${currentEditId}`, {
-            method: 'PUT',
-            headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-        r.ok ? (alert('Gespeichert!'), closeEditModal(), loadEntries()) : alert('Fehler beim Speichern!');
-    }
-
-    document.getElementById('adminUsername').addEventListener('keypress', e => { if(e.key==='Enter') login(); });
-    document.getElementById('adminPassword').addEventListener('keypress', e => { if(e.key==='Enter') login(); });
+if(localStorage.getItem('mk3-dark')==='1')document.body.classList.add('dark');
+$('adminPassword').addEventListener('keypress',e=>{if(e.key==='Enter')login()});
+$('adminUsername').addEventListener('keypress',e=>{if(e.key==='Enter')login()});
 </script>
 </body>
 </html>

@@ -149,18 +149,31 @@ public class HelloController {
 
     @PostMapping("/admin/pause")
     public ResponseEntity<String> setPause(@RequestBody Map<String,Integer> body) {
-        PauseState state = pauseRepository.findById(1L).orElse(new PauseState());
-        state.setPauseIndex(body.get("index"));
-        pauseRepository.save(state);
-        return ResponseEntity.ok("Pause gesetzt.");
+        return applyPause(body.get("index"));
     }
 
     @DeleteMapping("/admin/pause")
     public ResponseEntity<String> clearPause() {
+        return applyPause(null);
+    }
+
+    // Ungated Pause-Endpoints (Haushalts-App, vgl. D4) — schalten den Urlaubsmodus
+    // direkt aus dem Verlauf-Tab, ohne Admin-Auth.
+    @PostMapping("/pause")
+    public ResponseEntity<String> setPauseOpen(@RequestBody Map<String,Integer> body) {
+        return applyPause(body.get("index"));
+    }
+
+    @DeleteMapping("/pause")
+    public ResponseEntity<String> clearPauseOpen() {
+        return applyPause(null);
+    }
+
+    private ResponseEntity<String> applyPause(Integer index) {
         PauseState state = pauseRepository.findById(1L).orElse(new PauseState());
-        state.setPauseIndex(null);
+        state.setPauseIndex(index);
         pauseRepository.save(state);
-        return ResponseEntity.ok("Pause beendet.");
+        return ResponseEntity.ok(index != null ? "Pause gesetzt." : "Pause beendet.");
     }
 
     @PostMapping("/notify")

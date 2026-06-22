@@ -553,10 +553,9 @@ function applyVacation(){
 }
 async function toggleVac(){
   const target=!vacation;
-  if(!await ensureAdmin())return;
   try{
-    if(target)await postJSON('/admin/pause',{index:0});
-    else await api('/admin/pause',{method:'DELETE'});
+    if(target)await postJSON('/pause',{index:0});
+    else await api('/pause',{method:'DELETE'});
     vacation=target;applyVacation();await loadAll();paintVerlauf();
     toast(vacation?'Urlaubsmodus an — Einträge pausiert':'Urlaubsmodus aus');
   }catch(e){toast('Umschalten fehlgeschlagen');}

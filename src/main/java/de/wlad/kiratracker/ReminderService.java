@@ -21,34 +21,26 @@ public class ReminderService {
         this.pauseRepository = pauseRepository;
     }
 
-    @Scheduled(cron = "0 0 10 * * *", zone = "Europe/Berlin")
+    @Scheduled(cron = "0 0 11 * * *", zone = "Europe/Berlin")
     public void checkMorningReminder() {
         if (walkService.wasMorning()) return;
         Integer pauseIndex = getPauseIndex();
         if (pauseIndex == null) {
-            notificationService.sendCustomNotification("☀️ Kira war heute noch nicht draußen!");
-        } else if (pauseIndex == 0) {
-            notificationService.sendCustomNotification("✈️ Kira macht Urlaub in Neuglobsow, kein Gassi nötig!");
+            notificationService.sendCustomNotification(
+                    "☀️ War jemand schon mit Kira raus oder hat es jemand vergessen einzutragen?");
         }
+        // Bei aktivem Urlaub (pauseIndex != null): keine Erinnerung.
     }
 
-    @Scheduled(cron = "0 0 20 * * *", zone = "Europe/Berlin")
+    @Scheduled(cron = "0 0 22 * * *", zone = "Europe/Berlin")
     public void checkEveningReminder() {
         if (walkService.wasEvening()) return;
         Integer pauseIndex = getPauseIndex();
         if (pauseIndex == null) {
-            notificationService.sendCustomNotification("🌙 Kira braucht noch ihre Abendrunde!");
-        } else if (pauseIndex == 0) {
-            notificationService.sendCustomNotification("✈️ Kira macht Urlaub in Neuglobsow, kein Gassi nötig!");
+            notificationService.sendCustomNotification(
+                    "🌙 War jemand schon mit Kira raus oder hat es jemand vergessen einzutragen?");
         }
-    }
-
-    @Scheduled(cron = "0 0 7 * * *", zone = "Europe/Berlin")
-    public void checkAaronReminder() {
-        if (getPauseIndex() != null) return;
-        if (!walkService.personWalkedInLastDays("Aaron", 3)) {
-            notificationService.sendCustomNotification("👀 Aaron war schon länger nicht mit Kira draußen...");
-        }
+        // Bei aktivem Urlaub (pauseIndex != null): keine Erinnerung.
     }
 
     private Integer getPauseIndex() {

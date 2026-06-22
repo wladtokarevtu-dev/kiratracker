@@ -166,11 +166,13 @@ kein Mock mehr im Bundle.
 ---
 
 ## Definition of Done (gesamt)
-- [ ] Optik = `docs/mockups/index.html` (Stoic-Look, Tab-Bar, Flows).
-- [ ] Alle Altfunktionen erhalten (Gassi, Futter, Rangliste, Rufen, Würfeln,
+- [x] Optik = `docs/mockups/index.html` (Stoic-Look, Tab-Bar, Flows). _(1:1 übernommen)_
+- [x] Alle Altfunktionen erhalten (Gassi, Futter, Rangliste, Rufen, Würfeln,
       Admin, NFC, Walk-Requests, Pause).
-- [ ] Neu: Fairness (Wlad·Mama·Ilja·Aaron, 14T), Selbst-Blockieren m. Pflicht-Notiz,
+- [x] Neu: Fairness (Wlad·Mama·Ilja·Aaron, 14T), Selbst-Blockieren m. Pflicht-Notiz,
       Nachtragen gestapelt (Dismiss nur Admin), Urlaub im Verlauf, Punkt-je-Runde,
       Reminder 11/22.
-- [ ] Kein Mock-Fallback; echte Fehlerzustände.
-- [ ] `./mvnw test` grün; Smoke-curls grün.
+- [x] Kein Mock-Fallback; echte Fehlerzustände.
+- [x] `./mvnw test` grün (21 Tests); Smoke als Integrationstest mit echtem HTTP-Port.
+- [ ] **CP-2 (Wlad, live):** Render-Deploy, echte ntfy-Zustellung, Crons 11/22 Uhr,
+      UI-Klick-Durchlauf am Handy.

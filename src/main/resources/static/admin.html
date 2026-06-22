@@ -190,8 +190,13 @@ async function rejectRequest(id){const r=await fetch(`/admin/walk/request/${id}/
 async function deleteRequest(id){if(!confirm('Anfrage löschen?'))return;const r=await fetch(`/admin/walk/request/${id}`,{method:'DELETE',headers:authHeaders()});r.ok?(toast('Gelöscht'),loadRequests()):toast('Fehler');}
 async function deleteEntry(id){if(!confirm('Eintrag löschen?'))return;const r=await fetch(`/admin/walk/${id}`,{method:'DELETE',headers:authHeaders()});r.ok?(toast('Gelöscht'),loadEntries()):toast('Fehler');}
 
+// Zusätzliches Passwort-Gate für das unwiderrufliche Zurücksetzen.
+// Hardcoded, da der Admin-Modus selbst bereits serverseitig (Basic-Auth) geschützt ist.
+const RESET_PW='ryze!658';
 async function resetWalks(){
-  if(!confirm('Wirklich ALLE Runden löschen? Das kann nicht rückgängig gemacht werden.'))return;
+  const pw=prompt('Sicherheits-Passwort zum Zurücksetzen eingeben:');
+  if(pw===null)return;
+  if(pw!==RESET_PW){toast('Falsches Passwort');return;}
   const r=await fetch('/admin/reset',{method:'POST',headers:authHeaders()});
   r.ok?(toast('Verlauf auf 0 gesetzt'),loadEntries()):toast('Fehler');
 }

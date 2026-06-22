@@ -45,10 +45,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .greet{font-size:2.15rem;font-weight:800;letter-spacing:-.045em;line-height:1.02}
 .greet-sub{margin-top:8px;color:var(--ink2);font-size:.96rem;font-weight:500}
 
-/* ===== ERROR BAR ===== */
-.errbar{display:none;background:#fdecec;border:1px solid #f3d0d0;color:#9a3636;border-radius:14px;padding:12px 14px;margin-top:14px;font-size:.85rem;font-weight:600;line-height:1.4}
-.dark .errbar{background:#291616;border-color:#492525;color:#e6a5a5}
-
 /* ===== VACATION BANNER ===== */
 .vacbanner{display:none;align-items:flex-start;gap:12px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:15px 16px;margin-top:20px;font-size:.9rem}
 .phone.vac .vacbanner{display:flex}
@@ -131,7 +127,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .rankrow .rn{font-weight:700;font-size:.96rem}
 .rankrow .rc{font-weight:800;font-variant-numeric:tabular-nums;font-size:.92rem}
 .rankrow .rc small{color:var(--ink3);font-weight:600;font-size:.66rem;margin-left:3px}
-.emptyhint{color:var(--ink3);font-weight:600;font-size:.86rem;padding:18px 4px}
 
 /* ===== NACHTRAGEN (leicht rot, unter Kalender) ===== */
 #latelist:not(:empty){display:flex;flex-direction:column;gap:10px;margin:-2px 0 18px}
@@ -163,11 +158,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .sw.on{background:var(--fill)}
 .sw i{position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .sw.on i{left:22px}
-
-/* ===== MORE LINKS ===== */
-.morelinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-.morelinks a{padding:9px 16px;border:1.5px solid var(--line);border-radius:100px;font-size:.8rem;font-weight:700;color:var(--ink2);text-decoration:none}
-.morelinks a:active{background:var(--soft)}
 
 /* ===== TAB BAR ===== */
 .tabbar{position:absolute;left:0;right:0;bottom:0;height:88px;background:linear-gradient(to top,var(--bg) 62%,transparent);display:flex;align-items:flex-start;justify-content:space-around;padding:14px 14px 0;z-index:40}
@@ -229,11 +219,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div class="toprow">
         <div class="wx-top">
           <svg width="22" height="16" viewBox="0 0 22 16" fill="none"><path d="M6 13h9a4 4 0 0 0 .5-7.97A5 5 0 0 0 6 6.5 3.25 3.25 0 0 0 6 13Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-          <span class="wt" id="wt">–°</span><span class="wd" id="wd">…</span>
+          <span class="wt">14°</span><span class="wd">leicht bewölkt</span>
         </div>
         <div class="tr-right">
           <span class="streak">
-            <svg width="16" height="18" viewBox="0 0 17 19" fill="none"><path d="M8.5 1C9 5 13 5.5 13 9.8a4.5 4.5 0 1 1-9 0c0-1.6.8-2.6 1.6-3.4C6.2 5.8 7 5 7 3.4 7.8 4 8.5 1 8.5 1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><span id="streakNum">0</span>
+            <svg width="16" height="18" viewBox="0 0 17 19" fill="none"><path d="M8.5 1C9 5 13 5.5 13 9.8a4.5 4.5 0 1 1-9 0c0-1.6.8-2.6 1.6-3.4C6.2 5.8 7 5 7 3.4 7.8 4 8.5 1 8.5 1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>4
           </span>
           <button class="icbtn" id="adminBtn" onclick="toggleAdmin()" aria-label="Admin">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3.5" y="8" width="11" height="7.5" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 8V5.6a3 3 0 0 1 6 0V8" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -245,9 +235,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       </div>
 
       <div class="greet" id="greet-word">guten morgen.</div>
-      <div class="greet-sub" id="greet-sub">lädt …</div>
-
-      <div class="errbar" id="errbar"></div>
+      <div class="greet-sub" id="greet-sub">heute noch keine Runde eingetragen</div>
 
       <div class="vacbanner">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 17h14M5 17V9l5-3 5 3v8M8.5 17v-3h3v3" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
@@ -258,11 +246,22 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
       <div id="latelist"></div>
 
-      <div class="rituals" id="rituals"></div>
+      <div class="rituals">
+        <div class="ritual">
+          <div class="rl">Morgenrunde</div>
+          <div class="rh">Bereit für den Tag?</div>
+          <button class="begin" onclick="startLog()">Eintragen</button>
+        </div>
+        <div class="ritual">
+          <div class="rl">Abendrunde</div>
+          <div class="rh">Zeit für die letzte Runde.</div>
+          <button class="begin" onclick="startLog()">Eintragen</button>
+        </div>
+      </div>
 
       <div class="feat">
         <div class="fl">Am Zug</div>
-        <div class="fq">Wer dreht heute mit Kira die Runde?</div>
+        <div class="fq">Wer dreht heute Abend mit Kira die Runde?</div>
         <button class="pill-dark" onclick="startDice()">Würfeln</button>
       </div>
     </div>
@@ -291,12 +290,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div class="vacrow">
         <div class="vi"><div class="vt">Urlaubsmodus</div><div class="vd" id="vacrow-d">Kira ist da — Runden aktiv</div></div>
         <button class="sw" id="vacsw" onclick="toggleVac()"><i></i></button>
-      </div>
-
-      <div class="morelinks">
-        <a href="/stats.html">Statistik</a>
-        <a href="/admin.html">Admin</a>
-        <a href="/nfc.html">NFC</a>
       </div>
     </div>
   </div>
@@ -338,132 +331,56 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 </div>
 
 <script>
-/* ============== KONSTANTEN ============== */
-const NAMES=['Wlad','Mama','Ilja','Aaron','Dajen'];   // dürfen Runden eintragen
-const FAIRPPL=['Wlad','Mama','Ilja','Aaron'];          // Fairness-Rotation
+const NAMES=['Wlad','Mama','Ilja','Aaron','Dajen'];        // dürfen Runden eintragen
+const FAIRPPL=['Wlad','Mama','Ilja','Aaron'];              // Fairness-Rotation
+const FAIRCNT={Wlad:11,Mama:9,Ilja:5,Aaron:3};            // Runden / 7 Tage (mock)
+const MSGS=['Kannst du mit Kira raus?','Kira will raus — dringend!','Noch nicht gefüttert','Abendrunde!'];
 const FEEL=['Kurz','Normale Runde','Langer Gang','Am Spielplatz','Hat ihr Geschäft','War müde'];
-const FOODS=['Trockenfutter','Nassfutter','Leckerlies','Barf'];
-const MSGS=[['Kannst du mit Kira raus?','walk'],['Kira will raus — dringend!','urgent'],['Noch nicht gefüttert','food'],['Abendrunde!','evening']];
-
+const WEEKCNT=null; // computed
+const RANK={
+  3:[['Wlad',6],['Mama',4],['Ilja',2],['Aaron',1],['Dajen',1]],
+  7:[['Wlad',11],['Mama',9],['Ilja',5],['Dajen',4],['Aaron',3]],
+  14:[['Mama',19],['Wlad',18],['Ilja',10],['Aaron',7],['Dajen',6]],
+  30:[['Mama',38],['Wlad',34],['Ilja',19],['Aaron',12],['Dajen',11]],
+};
+let rankD=7;
+let VLOG=[
+  ['Heute',[['Wlad','08:30','Morgens']]],
+  ['Gestern',[['Mama','19:15','Abends'],['Ilja','08:05','Morgens']]],
+  ['Vorgestern',[['Aaron','18:20','Abends'],['Wlad','07:50','Morgens']]],
+];
 const $=id=>document.getElementById(id);
-const STATE={status:null,walks:[],fair:null,blocks:[]};
-let vacation=false, admin=false, rankD=7;
+let vacation=false;
+let admin=false;
+let blocks={}; // {name:{morning:note,evening:note}}
+// offene Nachträge — bleiben stehen bis Eintrag oder Dismiss
+let lateItems=[
+  {id:'m', slot:'Morgenrunde', label:'Morgens', deadline:'11:00', def:'08:30'},
+  {id:'e', slot:'Abendrunde', label:'Abends', deadline:'22:00', def:'19:30'},
+];
 
-/* ============== API ============== */
-function adminCreds(){return sessionStorage.getItem('mk3-admin')}
-function setAdminCreds(c){sessionStorage.setItem('mk3-admin',c)}
-function clearAdminCreds(){sessionStorage.removeItem('mk3-admin')}
-
-async function api(path,opts={}){
-  opts.headers=opts.headers||{};
-  if(path.startsWith('/admin')){const c=adminCreds();if(c)opts.headers['Authorization']='Basic '+c;}
-  const res=await fetch(path,opts);
-  if(res.status===401){clearAdminCreds();admin=false;$('adminBtn').classList.remove('on');throw new Error('401');}
-  if(!res.ok)throw new Error('HTTP '+res.status);
-  const ct=res.headers.get('content-type')||'';
-  return ct.includes('json')?res.json():res.text();
-}
-function postJSON(path,body,method='POST'){
-  return api(path,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-}
-
-/* ============== HELPERS ============== */
 function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2300)}
-function showError(m){$('errbar').textContent=m;$('errbar').style.display='block'}
-function clearError(){$('errbar').style.display='none'}
-function pad2(n){return String(n).padStart(2,'0')}
-function fmtHM(d){return pad2(d.getHours())+':'+pad2(d.getMinutes())}
-function dayKey(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
-function sameDay(a,b){return dayKey(a)===dayKey(b)}
-function dmyOf(d){return pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'+String(d.getFullYear()).slice(2)}
-function todayDMY(){return dmyOf(new Date())}
-// WalkEntryDto.timeFormatted = "HH:mm dd.MM.yy"
-function parseWalk(tf){
-  const [hm,dmy]=tf.split(' ');
-  const [H,Mi]=hm.split(':').map(Number);
-  const [d,mo,yy]=dmy.split('.').map(Number);
-  return new Date(2000+yy,mo-1,d,H,Mi);
-}
-function slotLabel(s){return s.toUpperCase()==='MORNING'?'Morgens':'Abends'}
+function toggleDark(){const d=$('phone').classList.toggle('dark');localStorage.setItem('mk3-dark',d?'1':'0')}
+function toggleAdmin(){admin=!admin;$('adminBtn').classList.toggle('on',admin);toast(admin?'Admin-Modus an — Einträge bearbeitbar':'Admin-Modus aus');paintLate();if($('verlauf').style.display!=='none')paintVerlauf()}
 
-/* ============== LOAD ============== */
-async function loadAll(){
-  try{
-    const [status,walks,fair,pause,blocks]=await Promise.all([
-      api('/status'),api('/walk'),api('/fairness'),api('/pause'),api('/blocks')
-    ]);
-    STATE.status=status;STATE.walks=walks||[];STATE.fair=fair;STATE.blocks=blocks||[];
-    vacation=!!pause.active;
-    clearError();
-    applyVacation();
-    paintAll();
-  }catch(e){
-    showError('Verbindung zum Server fehlgeschlagen — bitte später erneut versuchen.');
-    $('greet-sub').textContent='offline';
-  }
-}
-function paintAll(){
-  paintWeather();paintGreet();paintGreetSub();paintStreak();
-  paintWeek();paintRituals();computeLate();paintLate();
-  if($('verlauf').style.display!=='none')paintVerlauf();
-}
-
-/* ============== HOME PAINT ============== */
-function paintWeather(){
-  const w=STATE.status&&STATE.status.weather;
-  if(w){$('wt').textContent=Math.round(w.temperature)+'°';$('wd').textContent=w.description||'';}
-  else{$('wt').textContent='';$('wd').textContent='';}
-}
-function paintGreet(){const h=new Date().getHours();$('greet-word').textContent=h<11?'guten morgen.':h>=18?'guten abend.':'guten tag.'}
-function paintGreetSub(){
-  if(vacation){$('greet-sub').textContent='App inaktiv — Kira ist im Urlaub';return;}
-  const s=STATE.status;if(!s){$('greet-sub').textContent='lädt …';return;}
-  if(!s.wasMorning)$('greet-sub').textContent='heute noch keine Runde eingetragen';
-  else if(!s.wasEvening)$('greet-sub').textContent='die abendrunde steht noch aus';
-  else $('greet-sub').textContent='alle Runden erledigt — guter Tag.';
-}
-function computeStreak(){
-  const days=new Set((STATE.walks||[]).map(w=>dayKey(parseWalk(w.timeFormatted))));
-  let s=0;const d=new Date();
-  if(!days.has(dayKey(d)))d.setDate(d.getDate()-1);
-  while(days.has(dayKey(d))){s++;d.setDate(d.getDate()-1);}
-  return s;
-}
-function paintStreak(){$('streakNum').textContent=computeStreak()}
+/* ---- week strip: 1 Punkt je Spaziergang ---- */
 function paintWeek(){
-  const cnt={};(STATE.walks||[]).forEach(w=>{const k=dayKey(parseWalk(w.timeFormatted));cnt[k]=(cnt[k]||0)+1});
   const L=['M','D','M','D','F','S','S'];
   const now=new Date();const dow=(now.getDay()+6)%7;
   const mon=new Date(now);mon.setDate(now.getDate()-dow);
   let h='';
   for(let i=0;i<7;i++){
     const d=new Date(mon);d.setDate(mon.getDate()+i);
-    const today=sameDay(d,now);
-    const c=cnt[dayKey(d)]||0;
-    const dots=Array.from({length:c},()=>'<i></i>').join('');
+    const today=i===dow;
+    const cnt=i<dow?2:(today?1:0);            // mock: Vergangenes 2 Runden, heute 1
+    const dots=Array.from({length:cnt},()=>'<i></i>').join('');
     h+=`<div class="day ${today?'today':''}"><span>${L[i]}</span><span class="num">${d.getDate()}</span><span class="daydots">${dots}</span></div>`;
   }
   $('week').innerHTML=h;
 }
-function todayWalks(){const now=new Date();return (STATE.walks||[]).filter(w=>sameDay(parseWalk(w.timeFormatted),now))}
-function paintRituals(){
-  const s=STATE.status||{};
-  const tw=todayWalks();
-  const morning=tw.filter(w=>parseWalk(w.timeFormatted).getHours()<12);
-  const evening=tw.filter(w=>parseWalk(w.timeFormatted).getHours()>=12);
-  $('rituals').innerHTML=
-    ritualCard('Morgenrunde','Bereit für den Tag?',s.wasMorning,morning)+
-    ritualCard('Abendrunde','Zeit für die letzte Runde.',s.wasEvening,evening);
-}
-function ritualCard(label,prompt,done,entries){
-  if(done){
-    const chips=entries.map(w=>`<span class="donechip">${w.person} · ${fmtHM(parseWalk(w.timeFormatted))}</span>`).join('');
-    return `<div class="ritual done"><div class="rl">${label}</div><div class="rh">Erledigt.</div><div class="donechips">${chips}</div></div>`;
-  }
-  return `<div class="ritual"><div class="rl">${label}</div><div class="rh">${prompt}</div><button class="begin" onclick="startLog()">Eintragen</button></div>`;
-}
+function paintGreet(){const h=new Date().getHours();$('greet-word').textContent=h<11?'guten morgen.':h>=18?'guten abend.':'guten tag.'}
 
-/* ============== VERLAUF ============== */
+/* ================= SCREENS ================= */
 function showScreen(name){
   $('home').style.display=name==='home'?'block':'none';
   $('verlauf').style.display=name==='verlauf'?'block':'none';
@@ -471,143 +388,62 @@ function showScreen(name){
   $('tab-verlauf').classList.toggle('on',name==='verlauf');
   if(name==='verlauf')paintVerlauf();
 }
-function dayLabelFor(d){
-  const now=new Date();const y=new Date();y.setDate(now.getDate()-1);
-  if(sameDay(d,now))return 'Heute';
-  if(sameDay(d,y))return 'Gestern';
-  return pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.';
-}
-function groupWalks(){
-  const groups=[];const map={};
-  (STATE.walks||[]).forEach(w=>{
-    const dt=parseWalk(w.timeFormatted);const k=dayKey(dt);
-    if(!map[k]){map[k]={label:dayLabelFor(dt),items:[]};groups.push(map[k]);}
-    map[k].items.push({id:w.id,person:w.person,time:fmtHM(dt),slot:dt.getHours()<12?'Morgens':'Abends'});
-  });
-  return groups;
-}
+
+/* ---- Verlauf ---- */
 function paintVerlauf(){
-  const groups=groupWalks();
-  if(!groups.length){$('vlog').innerHTML='<div class="emptyhint">Noch keine Runden eingetragen.</div>';}
-  else $('vlog').innerHTML=groups.map(g=>`
-    <div class="dayhead">${g.label}</div>
-    ${g.items.map(e=>`<div class="ventry"><span class="vd"></span><span class="vn">${e.person}</span><span class="vslot">${e.slot}</span><span class="vt">${e.time}</span>${admin?`<span class="vadm"><button onclick="startEditTime(${e.id})" aria-label="Uhrzeit">✎</button><button onclick="delEntry(${e.id})" aria-label="Löschen">✕</button></span>`:''}</div>`).join('')}
+  $('vlog').innerHTML=VLOG.map((g,gi)=>`
+    <div class="dayhead">${g[0]}</div>
+    ${g[1].map((e,ei)=>`<div class="ventry"><span class="vd"></span><span class="vn">${e[0]}</span><span class="vslot">${e[2]}</span><span class="vt">${e[1]}</span>${admin?`<span class="vadm"><button onclick="startEditTime(${gi},${ei})" aria-label="Uhrzeit">✎</button><button onclick="delEntry(${gi},${ei})" aria-label="Löschen">✕</button></span>`:''}</div>`).join('')}
   `).join('');
   paintRank();
   paintFair();
 }
-async function delEntry(id){
-  try{await api('/admin/walk/'+id,{method:'DELETE'});toast('Eintrag gelöscht');await loadAll();paintVerlauf();}
-  catch(e){toast(e.message==='401'?'Admin-Zugang nötig':'Löschen fehlgeschlagen');}
-}
-function startEditTime(id){
-  const w=(STATE.walks||[]).find(x=>x.id===id);if(!w)return;
-  const dt=parseWalk(w.timeFormatted);
-  state={editId:id,who:w.person,date:dt,slot:dt.getHours()<12?'Morgens':'Abends'};
-  flow='edittime';step=0;openOver();render();
-}
-async function paintRank(){
-  try{
-    const lb=await api('/leaderboard?days='+rankD);
-    const rows=Object.entries(lb);
-    if(!rows.length){$('rank').innerHTML='<div class="emptyhint">Keine Runden im Zeitraum.</div>';return;}
-    $('rank').innerHTML=rows.map(([n,c],i)=>`<div class="rankrow"><span class="rk">${i+1}</span><span class="rn">${n}</span><span class="rc">${c}<small>RUNDEN</small></span></div>`).join('');
-  }catch(e){$('rank').innerHTML='<div class="emptyhint">Rangliste nicht verfügbar.</div>';}
+function delEntry(gi,ei){VLOG[gi][1].splice(ei,1);paintVerlauf();toast('Eintrag gelöscht')}
+function startEditTime(gi,ei){state={gi,ei,who:VLOG[gi][1][ei][0],slot:VLOG[gi][1][ei][2],time0:VLOG[gi][1][ei][1]};flow='edittime';step=0;openOver();render()}
+function paintRank(){
+  $('rank').innerHTML=RANK[rankD].map(([n,c],i)=>`<div class="rankrow"><span class="rk">${i+1}</span><span class="rn">${n}</span><span class="rc">${c}<small>RUNDEN</small></span></div>`).join('');
 }
 function setRank(d,btn){rankD=d;[...$('rankSeg').children].forEach(b=>b.classList.remove('on'));btn.classList.add('on');paintRank();}
-function blockNoteFor(name,slot){
-  const b=(STATE.blocks||[]).find(x=>x.person.toLowerCase()===name.toLowerCase()&&x.slot.toUpperCase()===slot.toUpperCase());
-  return b?b.note:'';
+function dranFor(slot){
+  const cand=FAIRPPL.filter(p=>!(blocks[p]&&blocks[p][slot]));
+  cand.sort((a,b)=>FAIRCNT[a]-FAIRCNT[b]);
+  return cand[0]||'—';
 }
 function paintFair(){
-  const f=STATE.fair;
-  if(!f){$('fair').innerHTML='<div class="emptyhint">Fairness nicht verfügbar.</div>';return;}
-  const hour=new Date().getHours();
-  const slot=hour<12?'MORNING':'EVENING';
-  const dran=slot==='MORNING'?f.dranMorning:f.dranEvening;
-  const label=vacation?'Pausiert · Urlaub':(slot==='MORNING'?'Heute Morgen dran':'Heute Abend dran');
-  const ppl=[...f.people].sort((a,b)=>a.count-b.count);
-  const max=Math.max(1,...f.people.map(p=>p.count));
-  const rows=ppl.map(p=>{
-    const bs=p.blocked||[];const blocked=bs.length>0;
-    const note=blocked?`<span class="blocknote">blockiert · ${bs.map(slotLabel).join(' & ')}${blockNoteFor(p.name,bs[0])?` — „${blockNoteFor(p.name,bs[0])}"`:''}</span>`:'';
-    return `<div class="fairrow ${p.name===dran?'next':''} ${blocked?'blocked':''}">
-      <span class="fn">${p.name}</span>
-      <span class="fc">${p.count}<small>RUNDEN / 14T</small></span>
-      <span class="fbar"><i style="width:${Math.round(p.count/max*100)}%"></i></span>
+  const slot='evening';
+  const dran=dranFor(slot);
+  const max=Math.max(...FAIRPPL.map(p=>FAIRCNT[p]));
+  const sorted=[...FAIRPPL].sort((a,b)=>FAIRCNT[a]-FAIRCNT[b]);
+  const rows=sorted.map(p=>{
+    const blk=blocks[p]||{};const bs=Object.keys(blk);
+    const note=bs.length?`<span class="blocknote">blockiert · ${bs.map(s=>s==='morning'?'Morgens':'Abends').join(' & ')} — „${blk[bs[0]]}"</span>`:'';
+    return `<div class="fairrow ${p===dran?'next':''} ${bs.length?'blocked':''}">
+      <span class="fn">${p}</span>
+      <span class="fc">${FAIRCNT[p]}<small>RUNDEN / 7T</small></span>
+      <span class="fbar"><i style="width:${Math.round(FAIRCNT[p]/max*100)}%"></i></span>
       ${note}</div>`;
   }).join('');
   $('fair').innerHTML=`
     <div class="fair ${vacation?'off':''}">
-      <div class="dran"><span class="lab">${label}</span><span class="who">${dran||'—'}</span></div>
+      <div class="dran"><span class="lab">${vacation?'Pausiert · Urlaub':'Heute Abend dran'}</span><span class="who">${dran}</span></div>
       ${rows}
       <div class="fairaction"><button class="btn-outline" onclick="${vacation?'':'startBlock()'}">Ich kann nicht</button></div>
     </div>`;
 }
 
-/* ============== URLAUBSMODUS ============== */
-function applyVacation(){
+/* ---- Urlaubsmodus ---- */
+function toggleVac(){
+  vacation=!vacation;
   $('vacsw').classList.toggle('on',vacation);
   $('phone').classList.toggle('vac',vacation);
   $('vacrow-d').textContent=vacation?'App inaktiv — Kira ist im Urlaub':'Kira ist da — Runden aktiv';
-}
-async function toggleVac(){
-  const target=!vacation;
-  try{
-    if(target)await postJSON('/pause',{index:0});
-    else await api('/pause',{method:'DELETE'});
-    vacation=target;applyVacation();await loadAll();paintVerlauf();
-    toast(vacation?'Urlaubsmodus an — Einträge pausiert':'Urlaubsmodus aus');
-  }catch(e){toast('Umschalten fehlgeschlagen');}
+  $('greet-sub').textContent=vacation?'App inaktiv — Kira ist im Urlaub':'die abendrunde steht noch aus';
+  paintLate();
+  paintFair();
+  toast(vacation?'Urlaubsmodus an — Einträge pausiert':'Urlaubsmodus aus');
 }
 
-/* ============== ADMIN ============== */
-async function ensureAdmin(){
-  if(adminCreds())return true;
-  const u=prompt('Admin-Benutzer:');if(!u)return false;
-  const p=prompt('Admin-Passwort:');if(p===null)return false;
-  setAdminCreds(btoa(u+':'+p));
-  try{await api('/admin/walk/request');return true;}
-  catch(e){clearAdminCreds();toast('Zugang abgelehnt');return false;}
-}
-async function toggleAdmin(){
-  if(admin){admin=false;$('adminBtn').classList.remove('on');toast('Admin-Modus aus');paintLate();if($('verlauf').style.display!=='none')paintVerlauf();return;}
-  if(await ensureAdmin()){admin=true;$('adminBtn').classList.add('on');toast('Admin-Modus an — Einträge bearbeitbar');paintLate();if($('verlauf').style.display!=='none')paintVerlauf();}
-}
-function toggleDark(){const d=$('phone').classList.toggle('dark');localStorage.setItem('mk3-dark',d?'1':'0')}
-
-/* ============== NACHTRAGEN (D5) ============== */
-let lateItems=[];
-function dismissed(){try{return JSON.parse(localStorage.getItem('mk3-late-dismiss')||'{}')}catch(e){return {}}}
-function computeLate(){
-  lateItems=[];
-  if(vacation)return;
-  const s=STATE.status;if(!s)return;
-  const now=new Date();const mins=now.getHours()*60+now.getMinutes();
-  const dk=dayKey(now);const dis=dismissed();
-  if(!s.wasMorning && mins>=11*60 && !dis[dk+'|morning'])
-    lateItems.push({id:'morning',slot:'Morgenrunde',label:'Morgens',deadline:'11:00',def:'08:30'});
-  if(!s.wasEvening && mins>=22*60 && !dis[dk+'|evening'])
-    lateItems.push({id:'evening',slot:'Abendrunde',label:'Abends',deadline:'22:00',def:'19:30'});
-}
-function paintLate(){
-  const box=$('latelist');
-  if(vacation||!lateItems.length){box.innerHTML='';return;}
-  box.innerHTML=lateItems.map(it=>`
-    <div class="latecard">
-      <span class="lt"><b>${it.deadline}</b> · keine ${it.slot} eingetragen — war jemand mit Kira raus?</span>
-      <button class="lb" onclick="startLate('${it.id}')">Nachtragen</button>
-      ${admin?`<button class="lx" onclick="dismissLate('${it.id}')" aria-label="Ausblenden">✕</button>`:''}
-    </div>`).join('');
-}
-function dismissLate(id){
-  const dk=dayKey(new Date());const dis=dismissed();dis[dk+'|'+id]=1;
-  localStorage.setItem('mk3-late-dismiss',JSON.stringify(dis));
-  computeLate();paintLate();
-}
-function startLate(id){if(vacation)return;flow='late';step=0;state={lateId:id};openOver();render()}
-
-/* ============== TAKEOVER ENGINE ============== */
+/* ================= TAKEOVER ENGINE ================= */
 let flow=null,step=0,state={};
 function dots(n,cur){$('dots').innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('')}
 function openOver(){$('over').classList.add('open')}
@@ -618,7 +454,7 @@ function startLog(){if(vacation)return toast('Urlaubsmodus aktiv — Kira brauch
 function startFeed(){if(vacation)return toast('Urlaubsmodus aktiv — Kira ist verreist');flow='feed';step=0;state={};openOver();render()}
 function startNotify(){flow='notify';step=0;state={};openOver();render()}
 function startDice(){flow='dice';step=0;state={};openOver();render()}
-function startBlock(){if(vacation)return;flow='block';step=0;state={};openOver();render()}
+function startBlock(){flow='block';step=0;state={};openOver();render()}
 
 function gridPicker(title,sub,items,key,multi){
   const sel=state[key]||(multi?[]:null);
@@ -637,86 +473,66 @@ function pick(key,val,multi){
   else state[key]=val;
   render();
 }
-function next(){
-  if(['log','feed','notify','late'].includes(flow)){if(step===0&&!state.who)return;step++;render();return}
-  if(flow==='block'){if(step===0&&!state.who)return;if(step===1&&!(state.slots&&state.slots.length))return;step++;render();return}
-}
 
 function render(){
   if(flow==='log'){
     if(step===0){dots(3,0);return gridPicker('Wer war mit Kira draußen?','Tippe einen Namen.',NAMES,'who',false)}
     if(step===1){dots(3,1);return gridPicker('Wie war die Runde?','Optional — mehrere möglich.',FEEL,'feel',true)}
     if(step===2){dots(3,2);return noteStep('Notiz zur Runde','Wie war\'s draußen? (optional)','Schreiben …','note',false,()=>{step=3;render()})}
-    if(step===3){submitWalk();return doneStep('Eingetragen.',state.who+' war mit Kira draußen',true)}
+    if(step===3){return doneStep('Eingetragen.',state.who+' war mit Kira draußen',true)}
   }
   if(flow==='feed'){
     if(step===0){dots(2,0);return gridPicker('Wer hat gefüttert?','Tippe einen Namen.',NAMES,'who',false)}
-    if(step===1){dots(2,1);return gridPicker('Was gab es?','Wähle aus.',FOODS,'what',false)}
-    if(step===2){submitFeed();return doneStep('Gefüttert.',state.who+' hat Kira gefüttert',false)}
+    if(step===1){dots(2,1);return gridPicker('Was gab es?','Wähle aus.',['Trockenfutter','Nassfutter','Leckerlies','Barf'],'what',false)}
+    if(step===2){return doneStep('Gefüttert.',state.who+' hat Kira gefüttert',false)}
   }
   if(flow==='notify'){
     if(step===0){dots(2,0);return gridPicker('Wen rufen?','Push an die Familie.',NAMES,'who',false)}
     if(step===1){dots(2,1);return msgStep()}
-    if(step===2){submitNotify();return doneStep('Gesendet.','Push an '+state.who+' raus',false)}
+    if(step===2){return doneStep('Gesendet.','Push an '+state.who+' raus',false)}
   }
   if(flow==='block'){
     if(step===0){dots(3,0);return gridPicker('Wer kann nicht?','Wähle dich aus.',FAIRPPL,'who',false)}
     if(step===1){dots(3,1);return gridPicker('Welche Runde fällt aus?','Morgens und/oder abends.',['Morgens','Abends'],'slots',true)}
     if(step===2){dots(3,2);return noteStep('Warum geht\'s nicht?','Kurz für die Familie — Pflicht.','z.B. Spätschicht bis 22 Uhr …','reason',true,finishBlock)}
-    if(step===3){return doneStep('Blockiert.',blockDoneSub(),false)}
+    if(step===3){return doneStep('Blockiert.',state.who+' ist '+(state.slots||[]).join(' & ').toLowerCase()+' raus — '+dranFor('evening')+' rückt nach',false)}
   }
   if(flow==='late'){
     if(step===0){dots(2,0);return gridPicker('Wer war mit Kira draußen?','Nachtragen — wähle einen Namen.',NAMES,'who',false)}
     if(step===1){const it=lateItems.find(i=>i.id===state.lateId);dots(2,1);return timeStep('Wann war die Runde?','Uhrzeit nachtragen.',it?it.def:'08:30',()=>{step=2;render()})}
-    if(step===2){submitLate();return doneStep('Nachgetragen.',state.who+' · '+state.time,false)}
+    if(step===2){addLate();return doneStep('Nachgetragen.',state.who+' · '+state.time,false)}
   }
   if(flow==='edittime'){
     $('dots').innerHTML='';
-    return timeStep('Uhrzeit ändern',state.who+' · '+state.slot,fmtHM(state.date),submitEditTime);
+    return timeStep('Uhrzeit ändern',state.who+' · '+state.slot,state.time0,()=>{VLOG[state.gi][1][state.ei][1]=state.time;closeOver();paintVerlauf();toast('Uhrzeit aktualisiert')});
   }
   if(flow==='dice'){return diceStep()}
 }
-
-/* ============== SUBMITS (echte API) ============== */
-function submitWalk(){
-  if(state._added)return;state._added=true;
-  postJSON('/walk',{person:state.who}).then(()=>loadAll()).catch(()=>toast('Eintragen fehlgeschlagen'));
-}
-function submitFeed(){
-  if(state._added)return;state._added=true;
-  postJSON('/food',{person:state.who,food:state.what}).then(()=>loadAll()).catch(()=>toast('Füttern fehlgeschlagen'));
-}
-function submitNotify(){
-  if(state._added)return;state._added=true;
-  postJSON('/notify',{person:state.who,message:state.msgKey}).catch(()=>toast('Senden fehlgeschlagen'));
-}
-function submitLate(){
-  if(state._added)return;state._added=true;
-  const time=todayDMY()+' '+state.time; // dd.MM.yy HH:mm → kein ntfy serverseitig
-  postJSON('/walk',{person:state.who,time}).then(()=>loadAll()).catch(()=>toast('Nachtragen fehlgeschlagen'));
-}
-async function submitEditTime(){
-  const dmy=dmyOf(state.date);
-  try{
-    await postJSON('/admin/walk/'+state.editId,{person:state.who,time:dmy+' '+state.time},'PUT');
-    closeOver();await loadAll();paintVerlauf();toast('Uhrzeit aktualisiert');
-  }catch(e){toast(e.message==='401'?'Admin-Zugang nötig':'Ändern fehlgeschlagen');}
-}
-function blockDoneSub(){
-  const f=STATE.fair;
-  const next=f?(f.dranEvening||f.dranMorning):'jemand';
-  return state.who+' ist '+(state.slots||[]).join(' & ').toLowerCase()+' raus — '+next+' rückt nach';
-}
-async function finishBlock(){
-  const slots=(state.slots||[]).map(s=>s==='Morgens'?'MORNING':'EVENING');
-  try{
-    await postJSON('/block',{person:state.who,slots,note:state.reason});
-    await loadAll();
-    step=3;render();
-  }catch(e){toast('Blockieren fehlgeschlagen');}
+function next(){
+  if(['log','feed','notify','late'].includes(flow)){if(step===0&&!state.who)return;step++;render();return}
+  if(flow==='block'){if(step===0&&!state.who)return;if(step===1&&!(state.slots&&state.slots.length))return;step++;render();return}
 }
 
-/* ============== STEPS ============== */
+/* ---- Nachtragen (gestapelte Hinweise) + Uhrzeit-Step ---- */
+function paintLate(){
+  const box=$('latelist');
+  if(vacation){box.innerHTML='';return;}
+  box.innerHTML=lateItems.map(it=>`
+    <div class="latecard">
+      <span class="lt"><b>${it.deadline}</b> · keine ${it.slot} eingetragen — war jemand mit Kira raus?</span>
+      <button class="lb" onclick="startLate('${it.id}')">Nachtragen</button>
+      ${admin?`<button class="lx" onclick="dismissLate('${it.id}')" aria-label="Ausblenden">✕</button>`:''}
+    </div>`).join('');
+}
+function dismissLate(id){lateItems=lateItems.filter(i=>i.id!==id);paintLate()}
+function startLate(id){if(vacation)return;flow='late';step=0;state={lateId:id};openOver();render()}
+function addLate(){
+  if(state._added)return;state._added=true;
+  const it=lateItems.find(i=>i.id===state.lateId);
+  VLOG[0][1].unshift([state.who,state.time,it?it.label:'Morgens']);
+  lateItems=lateItems.filter(i=>i.id!==state.lateId);
+  paintLate();
+}
 function timeStep(title,sub,def,done){
   state._timeDone=done;
   $('overBody').innerHTML=`
@@ -726,6 +542,7 @@ function timeStep(title,sub,def,done){
 }
 function timeGo(){state.time=$('tf').value||'08:30';state._timeDone()}
 
+/* note step (optional or mandatory) */
 function noteStep(title,sub,ph,key,mandatory,done){
   state._noteDone=done;state._noteKey=key;state._noteReq=mandatory;
   $('overBody').innerHTML=`
@@ -738,10 +555,15 @@ function noteStep(title,sub,ph,key,mandatory,done){
 function noteInput(){if(state._noteReq)$('nbnext').classList.toggle('off',!$('nb').innerText.trim())}
 function noteGo(){const v=($('nb')&&$('nb').innerText.trim())||'';if(state._noteReq&&!v)return;state[state._noteKey]=v;state._noteDone()}
 
+function finishBlock(){
+  (state.slots||[]).forEach(s=>{const slot=s==='Morgens'?'morning':'evening';blocks[state.who]=blocks[state.who]||{};blocks[state.who][slot]=state.reason;});
+  step=3;render();
+}
+
 function msgStep(){
   $('overBody').innerHTML=`
     <h2>Welche Nachricht?</h2><div class="osub">An ${state.who}.</div>
-    <div class="list">${MSGS.map(([m,k])=>`<div class="lopt" onclick='state.msg=${JSON.stringify(m)};state.msgKey=${JSON.stringify(k)};step=2;render()'><span>${m}</span><span class="ar">↗</span></div>`).join('')}</div>
+    <div class="list">${MSGS.map(m=>`<div class="lopt" onclick='state.msg=${JSON.stringify(m)};step=2;render()'><span>${m}</span><span class="ar">↗</span></div>`).join('')}</div>
     <div class="over-foot"><span class="skip"></span></div>`;
 }
 function diceStep(){
@@ -756,23 +578,20 @@ function spin(){const o=$('diceOut');if(!o)return;let i=0;const iv=setInterval((
 
 function doneStep(title,sub,streak){
   $('dots').innerHTML='';const f=flow;
-  const sval=computeStreak();
   $('overBody').innerHTML=`
     <div class="donewrap">
       <div class="check"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M8 16.5l5 5 11-12" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <h2>${title}</h2><div class="ds">${sub}</div>
-      ${streak?`<div class="streakbig"><svg width="16" height="18" viewBox="0 0 17 19" fill="none"><path d="M8.5 1C9 5 13 5.5 13 9.8a4.5 4.5 0 1 1-9 0c0-1.6.8-2.6 1.6-3.4C6.2 5.8 7 5 7 3.4 7.8 4 8.5 1 8.5 1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> ${sval} Tage Streak</div>`:''}
+      ${streak?`<div class="streakbig"><svg width="16" height="18" viewBox="0 0 17 19" fill="none"><path d="M8.5 1C9 5 13 5.5 13 9.8a4.5 4.5 0 1 1-9 0c0-1.6.8-2.6 1.6-3.4C6.2 5.8 7 5 7 3.4 7.8 4 8.5 1 8.5 1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> 5 Tage Streak</div>`:''}
     </div>
     <div class="over-foot" style="justify-content:center"><button class="pill-dark" onclick="finishDone('${f}')">Fertig</button></div>`;
 }
-function finishDone(f){closeOver();if(f==='block'){showScreen('verlauf');}else{showScreen('home');}}
+function finishDone(f){closeOver();if(f==='block'){showScreen('verlauf');}}
 
-/* ============== INIT ============== */
 document.addEventListener('DOMContentLoaded',()=>{
   if(localStorage.getItem('mk3-dark')==='1')$('phone').classList.add('dark');
-  const now=new Date();$('clock').textContent=`${now.getHours()}:${pad2(now.getMinutes())}`;
-  paintGreet();
-  loadAll();
+  paintWeek();paintGreet();paintLate();
+  const now=new Date();$('clock').textContent=`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
 });
 </script>
 </body>

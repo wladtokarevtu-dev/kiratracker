@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:kira;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Europe/Berlin
+    show-sql: false
+
+app:
+  security:
+    username: testadmin
+    password: testpass
+
+weather:
+  api:
+    key: dummy
+    url: http://localhost:0/weather
+  city: Berlin
+  country: DE
+
+ntfy:
+  url: http://localhost:0
+  topic: test-topic

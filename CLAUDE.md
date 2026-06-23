@@ -13,16 +13,36 @@ Erinnerungen, Fairness-Rotation. Läuft im Haushalt auf dem Handy.
 ## Wichtige Backend-Bausteine
 - `HelloController` / `NfcController` — REST-Endpunkte (`/walk`, `/food`, `/status`,
   `/leaderboard`, `/walk/request`, `/notify`, `/admin/*`, `/pause`, NFC `/nfc/*`).
+- `BlockController` (`/blocks`, `/block`, `/block/{id}`) · `FairnessController` (`/fairness`).
 - `WalkService`, `FoodService`, `WalkRequestService`, `ReminderService`,
   `NotificationService`, `WeatherService`, `PauseState`/`PauseRepository`.
+- `WalkBlock`/`WalkBlockRepository`/`WalkBlockService` (Selbst-Blockieren),
+  `FairnessService` (Rotation).
+
+## Bauen & Testen
+- Build: `./mvnw -q -DskipTests package` · Tests: `./mvnw -q test`.
+- DB-freies Testen via H2-Profil: `src/test/resources/application-test.yml`
+  (`@ActiveProfiles("test")`). Env-Vars & Smoke-curls: `docs/RUNBOOK.md`.
 
 ---
 
-# Redesign — „the Stoic way"
+# Redesign — „the Stoic way" (umgesetzt & in `master` gemerged)
 
-Die Oberfläche wird **komplett neu** gestaltet: Funktionen bleiben, das Design wird
-an die ruhige, monochrome, weißraumstarke Sprache der App **Stoic** angelehnt
-(eigene Inhalte/Assets — **keine** kopierten Stoic-Texte, -Bilder oder -Logos).
+Die Oberfläche **ist neu** gestaltet (Plan `docs/IMPLEMENTATION-PLAN.md` Phase 0–7
+abgearbeitet): Funktionen bleiben, das Design ist an die ruhige, monochrome,
+weißraumstarke Sprache der App **Stoic** angelehnt (eigene Inhalte/Assets —
+**keine** kopierten Stoic-Texte, -Bilder oder -Logos).
+
+**Stand der Umsetzung (Abweichungen/Ergänzungen zum ursprünglichen Plan):**
+- `index.html` neu, an echte API verdrahtet, **kein Mock-Fallback** (Altlast erledigt).
+- **iPhone-Mockup-Chrome entfernt** (keine Statusbar/Uhr/Dynamic-Island/Akku) — der
+  Phone-Frame bleibt als App-Container, auf dem Handy randlos.
+- **Verlauf-Liste gecappt auf 4**, „mehr anzeigen" expandiert bis **max 10**.
+- Unter „Verlauf" nur noch **Admin-Link** (Statistik/NFC-Links entfernt).
+- `admin.html` komplett im Stoic-Design neu; enthält **„Verlauf auf 0 setzen"**
+  (`POST /admin/reset`) mit **zusätzlichem hardcodierten Passwort-Gate** (clientseitig,
+  zusätzlich zum serverseitigen Admin-Login).
+- `stats.html` / `nfc.html` weiter funktional, noch im alten Stil.
 
 - **Format:** Handy (Phone-First, ein zentraler Telefon-Frame im Browser-Mockup).
 - **Optik:** monochrom, viel Weißraum, Lowercase-Begrüßung, **ein** Akzent
@@ -57,7 +77,7 @@ an die ruhige, monochrome, weißraumstarke Sprache der App **Stoic** angelehnt
 - Zeigt, **wer als nächstes dran sein sollte**.
 - **Rotation nur unter Wlad, Mama, Ilja, Aaron** (Dajen darf eintragen, zählt aber
   nicht in die Fairness-Rotation).
-- „Dran" = die Person mit den **wenigsten Runden im Zeitfenster** (rollierend, z. B. 7 Tage);
+- „Dran" = die Person mit den **wenigsten Runden im Zeitfenster** (rollierend **14 Tage**);
   bei Gleichstand die, die am längsten nicht dran war.
 
 ## 4. Selbst-Blockieren
@@ -94,16 +114,18 @@ an die ruhige, monochrome, weißraumstarke Sprache der App **Stoic** angelehnt
 - Im Admin-Modus ist **jeder Eintrag löschbar** und die **Uhrzeit jedes Eintrags
   verstellbar** (in der Verlaufsliste).
 
-## Bekannte Altlast
-- Das alte `index.html`-Frontend fällt bei API-Fehlern auf **Mock-Daten** zurück
-  und verschleiert so echte Fehler. Im Redesign: echte Fehlerzustände zeigen,
-  keine stillen Mocks im Produktivpfad.
+## Bekannte Altlast (erledigt)
+- ~~Das alte `index.html`-Frontend fällt bei API-Fehlern auf Mock-Daten zurück.~~
+  Im Redesign behoben: echte Fehlerzustände (ruhiger Inline-Hinweis), keine Mocks.
 
 ---
 
 # Design-System (Stoic-Look)
 
-Quelle der Wahrheit = `docs/mockups/index.html` (pixelgenau übernehmen).
+Design-Sprache (Tokens/Komponenten) = `docs/mockups/index.html`. **Umgesetzter Stand
+= `src/main/resources/static/index.html`** (an echte API verdrahtet; bewusste Abweichung:
+iPhone-Chrome entfernt, Home luftiger, Verlauf gecappt). Bei UI-Arbeit die Live-Datei
+als Wahrheit nehmen, das Mockup als Stil-Referenz.
 
 **Farb-Tokens**
 ```
@@ -153,20 +175,25 @@ native `input[type=time]` für Uhrzeiten.
 | Admin: Eintrag löschen | `DELETE /admin/walk/{id}` (Basic-Auth) | vorhanden |
 | Admin: Uhrzeit/Name ändern | `PUT /admin/walk/{id}` `{person,time}` (Basic-Auth) | vorhanden |
 | Urlaub/Pause lesen | `GET /pause` → `{active,index}` | vorhanden |
-| Urlaub setzen/beenden | `POST /admin/pause {index}` · `DELETE /admin/pause` | vorhanden (admin-gated) |
-| **Fairness** (wer dran, Counts) | `GET /fairness` | **neu** |
-| **Selbst-Blockieren** | `GET /blocks` · `POST /block` · `DELETE /block/{id}` | **neu** |
-| Erinnerungs-Push 11:00 / 22:00 | `ReminderService` Cron | **anpassen (10→11, 20→22)** |
+| Urlaub setzen/beenden (UI) | `POST /pause {index}` · `DELETE /pause` (ungated) | vorhanden |
+| Urlaub setzen/beenden (admin) | `POST /admin/pause {index}` · `DELETE /admin/pause` | vorhanden |
+| **Fairness** (wer dran, Counts) | `GET /fairness` (14-Tage-Fenster, blockiert-aware) | vorhanden |
+| **Selbst-Blockieren** | `GET /blocks` · `POST /block {person,slots,note}` · `DELETE /block/{id}` (ungated, Notiz Pflicht) | vorhanden |
+| Verlauf zurücksetzen | `POST /admin/reset` (Basic-Auth + Client-Passwort-Gate) | vorhanden |
+| Erinnerungs-Push 11:00 / 22:00 | `ReminderService` Cron (Aaron-7-Uhr entfernt) | vorhanden |
 
 **Slot-Ableitung:** Zeit `< 12:00` = *Morgens*, sonst *Abends* (wie `wasMorning/wasEvening`).
 **Admin-Auth:** Basic-Auth (`app.security.*`), Lock fragt Creds ab und cacht in `sessionStorage`.
 
 ---
 
-# Architektur-Entscheidungen (Defaults — gelten, bis Wlad widerspricht)
+# Architektur-Entscheidungen (umgesetzt — gelten, bis Wlad widerspricht)
 
-- **D1 Erinnerung:** 11:00 (morgens) / 22:00 (abends). Alten 7-Uhr-„Aaron"-Reminder
-  entfernen — die Fairness deckt das ab.
+> Alle D1–D6 sind in `master` implementiert. D4 ist als **ungated** `POST/DELETE /pause`
+> umgesetzt (UI-Toggle nutzt diese); `/admin/pause` bleibt zusätzlich bestehen.
+
+- **D1 Erinnerung:** 11:00 (morgens) / 22:00 (abends). Alter 7-Uhr-„Aaron"-Reminder
+  entfernt — die Fairness deckt das ab.
 - **D2 Fairness:** Rotation **Wlad·Mama·Ilja·Aaron**; „dran" = wenigste Runden in den
   letzten **14 Tagen**, Tie-Break = längste Zeit seit letzter Runde. Dajen zählt nicht.
 - **D3 Blockieren:** gilt für den nächsten betroffenen Slot (heute, sonst morgen),

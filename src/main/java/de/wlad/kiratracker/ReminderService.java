@@ -32,6 +32,11 @@ public class ReminderService {
         // Bei aktivem Urlaub (pauseIndex != null): keine Erinnerung.
     }
 
+    @Scheduled(cron = "0 0 21 * * *", zone = "Europe/Berlin")
+    public void aaronBedtime() {
+        notificationService.sendCustomNotification("Schlafenszeit für Aaron, ab ins Bett!");
+    }
+
     @Scheduled(cron = "0 0 22 * * *", zone = "Europe/Berlin")
     public void checkEveningReminder() {
         if (walkService.wasEvening()) return;

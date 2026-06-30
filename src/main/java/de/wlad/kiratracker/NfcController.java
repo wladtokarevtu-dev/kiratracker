@@ -114,6 +114,11 @@ public class NfcController {
             return ResponseEntity.ok(Map.of("status", "recent", "person", person));
         }
 
+        // Wlad: kein stiller Auto-Eintrag — er muss den Eintrag aktiv bestätigen.
+        if ("Wlad".equalsIgnoreCase(person)) {
+            return ResponseEntity.ok(Map.of("status", "confirm", "person", person));
+        }
+
         WalkEntry entry = walkService.addWalk(person, null);
         return ResponseEntity.ok(Map.of("status", "logged", "person", person, "walkId", entry.getId()));
     }

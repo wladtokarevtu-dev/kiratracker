@@ -189,6 +189,14 @@ html,body{
     <button class="wrong-btn" id="wrong-btn" onclick="wrongPerson()">Nicht ich →</button>
   </div>
 
+  <!-- Bestätigen (nur Wlad) -->
+  <div id="v-confirm" class="view">
+    <div class="big-emoji">🐕</div>
+    <div class="pick-title" id="confirm-name"></div>
+    <div class="pick-sub">Bereit, Kira rauszubringen?</div>
+    <button class="retry-btn" style="margin-top:8px" onclick="confirmEntry()">Eintrag bestätigen</button>
+  </div>
+
   <!-- Recent / Duplikat -->
   <div id="v-recent" class="view">
     <div class="big-emoji">⏱️</div>
@@ -366,6 +374,23 @@ async function wrongPerson() {
   show('v-pick');
 }
 
+async function confirmEntry() {
+  if (!_currentPerson) return;
+  show('v-loading');
+  const r = await fetch('/walk', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({person: _currentPerson, time: null})
+  });
+  if (r.ok) {
+    const data = await r.json().catch(() => ({}));
+    _lastWalkId = data.id || null;
+    showSuccess(_currentPerson);
+  } else {
+    showError(await r.text() || 'Fehler beim Eintragen.');
+  }
+}
+
 async function forceLog() {
   if (!_currentPerson) return;
   show('v-loading');
@@ -401,6 +426,10 @@ async function main() {
       _currentPerson = data.person;
       _lastWalkId = data.walkId || null;
       showSuccess(data.person);
+    } else if (data.status === 'confirm') {
+      _currentPerson = data.person;
+      document.getElementById('confirm-name').textContent = data.person;
+      show('v-confirm');
     } else if (data.status === 'recent') {
       _currentPerson = data.person;
       document.getElementById('recent-title').textContent = data.person;

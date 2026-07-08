@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>heute — kiratracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ececef;--card:#ffffff;--ink:#0d0d0f;--ink2:#6c6c74;--ink3:#a3a3ab;--line:#e4e4e8;--fill:#0d0d0f;--onfill:#ffffff;--soft:#f4f4f6;--wxc0:#3c8a5c;--wxc1:#c9a227;--wxc2:#c97a27;--wxc3:#9a3636}
+.dark{--bg:#000000;--card:#151517;--ink:#f4f4f6;--ink2:#9b9ba3;--ink3:#65656d;--line:#262629;--fill:#f4f4f6;--onfill:#0d0d0f;--soft:#1d1d20;--wxc0:#5fae7f;--wxc1:#e0c157;--wxc2:#e0a157;--wxc3:#e6a5a5}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:"Inter",-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;transition:background .4s,color .4s}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding:28px 22px 80px}
+
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.back{display:inline-flex;align-items:center;gap:7px;color:var(--ink2);font-weight:700;font-size:.9rem;text-decoration:none}
+.back:active{color:var(--ink)}
+.icbtn{color:var(--ink2);display:flex}.icbtn:active{color:var(--ink)}
+h1.title{font-size:2.15rem;font-weight:800;letter-spacing:-.045em;line-height:1.02;margin:8px 0 2px}
+.sub{color:var(--ink2);font-weight:500;font-size:.95rem;margin-bottom:6px}
+
+.eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:0 0 12px}
+.chartcard{background:var(--card);border-radius:24px;padding:22px 18px;margin-top:22px}
+.chartcard svg{display:block;width:100%;height:auto}
+.chart-axis text{font-size:9px;fill:var(--ink3);font-family:"Inter",sans-serif;font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:.72rem;font-weight:600;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:8px;height:8px;border-radius:50%}
+
+.rec{background:var(--card);border-radius:24px;padding:20px 18px;margin-top:16px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:9px 16px;border-radius:100px;background:var(--soft);font-weight:700;font-size:.86rem;color:var(--ink)}
+.none{color:var(--ink3);font-weight:600;font-size:.88rem;line-height:1.4}
+.empty{color:var(--ink3);font-weight:600;font-size:.86rem;padding:18px 2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="/index.html">‹ zurück</a>
+    <button class="icbtn" onclick="toggleDark()" aria-label="Theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M16 11.5A6.5 6.5 0 0 1 8.5 4c0-.5.06-1 .17-1.46A7 7 0 1 0 17.5 11.3c-.47.13-.97.2-1.5.2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <h1 class="title">heute.</h1>
+  <div class="sub" id="stageText">lädt …</div>
+
+  <div class="eyebrow" style="margin-top:22px">Tagesverlauf</div>
+  <div class="chartcard" id="chartCard"><div class="empty">Lade Tagesverlauf …</div></div>
+
+  <div class="eyebrow" style="margin-top:22px">Empfehlung</div>
+  <div class="rec" id="recCard"><div class="none">lädt …</div></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const STAGES=['unbedenklich','Vorsicht','gefährlich','potenziell lebensgefährlich'];
+function toggleDark(){const d=document.body.classList.toggle('dark');localStorage.setItem('mk3-dark',d?'1':'0')}
+if(localStorage.getItem('mk3-dark')==='1')document.body.classList.add('dark');
+
+async function load(){
+  try{
+    const r=await fetch('/weather/forecast');
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    render(await r.json());
+  }catch(e){
+    $('stageText').textContent='Vorhersage nicht verfügbar';
+    $('chartCard').innerHTML='<div class="empty">Tagesverlauf konnte nicht geladen werden.</div>';
+    $('recCard').innerHTML='<div class="none">Keine Empfehlung verfügbar.</div>';
+  }
+}
+
+function render(data){
+  const points=data.points||[];
+  $('stageText').textContent=points.length
+    ? ('heute: '+STAGES[data.maxRiskLevel]+' für Kira')
+    : 'keine Vorhersagedaten für heute';
+  $('chartCard').innerHTML=points.length?chartSvg(points):'<div class="empty">Keine Vorhersagedaten für heute.</div>';
+  renderRec(data);
+}
+
+function chartSvg(points){
+  const W=320,H=160,PAD_L=18,PAD_R=18,PAD_T=14,PAD_B=22;
+  const temps=points.map(p=>p.temperature);
+  const minT=Math.min(...temps)-2, maxT=Math.max(...temps)+2;
+  const x=i=>PAD_L+(W-PAD_L-PAD_R)*(i/(Math.max(points.length-1,1)));
+  const y=t=>PAD_T+(H-PAD_T-PAD_B)*(1-(t-minT)/((maxT-minT)||1));
+
+  const linePath=points.map((p,i)=>`${i===0?'M':'L'}${x(i).toFixed(1)},${y(p.temperature).toFixed(1)}`).join(' ');
+  const areaPath=linePath+` L${x(points.length-1).toFixed(1)},${(H-PAD_B).toFixed(1)} L${x(0).toFixed(1)},${(H-PAD_B).toFixed(1)} Z`;
+  const dots=points.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.temperature).toFixed(1)}" r="3.5" fill="var(--wxc${p.riskLevel})"/>`).join('');
+  const labels=points.map((p,i)=>i%2===0?`<text x="${x(i).toFixed(1)}" y="${H-4}" text-anchor="middle">${p.time}</text>`:'').join('');
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="chart-axis">
+    <path d="${areaPath}" fill="var(--soft)"/>
+    <path d="${linePath}" fill="none" stroke="var(--ink2)" stroke-width="1.5"/>
+    ${dots}
+    ${labels}
+  </svg>
+  <div class="legend">
+    <span><i style="background:var(--wxc0)"></i>unbedenklich</span>
+    <span><i style="background:var(--wxc1)"></i>Vorsicht</span>
+    <span><i style="background:var(--wxc2)"></i>gefährlich</span>
+    <span><i style="background:var(--wxc3)"></i>lebensgefährlich</span>
+  </div>`;
+}
+
+function renderRec(data){
+  const pills=[];
+  if(data.morningWindow)pills.push(`<span class="pill">${data.morningWindow.start}–${data.morningWindow.end}</span>`);
+  if(data.eveningWindow)pills.push(`<span class="pill">${data.eveningWindow.start}–${data.eveningWindow.end}</span>`);
+  $('recCard').innerHTML=pills.length
+    ? `<div class="pills">${pills.join('')}</div>`
+    : `<div class="none">Heute kein sicheres Zeitfenster — wenn möglich, kurze Runden im Schatten.</div>`;
+}
+
+load();
+</script>
+</body>
+</html>

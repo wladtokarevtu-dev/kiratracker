@@ -55,6 +55,17 @@ class SmokeIntegrationTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void weatherForecastRespondsEvenWhenApiUnreachable() {
+        ResponseEntity<Map<String,Object>> res = rest.exchange(
+                "/weather/forecast", HttpMethod.GET, null,
+                new org.springframework.core.ParameterizedTypeReference<Map<String,Object>>() {});
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(res.getBody().get("maxRiskLevel")).isEqualTo(0);
+        assertThat((List<Object>) res.getBody().get("points")).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void blockShiftsFairnessAwayFromBlockedPerson() {
         // Wlad/Mama/Ilja haben Runden, Aaron 0 → Aaron wäre dran
         rest.postForEntity("/walk", json("{\"person\":\"Wlad\"}"), String.class);

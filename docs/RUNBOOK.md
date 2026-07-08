@@ -51,6 +51,7 @@ App läuft danach auf http://localhost:8080 (UI = `static/index.html`).
 ```bash
 curl -s localhost:8080/status
 curl -s localhost:8080/fairness
+curl -s localhost:8080/weather/forecast
 curl -s -XPOST localhost:8080/walk -H 'Content-Type: application/json' -d '{"person":"Aaron"}'
 # Nachtragen (kein Push, time=dd.MM.yy HH:mm):
 curl -s -XPOST localhost:8080/walk -H 'Content-Type: application/json' -d '{"person":"Mama","time":"20.06.26 08:15"}'
@@ -74,4 +75,5 @@ curl -s -u "$APP_SECURITY_USERNAME:$APP_SECURITY_PASSWORD" -XDELETE localhost:80
 
 - Free Tier → JVM-Kaltstart ~25 s nach Spin-down (kein Blocker, nur Geduld beim ersten Call).
 - Bestehende Pipeline (Docker). Env-Vars im Render-Dashboard setzen.
-- Reminder-Crons greifen serverseitig (Zone `Europe/Berlin`): 11:00 Morgen, 22:00 Abend.
+- Reminder-Crons greifen serverseitig (Zone `Europe/Berlin`): 06:00 Hitze-Warnung (nur bei
+  Ampel-Level 3), 11:00 Morgen, 22:00 Abend.

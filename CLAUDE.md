@@ -8,7 +8,7 @@ Erinnerungen, Fairness-Rotation. Läuft im Haushalt auf dem Handy.
 - **Push:** ntfy.sh.
 - **Deployment:** Render (Free Tier → JVM-Kaltstart ~25 s nach Spin-down).
 - **Frontend:** statische Seiten unter `src/main/resources/static/`
-  (`index.html`, `admin.html`, `stats.html`, `nfc.html`), vom Spring-Server ausgeliefert.
+  (`index.html`, `admin.html`, `stats.html`, `nfc.html`, `weather.html`), vom Spring-Server ausgeliefert.
 
 ## Wichtige Backend-Bausteine
 - `HelloController` / `NfcController` — REST-Endpunkte (`/walk`, `/food`, `/status`,
@@ -178,9 +178,12 @@ native `input[type=time]` für Uhrzeiten.
 | Urlaub setzen/beenden (UI) | `POST /pause {index}` · `DELETE /pause` (ungated) | vorhanden |
 | Urlaub setzen/beenden (admin) | `POST /admin/pause {index}` · `DELETE /admin/pause` | vorhanden |
 | **Fairness** (wer dran, Counts) | `GET /fairness` (14-Tage-Fenster, blockiert-aware) | vorhanden |
+| **Hitze-Ampel** (aktuelles Risiko 0–3) | `GET /status` → `weather.riskLevel` | vorhanden |
+| **Tagesverlauf + Zeitfenster** | `GET /weather/forecast` | vorhanden |
 | **Selbst-Blockieren** | `GET /blocks` · `POST /block {person,slots,note}` · `DELETE /block/{id}` (ungated, Notiz Pflicht) | vorhanden |
 | Verlauf zurücksetzen | `POST /admin/reset` (Basic-Auth + Client-Passwort-Gate) | vorhanden |
 | Erinnerungs-Push 11:00 / 22:00 | `ReminderService` Cron (Aaron-7-Uhr entfernt) | vorhanden |
+| Hitze-Push bei Rot (Level 3), 6:00 Uhr | `ReminderService` Cron | vorhanden |
 
 **Slot-Ableitung:** Zeit `< 12:00` = *Morgens*, sonst *Abends* (wie `wasMorning/wasEvening`).
 **Admin-Auth:** Basic-Auth (`app.security.*`), Lock fragt Creds ab und cacht in `sessionStorage`.

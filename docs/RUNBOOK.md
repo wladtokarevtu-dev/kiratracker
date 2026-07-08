@@ -23,7 +23,7 @@ Die Tests laufen mit `@ActiveProfiles("test")` gegen `src/test/resources/applica
 | `APP_SECURITY_USERNAME` | Basic-Auth-User für `/admin/**` |
 | `APP_SECURITY_PASSWORD` | Basic-Auth-Passwort |
 | `WEATHER_API_KEY` | Wetter-API-Key |
-| `WEATHER_API_URL` | Wetter-API-Basis-URL |
+| `WEATHER_API_URL` | Wetter-API-Basis-URL — **muss auf `/weather` enden** (z. B. `https://api.openweathermap.org/data/2.5/weather`); die Forecast-URL wird daraus per `.replace("/weather", "/forecast")` abgeleitet |
 | `WEATHER_CITY` | Stadt (z. B. `Berlin`) |
 | `WEATHER_COUNTRY` | Land (z. B. `DE`) |
 | `NTFY_TOPIC` | ntfy.sh-Topic für Push |

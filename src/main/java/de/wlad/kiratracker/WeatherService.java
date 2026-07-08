@@ -1,5 +1,7 @@
 package de.wlad.kiratracker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import java.util.Map;
 
 @Service
 public class WeatherService {
+
+    private static final Logger log = LoggerFactory.getLogger(WeatherService.class);
 
     private static final ZoneId BERLIN = ZoneId.of("Europe/Berlin");
     private static final DateTimeFormatter HM = DateTimeFormatter.ofPattern("HH:mm");
@@ -104,10 +108,16 @@ public class WeatherService {
                     forecastUrl(), city, country, apiKey);
 
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-            if (response == null) return buildForecast(List.of());
+            if (response == null) {
+                log.warn("Wetter-Forecast: leere Antwort von {}", forecastUrl());
+                return buildForecast(List.of());
+            }
 
             List<Map<String, Object>> list = (List<Map<String, Object>>) response.get("list");
-            if (list == null) return buildForecast(List.of());
+            if (list == null || list.isEmpty()) {
+                log.warn("Wetter-Forecast: keine 'list' im Payload von {}", forecastUrl());
+                return buildForecast(List.of());
+            }
 
             LocalDate today = LocalDate.now(BERLIN);
             List<ForecastPointDto> points = new ArrayList<>();
@@ -124,6 +134,7 @@ public class WeatherService {
             }
             return buildForecast(points);
         } catch (RestClientException | NullPointerException | ClassCastException e) {
+            log.warn("Wetter-Forecast-Abruf fehlgeschlagen: {}", e.getMessage());
             return buildForecast(List.of());
         }
     }

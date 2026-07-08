@@ -13,7 +13,8 @@ Erinnerungen, Fairness-Rotation. Läuft im Haushalt auf dem Handy.
 ## Wichtige Backend-Bausteine
 - `HelloController` / `NfcController` — REST-Endpunkte (`/walk`, `/food`, `/status`,
   `/leaderboard`, `/walk/request`, `/notify`, `/admin/*`, `/pause`, NFC `/nfc/*`).
-- `BlockController` (`/blocks`, `/block`, `/block/{id}`) · `FairnessController` (`/fairness`).
+- `BlockController` (`/blocks`, `/block`, `/block/{id}`) · `FairnessController` (`/fairness`) ·
+  `WeatherController` (`/weather/forecast`).
 - `WalkService`, `FoodService`, `WalkRequestService`, `ReminderService`,
   `NotificationService`, `WeatherService`, `PauseState`/`PauseRepository`.
 - `WalkBlock`/`WalkBlockRepository`/`WalkBlockService` (Selbst-Blockieren),

@@ -35,11 +35,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wx-top .wt{font-weight:800;color:var(--ink);font-size:.94rem}
 .wx-top .wd{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wx-tap{display:flex;align-items:center;gap:8px;min-width:0;padding:0;text-align:left}
-.wx-risk{width:8px;height:8px;border-radius:50%;padding:0;flex-shrink:0;display:none}
-.wx-risk[data-level="0"]{background:var(--wxc0)}
-.wx-risk[data-level="1"]{background:var(--wxc1)}
-.wx-risk[data-level="2"]{background:var(--wxc2)}
-.wx-risk[data-level="3"]{background:var(--wxc3)}
+.wx-risk{width:32px;height:32px;margin:-12px -12px -12px -4px;border-radius:50%;padding:0;flex-shrink:0;display:none;background:none;position:relative}
+.wx-risk::after{content:'';position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%)}
+.wx-risk[data-level="0"]::after{background:var(--wxc0)}
+.wx-risk[data-level="1"]::after{background:var(--wxc1)}
+.wx-risk[data-level="2"]::after{background:var(--wxc2)}
+.wx-risk[data-level="3"]::after{background:var(--wxc3)}
 .wx-pop{display:none;position:absolute;top:26px;left:0;z-index:60;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-size:.76rem;font-weight:600;color:var(--ink2);width:230px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
 .wx-pop.open{display:block}
 .wx-pop .wpr{display:flex;align-items:center;gap:8px;padding:5px 0}

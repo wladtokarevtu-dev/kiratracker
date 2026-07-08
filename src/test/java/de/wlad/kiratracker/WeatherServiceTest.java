@@ -3,6 +3,8 @@ package de.wlad.kiratracker;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class WeatherServiceTest {
@@ -21,5 +23,49 @@ class WeatherServiceTest {
     })
     void riskLevel_matchesTempHumidityThresholds(double tempC, int humidity, int expected) {
         assertThat(WeatherService.riskLevel(tempC, humidity)).isEqualTo(expected);
+    }
+
+    @org.junit.jupiter.api.Test
+    void buildForecast_picksEarliestLowestRiskInMorning_andLatestInEvening() {
+        List<ForecastPointDto> points = List.of(
+                new ForecastPointDto("07:00", 18, 60, 0),
+                new ForecastPointDto("10:00", 28, 70, 1),
+                new ForecastPointDto("13:00", 34, 80, 3),
+                new ForecastPointDto("16:00", 34, 80, 3),
+                new ForecastPointDto("19:00", 30, 75, 1),
+                new ForecastPointDto("22:00", 24, 65, 0)
+        );
+
+        WeatherForecastDto forecast = WeatherService.buildForecast(points);
+
+        assertThat(forecast.getMaxRiskLevel()).isEqualTo(3);
+        assertThat(forecast.getMorningWindow().getStart()).isEqualTo("07:00");
+        assertThat(forecast.getMorningWindow().getEnd()).isEqualTo("10:00");
+        assertThat(forecast.getEveningWindow().getStart()).isEqualTo("22:00");
+        assertThat(forecast.getEveningWindow().getEnd()).isEqualTo("01:00");
+    }
+
+    @org.junit.jupiter.api.Test
+    void buildForecast_returnsNullWindow_whenNoSafeSlotInRange() {
+        List<ForecastPointDto> points = List.of(
+                new ForecastPointDto("07:00", 34, 80, 3),
+                new ForecastPointDto("10:00", 35, 82, 3),
+                new ForecastPointDto("19:00", 33, 79, 3)
+        );
+
+        WeatherForecastDto forecast = WeatherService.buildForecast(points);
+
+        assertThat(forecast.getMaxRiskLevel()).isEqualTo(3);
+        assertThat(forecast.getMorningWindow()).isNull();
+        assertThat(forecast.getEveningWindow()).isNull();
+    }
+
+    @org.junit.jupiter.api.Test
+    void buildForecast_handlesEmptyPoints() {
+        WeatherForecastDto forecast = WeatherService.buildForecast(List.of());
+
+        assertThat(forecast.getMaxRiskLevel()).isEqualTo(0);
+        assertThat(forecast.getMorningWindow()).isNull();
+        assertThat(forecast.getEveningWindow()).isNull();
     }
 }

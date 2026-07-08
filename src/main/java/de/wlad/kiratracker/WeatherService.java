@@ -90,7 +90,7 @@ public class WeatherService {
     }
 
     private WeatherDto getDefaultWeather() {
-        return new WeatherDto("Wetter nicht verfügbar", 0.0, 0, 0.0, "01d", 0);
+        return new WeatherDto("Wetter nicht verfügbar", 0.0, 0, 0.0, "01d", null);
     }
 
     /**

@@ -25,9 +25,9 @@ Faustregel (etablierter Tierschutz-Richtwert): `tempF + humidity%`, wobei
 Implementiert als reine Funktion (z.B. `WeatherService.riskLevel(tempC, humidityPct)`),
 wiederverwendet für aktuelles Wetter, Forecast-Punkte und den 6-Uhr-Check.
 
-`WeatherDto` bekommt ein neues Feld `riskLevel` (int, 0–3), berechnet aus dem
+`WeatherDto` bekommt ein neues Feld `riskLevel` (`Integer`, 0–3), berechnet aus dem
 aktuellen `temperature`/`humidity` beim Abruf in `WeatherService.getCurrentWeather()`.
-Der Default-Wetter-Fallback (API nicht erreichbar) liefert `riskLevel = 0`
+Der Default-Wetter-Fallback (API nicht erreichbar) liefert `riskLevel = null`
 (keine Warnung ohne valide Daten).
 
 ## 2. Neuer Endpoint `GET /weather/forecast`

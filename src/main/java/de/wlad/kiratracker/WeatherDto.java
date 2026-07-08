@@ -6,12 +6,12 @@ public class WeatherDto {
     private int humidity;
     private double windSpeed;
     private String icon;
-    private int riskLevel;
+    private Integer riskLevel;
 
     public WeatherDto() {
     }
 
-    public WeatherDto(String description, double temperature, int humidity, double windSpeed, String icon, int riskLevel) {
+    public WeatherDto(String description, double temperature, int humidity, double windSpeed, String icon, Integer riskLevel) {
         this.description = description;
         this.temperature = temperature;
         this.humidity = humidity;
@@ -61,11 +61,11 @@ public class WeatherDto {
         this.icon = icon;
     }
 
-    public int getRiskLevel() {
+    public Integer getRiskLevel() {
         return riskLevel;
     }
 
-    public void setRiskLevel(int riskLevel) {
+    public void setRiskLevel(Integer riskLevel) {
         this.riskLevel = riskLevel;
     }
 }

@@ -427,8 +427,11 @@ function paintWeather(){
   const w=STATE.status&&STATE.status.weather;
   if(w){
     $('wt').textContent=Math.round(w.temperature)+'°';$('wd').textContent=w.description||'';
-    $('wxRisk').style.display='block';$('wxRisk').dataset.level=w.riskLevel;
-    renderWxPop(w.riskLevel);
+    const valid=typeof w.riskLevel==='number'&&w.description!=='Wetter nicht verfügbar';
+    if(valid){
+      $('wxRisk').style.display='block';$('wxRisk').dataset.level=w.riskLevel;
+      renderWxPop(w.riskLevel);
+    }else{$('wxRisk').style.display='none';closeWxPop();}
   }else{
     $('wt').textContent='';$('wd').textContent='';
     $('wxRisk').style.display='none';closeWxPop();

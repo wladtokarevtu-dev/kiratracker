@@ -32,6 +32,19 @@ public class WeatherService {
         this.restTemplate = new RestTemplate(factory);
     }
 
+    /**
+     * Faustregel für Hitzegefahr bei Hunden: Temperatur(°F) + Luftfeuchtigkeit(%).
+     * <150 unbedenklich, 150–159 Vorsicht, 160–179 gefährlich, ≥180 potenziell lebensgefährlich.
+     */
+    public static int riskLevel(double tempC, int humidityPct) {
+        double tempF = tempC * 9.0 / 5.0 + 32;
+        double sum = tempF + humidityPct;
+        if (sum >= 180) return 3;
+        if (sum >= 160) return 2;
+        if (sum >= 150) return 1;
+        return 0;
+    }
+
     public WeatherDto getCurrentWeather() {
         try {
             String url = String.format("%s?q=%s,%s&appid=%s&units=metric&lang=de",
@@ -48,12 +61,16 @@ public class WeatherService {
             var weatherList = (java.util.List<Map<String, Object>>) response.get("weather");
             Map<String, Object> weather = weatherList.get(0);
 
+            double temperature = ((Number) main.get("temp")).doubleValue();
+            int humidity = ((Number) main.get("humidity")).intValue();
+
             return new WeatherDto(
                     (String) weather.get("description"),
-                    ((Number) main.get("temp")).doubleValue(),
-                    ((Number) main.get("humidity")).intValue(),
+                    temperature,
+                    humidity,
                     ((Number) wind.get("speed")).doubleValue(),
-                    (String) weather.get("icon")
+                    (String) weather.get("icon"),
+                    riskLevel(temperature, humidity)
             );
 
         } catch (RestClientException | NullPointerException e) {
@@ -62,6 +79,6 @@ public class WeatherService {
     }
 
     private WeatherDto getDefaultWeather() {
-        return new WeatherDto("Wetter nicht verfügbar", 0.0, 0, 0.0, "01d");
+        return new WeatherDto("Wetter nicht verfügbar", 0.0, 0, 0.0, "01d", 0);
     }
 }

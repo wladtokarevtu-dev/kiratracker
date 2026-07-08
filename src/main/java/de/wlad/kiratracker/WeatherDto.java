@@ -6,16 +6,18 @@ public class WeatherDto {
     private int humidity;
     private double windSpeed;
     private String icon;
+    private int riskLevel;
 
     public WeatherDto() {
     }
 
-    public WeatherDto(String description, double temperature, int humidity, double windSpeed, String icon) {
+    public WeatherDto(String description, double temperature, int humidity, double windSpeed, String icon, int riskLevel) {
         this.description = description;
         this.temperature = temperature;
         this.humidity = humidity;
         this.windSpeed = windSpeed;
         this.icon = icon;
+        this.riskLevel = riskLevel;
     }
 
     // Getters and Setters
@@ -57,5 +59,13 @@ public class WeatherDto {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public int getRiskLevel() {
+        return riskLevel;
+    }
+
+    public void setRiskLevel(int riskLevel) {
+        this.riskLevel = riskLevel;
     }
 }

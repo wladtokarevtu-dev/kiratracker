@@ -216,6 +216,8 @@ public class WeatherService {
         LocalTime end = start.plusHours(3);
         // Ende auf 23:00 kappen (auch wenn +3h über Mitternacht wrappt).
         if (end.isBefore(start) || !end.isBefore(DAY_END)) end = DAY_END;
+        // Nach dem Kappen kein Null-/Negativ-Fenster (z. B. Slot 23:00 → „23:00–23:00").
+        if (!end.isAfter(start)) return null;
         return new WeatherWindowDto(chosen.getTime(), end.format(HM));
     }
 }

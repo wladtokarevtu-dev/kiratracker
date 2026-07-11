@@ -61,6 +61,19 @@ class WeatherServiceTest {
     }
 
     @org.junit.jupiter.api.Test
+    void buildForecast_dropsDegenerateEveningWindow_whenOnlySlotIsAt2300() {
+        // Spätabends bleibt heute evtl. nur der 23:00-Slot übrig → +3h wird auf
+        // 23:00 gekappt, das ergäbe „23:00–23:00" → soll null sein.
+        List<ForecastPointDto> points = List.of(
+                new ForecastPointDto("23:00", 22, 49, 0)
+        );
+
+        WeatherForecastDto forecast = WeatherService.buildForecast(points);
+
+        assertThat(forecast.getEveningWindow()).isNull();
+    }
+
+    @org.junit.jupiter.api.Test
     void buildForecast_returnsNullWindow_whenNoSafeSlotInRange() {
         List<ForecastPointDto> points = List.of(
                 new ForecastPointDto("07:00", 34, 80, 3),

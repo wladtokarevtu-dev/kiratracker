@@ -253,6 +253,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wxpill i{width:8px;height:8px;border-radius:50%;background:var(--wxc0)}
 .wxpill .wl{font-size:.66rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em}
 .wxnone{color:var(--ink3);font-weight:600;font-size:.86rem;line-height:1.45}
+/* Hitze-Ampel-Legende (erklärt die Punktfarben, heutiges Level hervorgehoben) */
+.wxrisk{margin-top:22px}
+.wxrisks{display:flex;flex-direction:column;gap:2px}
+.wxr{display:flex;align-items:flex-start;gap:9px;padding:6px 2px;font-size:.8rem;font-weight:500;color:var(--ink3);line-height:1.35}
+.wxr i{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.wxr b{font-weight:700;color:var(--ink2)}
+.wxr.c0 i{background:var(--wxc0)}
+.wxr.c1 i{background:var(--wxc1)}
+.wxr.c2 i{background:var(--wxc2)}
+.wxr.c3 i{background:var(--wxc3)}
+.wxr.on{color:var(--ink)}
+.wxr.on b{color:var(--ink)}
 
 /* ===== ELFMETER-PICKER ===== */
 .pkwrap{display:flex;flex-direction:column;gap:14px;margin-top:4px}
@@ -867,6 +879,12 @@ function spin(){
 }
 
 /* ============== WETTER-PANEL (In-App) ============== */
+const WX_LEVELS=[
+  {label:'unbedenklich',desc:'normale Runden ohne Einschränkung'},
+  {label:'Vorsicht',desc:'Wasser mitnehmen, kürzere Runden im Schatten'},
+  {label:'gefährlich',desc:'nur kurze Runden, direkte Sonne meiden'},
+  {label:'potenziell lebensgefährlich',desc:'wenn möglich nur früh morgens oder spät abends raus'}
+];
 const WD_LONG=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
 const MON_LONG=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 let WX_WEEK=null, wxDay=0;
@@ -916,6 +934,11 @@ function renderWeatherPanel(){
         <span><i class="win"></i>gutes Fenster</span>
       </div>
       <div class="wxrec"><div class="rl">Beste Zeiten für Kira</div>${recPills(day)}</div>
+      <div class="wxrisk">
+        <div class="rl">Was die Ampel-Farbe bedeutet</div>
+        <div class="wxrisks">${WX_LEVELS.map((l,i)=>`
+          <div class="wxr c${i} ${i===day.maxRiskLevel?'on':''}"><i></i><span class="wxrt"><b>${l.label}</b> — ${l.desc}</span></div>`).join('')}</div>
+      </div>
     </div>`;
 }
 function toHour(t){const [h,m]=t.split(':').map(Number);return h+(m||0)/60;}

@@ -132,7 +132,10 @@ weißraumstarke Sprache der App **Stoic** angelehnt (eigene Inhalte/Assets —
   - **Diagramm** je Tag: **kombiniert Temperatur (Linie, geglättet) + Luftfeuchtigkeit
     (gestrichelt)**, Punkte in Ampel-Farben, X-Achse 0–24 Uhr, Jetzt-Marker (nur heute).
     Die empfohlenen **Zeitfenster sind als grüne Bänder** markiert.
-  - **Empfehlungs-Pillen** (Vormittag/Abend); sind beide `null`: „kein sicheres Fenster …".
+  - **Empfehlungs-Pillen:** **immer beide** Zeilen (Vormittag **und** Abend, da Kira
+    morgens und abends geht). Fehlt ein Fenster (`null`), erscheint die Zeile als
+    gedämpfte „kein sicheres Fenster"-Pille; sind beide `null`, zusätzlich der Hinweis
+    „zu heiß — nur kurze Runden im Schatten".
   - **Ampel-Farb-Legende** („Was die Ampel-Farbe bedeutet") — alle 4 Stufen + Kurzinfo,
     das Level des gewählten Tages (`maxRiskLevel`) hervorgehoben (ersetzt das alte Popover).
 - **Zeitfenster:** Vormittag = Slots `6:00–12:00`, Abend = Slots `≥ 17:00`. Gewählt wird
@@ -155,6 +158,10 @@ weißraumstarke Sprache der App **Stoic** angelehnt (eigene Inhalte/Assets —
   im Stoic-Design (monochrom, ein Akzent).
 - Beide Modi bleiben **auch im Urlaubsmodus nutzbar** (nicht ausgegraut) — sie hängen
   nicht an der Gassi-Sperre. Nur die Ritual-Karten werden im Urlaub ausgegraut.
+- **Elfmeter-Optik:** Picker mit sichtbarem Dropdown-Chevron + „gegen"-Trenner (klarer
+  Kontrast). Torwart ist eine SVG-Figur mit **Spielfarben-Tokens** `--pkjersey` (Trikot),
+  `--pkglove` (Handschuhe), `--pkgoal` (Tor) — eine **bewusste Farb-Ausnahme** vom
+  Ein-Akzent-Prinzip, nur in diesem verspielten Takeover (theme-aware in `:root`/`.dark`).
 
 ## Bekannte Altlast (erledigt)
 - ~~Das alte `index.html`-Frontend fällt bei API-Fehlern auf Mock-Daten zurück.~~

@@ -11,11 +11,13 @@
   --bg:#ececef;--card:#ffffff;--ink:#0d0d0f;--ink2:#6c6c74;--ink3:#a3a3ab;
   --line:#e4e4e8;--fill:#0d0d0f;--onfill:#ffffff;--soft:#f4f4f6;
   --wxc0:#3c8a5c;--wxc1:#c9a227;--wxc2:#c97a27;--wxc3:#9a3636;
+  --pkjersey:#2f9e6e;--pkglove:#e0a157;--pkgoal:#5b5b63;
 }
 .dark{
   --bg:#000000;--card:#151517;--ink:#f4f4f6;--ink2:#9b9ba3;--ink3:#65656d;
   --line:#262629;--fill:#f4f4f6;--onfill:#0d0d0f;--soft:#1d1d20;
   --wxc0:#5fae7f;--wxc1:#e0c157;--wxc2:#e0a157;--wxc3:#e6a5a5;
+  --pkjersey:#4cc08c;--pkglove:#e8b57a;--pkgoal:#8a8a93;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:#cfcfd4;font-family:"Inter",-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px 0}
@@ -33,8 +35,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wx-top{flex:1;display:flex;align-items:center;min-width:0;color:var(--ink2);font-size:.88rem;font-weight:500;position:relative}
 .wx-top svg{display:block;flex-shrink:0}
 .wx-top .wt{font-weight:800;color:var(--ink);font-size:.94rem}
-.wx-top .wd{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wx-tap{display:flex;align-items:center;gap:8px;min-width:0;padding:0;text-align:left}
+/* Beschreibung („klarer himmel") mittig zwischen Temp-Cluster und den Icons */
+.wx-top .wd{flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wx-tap{flex:1;display:flex;align-items:center;gap:8px;min-width:0;padding:0;text-align:left}
 /* Ampel-Punkt sitzt direkt neben der Gradzahl */
 .wx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:none}
 .wx-dot[data-level="0"]{background:var(--wxc0)}
@@ -252,6 +255,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wxpill{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:100px;background:var(--soft);font-weight:700;font-size:.86rem;color:var(--ink)}
 .wxpill i{width:8px;height:8px;border-radius:50%;background:var(--wxc0)}
 .wxpill .wl{font-size:.66rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em}
+.wxpill.off{background:transparent;border:1.5px solid var(--line);color:var(--ink3);font-weight:600}
 .wxnone{color:var(--ink3);font-weight:600;font-size:.86rem;line-height:1.45}
 /* Hitze-Ampel-Legende (erklärt die Punktfarben, heutiges Level hervorgehoben) */
 .wxrisk{margin-top:22px}
@@ -267,12 +271,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wxr.on b{color:var(--ink)}
 
 /* ===== ELFMETER-PICKER ===== */
-.pkwrap{display:flex;flex-direction:column;gap:14px;margin-top:4px}
-.pkfield{display:flex;flex-direction:column;gap:7px}
-.pkfield span{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3)}
-.pkfield input{font:inherit;font-size:1.15rem;font-weight:700;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:15px 16px;outline:none;transition:border-color .15s}
-.pkfield input:focus{border-color:var(--ink)}
-.pkvs{text-align:center;font-weight:800;color:var(--ink3);font-size:.9rem;letter-spacing:.05em}
+.pkwrap{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+.pkfield{display:flex;flex-direction:column;gap:8px}
+.pkfield>span{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)}
+.pkinput{position:relative}
+.pkinput input{width:100%;font:inherit;font-size:1.15rem;font-weight:700;color:var(--ink);background:var(--card);border:2px solid var(--ink3);border-radius:16px;padding:15px 44px 15px 16px;outline:none;transition:border-color .15s}
+.pkinput input::placeholder{color:var(--ink3);font-weight:600}
+.pkinput input:focus{border-color:var(--ink)}
+.pkchev{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--ink2);pointer-events:none}
+/* „gegen" als klar zentrierter Trenner mit Hairlines */
+.pkvs{display:flex;align-items:center;gap:12px;color:var(--ink2);font-weight:800;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase}
+.pkvs::before,.pkvs::after{content:'';flex:1;height:1.5px;background:var(--line)}
 
 /* ===== ELFMETER-ARENA ===== */
 .pkscore{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
@@ -282,18 +291,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .pkscore .pkdash{color:var(--ink3);font-size:1.1rem}
 .pkrounds{display:flex;flex-direction:column;gap:5px;margin:12px 0 4px}
 .pkrline{display:flex;align-items:center;gap:6px;font-size:.68rem;font-weight:700;color:var(--ink3)}
-.pkrline .pkrn{width:52px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pkrline .pkrn{width:54px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
 .pkrline .pkdots{display:flex;gap:5px}
-.pkrline .pkdots i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--line);box-sizing:border-box}
+.pkrline .pkdots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink3);box-sizing:border-box}
 .pkrline .pkdots i.goal{background:var(--fill);border-color:var(--fill)}
 .pkrline .pkdots i.miss{background:transparent;border-color:var(--ink3);position:relative}
-.pkrline .pkdots i.miss::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--ink3);opacity:.35}
+.pkrline .pkdots i.miss::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--ink3);opacity:.5}
 .pkarena{position:relative;height:210px;margin:6px 0 2px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-.pkgoal{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:210px;height:96px;border:3px solid var(--ink2);border-bottom:none;border-radius:6px 6px 0 0;
-  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:24px 24px;background-position:center}
-.pkkeeper{position:absolute;top:40px;left:50%;width:26px;height:52px;margin-left:-13px;border-radius:12px 12px 8px 8px;background:var(--ink);transition:transform .32s cubic-bezier(.3,1.4,.5,1);transform:translate(0,0)}
-.pkkeeper::before{content:'';position:absolute;top:-11px;left:50%;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;background:var(--ink)}
-.pkball{position:absolute;bottom:14px;left:50%;margin-left:-10px;width:20px;height:20px;border-radius:50%;background:var(--fill);border:2px solid var(--onfill);box-shadow:0 3px 8px rgba(0,0,0,.28);transition:transform .5s cubic-bezier(.4,.9,.5,1);transform:translate(0,0);z-index:3}
+.pkgoal{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:214px;height:98px;border:4px solid var(--pkgoal);border-bottom:none;border-radius:4px 4px 0 0;
+  background-image:linear-gradient(rgba(130,130,140,.30) 1px,transparent 1px),linear-gradient(90deg,rgba(130,130,140,.30) 1px,transparent 1px);background-size:22px 22px;background-position:center}
+.pkgoal::after{content:'';position:absolute;left:-4px;right:-4px;bottom:0;height:4px;background:var(--pkgoal);border-radius:2px}
+.pkkeeper{position:absolute;top:34px;left:50%;width:46px;height:62px;margin-left:-23px;transition:transform .32s cubic-bezier(.3,1.4,.5,1);transform:translate(0,0);z-index:2}
+.pkkeeper svg{display:block;width:100%;height:100%;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
+.pkball{position:absolute;bottom:12px;left:50%;margin-left:-11px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fff 0 30%,var(--fill) 62%);border:1.5px solid var(--fill);box-shadow:0 3px 8px rgba(0,0,0,.32);transition:transform .5s cubic-bezier(.4,.9,.5,1);transform:translate(0,0);z-index:3}
 .pkflash{position:absolute;top:44%;left:0;right:0;text-align:center;font-weight:800;font-size:1.5rem;letter-spacing:-.03em;pointer-events:none;opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s;z-index:5}
 .pkflash.show{opacity:1;transform:scale(1)}
 .pkflash.goal{color:var(--ink)}
@@ -901,13 +911,16 @@ async function loadWeek(){
 }
 function wxPick(i){wxDay=i;renderWeatherPanel();}
 function longDate(iso){const [y,mo,d]=iso.split('-').map(Number);const dt=new Date(y,mo-1,d);return WD_LONG[dt.getDay()]+', '+d+'. '+MON_LONG[mo-1];}
-function wxWin(lab,w){return `<span class="wxpill"><i></i><span class="wl">${lab}</span> ${w.start}–${w.end}</span>`;}
+// Immer BEIDE Runden zeigen (Kira geht morgens UND abends). Fehlt ein Fenster,
+// klar als „kein Fenster" markieren statt die Zeile wegzulassen.
+function wxWin(lab,w){
+  if(w)return `<span class="wxpill"><i></i><span class="wl">${lab}</span> ${w.start}–${w.end}</span>`;
+  return `<span class="wxpill off"><span class="wl">${lab}</span> kein sicheres Fenster</span>`;
+}
 function recPills(day){
-  const p=[];
-  if(day.morningWindow)p.push(wxWin('Vormittag',day.morningWindow));
-  if(day.eveningWindow)p.push(wxWin('Abend',day.eveningWindow));
-  if(!p.length)return '<div class="wxnone">Kein sicheres Zeitfenster an diesem Tag — wenn möglich nur kurze Runden im Schatten.</div>';
-  return '<div class="wxpills">'+p.join('')+'</div>';
+  const both=!day.morningWindow&&!day.eveningWindow;
+  return '<div class="wxpills">'+wxWin('Vormittag',day.morningWindow)+wxWin('Abend',day.eveningWindow)+'</div>'
+    +(both?'<div class="wxnone" style="margin-top:8px">An diesem Tag wird’s zu heiß — wenn möglich nur kurze Runden im Schatten.</div>':'');
 }
 function renderWeatherPanel(){
   const body=$('overBody');
@@ -998,6 +1011,7 @@ function chartSvg(day){
 /* ============== ELFMETERSCHIESSEN ============== */
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function startPenalty(){flow='penalty';step=0;state={};$('dots').innerHTML='';openOver();render();}
+const PK_CHEV='<svg class="pkchev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function penaltyPickStep(){
   $('dots').innerHTML='';
   const p1=state.p1||'',p2=state.p2||'';
@@ -1006,9 +1020,9 @@ function penaltyPickStep(){
     <h2>Elfmeterschießen</h2><div class="osub">Wer tritt an? Namen wählen oder tippen.</div>
     <datalist id="pnames">${NAMES.map(n=>`<option value="${n}"></option>`).join('')}</datalist>
     <div class="pkwrap">
-      <label class="pkfield"><span>Spieler 1</span><input id="pk1" list="pnames" autocomplete="off" placeholder="Name" value="${esc(p1)}" oninput="pkIn()"></label>
+      <label class="pkfield"><span>Spieler 1</span><div class="pkinput"><input id="pk1" list="pnames" autocomplete="off" placeholder="Name" value="${esc(p1)}" oninput="pkIn()">${PK_CHEV}</div></label>
       <div class="pkvs">gegen</div>
-      <label class="pkfield"><span>Spieler 2</span><input id="pk2" list="pnames" autocomplete="off" placeholder="Name" value="${esc(p2)}" oninput="pkIn()"></label>
+      <label class="pkfield"><span>Spieler 2</span><div class="pkinput"><input id="pk2" list="pnames" autocomplete="off" placeholder="Name" value="${esc(p2)}" oninput="pkIn()">${PK_CHEV}</div></label>
     </div>
     <div class="over-foot"><span class="skip"></span><button class="next ${ready?'':'off'}" id="pknext" onclick="penaltyGo()">›</button></div>`;
 }
@@ -1022,6 +1036,16 @@ function penaltyGo(){
   if(!p1||!p2||p1.toLowerCase()===p2.toLowerCase())return;
   state.p1=p1;state.p2=p2;step=1;render();
 }
+const PK_KEEPER_SVG=`<svg viewBox="0 0 46 62" xmlns="http://www.w3.org/2000/svg">
+  <path d="M14 29 L5 16" stroke="var(--pkjersey)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M32 29 L41 16" stroke="var(--pkjersey)" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="4.5" cy="14.5" r="5.5" fill="var(--pkglove)"/>
+  <circle cx="41.5" cy="14.5" r="5.5" fill="var(--pkglove)"/>
+  <rect x="15" y="46" width="6.5" height="14" rx="3.2" fill="var(--ink)"/>
+  <rect x="24.5" y="46" width="6.5" height="14" rx="3.2" fill="var(--ink)"/>
+  <rect x="12" y="24" width="22" height="30" rx="10" fill="var(--pkjersey)"/>
+  <circle cx="23" cy="13.5" r="8.5" fill="var(--ink)"/>
+</svg>`;
 const PK_ZONES=['tl','tr','c','bl','br'];
 const PK_BALL={tl:[-78,-150],tr:[78,-150],c:[0,-118],bl:[-78,-98],br:[78,-98]};
 const PK_KEEP={tl:[-74,-30,-24],tr:[74,-30,24],c:[0,4,0],bl:[-74,18,-24],br:[74,18,24]};
@@ -1035,7 +1059,7 @@ function penaltyArena(){
     </div>
     <div class="pkrounds" id="pkrounds"></div>
     <div class="pkarena">
-      <div class="pkgoal"><div class="pkkeeper" id="pkkeeper"></div></div>
+      <div class="pkgoal"><div class="pkkeeper" id="pkkeeper">${PK_KEEPER_SVG}</div></div>
       <div class="pkball" id="pkball"></div>
       <div class="pkflash" id="pkflash"></div>
     </div>

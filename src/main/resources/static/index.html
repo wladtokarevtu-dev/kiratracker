@@ -56,7 +56,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 /* ===== VACATION BANNER ===== */
 .vacbanner{display:none;align-items:flex-start;gap:12px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:15px 16px;margin-top:20px;font-size:.9rem}
-.phone.vac .vacbanner{display:flex}
+/* Urlaub: Banner mittig zwischen Gruß und Kalenderleiste (gleicher Abstand oben/unten) */
+.phone.vac .vacbanner{display:flex;margin:34px 0}
+.phone.vac .week{margin-top:34px}
 .vacbanner svg{flex-shrink:0;margin-top:1px;color:var(--ink2)}
 .vacbanner .vt{font-weight:700}
 .vacbanner .vd{color:var(--ink2);font-weight:500;margin-top:2px;line-height:1.4}

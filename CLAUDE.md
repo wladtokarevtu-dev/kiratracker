@@ -122,21 +122,25 @@ weißraumstarke Sprache der App **Stoic** angelehnt (eigene Inhalte/Assets —
   `<150` = 0 grün (unbedenklich) · `150–159` = 1 gelb (Vorsicht) ·
   `160–179` = 2 orange (gefährlich) · `≥180` = 3 rot (potenziell lebensgefährlich).
 - **Ampel-Punkt** sitzt **inline direkt neben der Gradzahl** im Wetter-Widget
-  (8px). Kein separates Tap-Target/Popover mehr. Punkt **versteckt**, wenn
-  `weather.riskLevel == null` (API down — kein falsches Grün).
+  (8px). **Kein Popover mehr** — die Farb-Bedeutung steht im Wetter-Panel (s. u.).
+  Punkt **versteckt**, wenn `weather.riskLevel == null` (API down — kein falsches Grün).
 - **Tap aufs Wetter** (Icon/Temp/Punkt/Beschreibung) → **In-App-Wetter-Panel**
   (Takeover in `index.html`, kein zweites HTML). Inhalt:
-  - **Tagesauswahl-Strip** (OWM liefert 5 Tage / 3h) — Wochentag + Datum, aktiver
+  - **Tagesauswahl-Strip** — **nur 3 Tage** (heute/morgen/übermorgen; `FORECAST_DAYS`,
+    weiter in die Zukunft ist die Vorhersage unzuverlässig). Wochentag + Datum, aktiver
     Tag als gefüllte Pille, kleiner Ampel-Punkt (`maxRiskLevel`) je Tag.
   - **Diagramm** je Tag: **kombiniert Temperatur (Linie, geglättet) + Luftfeuchtigkeit
     (gestrichelt)**, Punkte in Ampel-Farben, X-Achse 0–24 Uhr, Jetzt-Marker (nur heute).
     Die empfohlenen **Zeitfenster sind als grüne Bänder** markiert.
   - **Empfehlungs-Pillen** (Vormittag/Abend); sind beide `null`: „kein sicheres Fenster …".
-- **Zeitfenster:** Vormittag = Slots `6:00–12:00` (frühester Slot mit minimalem Risiko),
-  Abend = Slots `≥ 17:00` (spätester Slot mit minimalem Risiko), Fenster = Slot + 3h;
-  `null`, wenn das Minimum dort Level 3 ist. **Nichts vor 6:00 vorschlagen; Fenster-Ende
-  auf 23:00 gekappt** (keine Runden mitten in der Nacht — ersetzt die alte
-  „über-Mitternacht"-Eigenheit).
+  - **Ampel-Farb-Legende** („Was die Ampel-Farbe bedeutet") — alle 4 Stufen + Kurzinfo,
+    das Level des gewählten Tages (`maxRiskLevel`) hervorgehoben (ersetzt das alte Popover).
+- **Zeitfenster:** Vormittag = Slots `6:00–12:00`, Abend = Slots `≥ 17:00`. Gewählt wird
+  je Bereich der **nach der Formel (tempF+Feuchte) kühlste Slot** (nicht mehr stur der
+  früheste/späteste) — bei Gleichstand morgens der frühere, abends der spätere; so
+  **variiert das Fenster echt mit dem Wetter**. Fenster = Slot + 3h; `null`, wenn das
+  Minimum dort Level 3 ist. **Nichts vor 6:00; Fenster-Ende auf 23:00 gekappt**;
+  entartete Null-Fenster (z. B. Slot 23:00 → „23:00–23:00") werden zu `null`.
 - **6-Uhr-Push** (Europe/Berlin): nur wenn `maxRiskLevel == 3` und kein Urlaub —
   nennt die besten Fenster, ohne Fenster: „nur kurze, schattige Runden".
   Forecast-API down um 6:00 → kein Push (keine Warnung ohne valide Daten), WARN im Log.
@@ -149,6 +153,8 @@ weißraumstarke Sprache der App **Stoic** angelehnt (eigene Inhalte/Assets —
   frei tippen) treten an — **animierte** Best-of-5-Schießerei (Torwart/Ball, Sudden
   Death bei Gleichstand), Verlierer „geht mit Kira raus". Reine Client-Logik,
   im Stoic-Design (monochrom, ein Akzent).
+- Beide Modi bleiben **auch im Urlaubsmodus nutzbar** (nicht ausgegraut) — sie hängen
+  nicht an der Gassi-Sperre. Nur die Ritual-Karten werden im Urlaub ausgegraut.
 
 ## Bekannte Altlast (erledigt)
 - ~~Das alte `index.html`-Frontend fällt bei API-Fehlern auf Mock-Daten zurück.~~
@@ -199,7 +205,8 @@ native `input[type=time]` für Uhrzeiten.
 - **Segmented Control** (Rangliste 3/7/14/30)
 - **Fairness-Karte**, **Nachtrag-Stack** (leicht rot), **Urlaubs-Banner**, **Lock/Admin**
 - **Hitze-Ampel-Punkt** (inline neben der Gradzahl auf Home) · **Wetter-Panel**
-  (In-App-Takeover: Tagesauswahl + kombiniertes Temp/Feuchte-Diagramm + Fenster-Pillen)
+  (In-App-Takeover: 3-Tage-Auswahl + kombiniertes Temp/Feuchte-Diagramm + Fenster-Pillen
+  + Ampel-Farb-Legende)
 - **Featured-Karten** Würfeln & **Elfmeterschießen** (animiert, `datalist`-Namenswahl)
 
 ---

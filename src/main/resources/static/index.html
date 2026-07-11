@@ -29,19 +29,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .pad{padding:16px 24px 128px}
 
 /* ===== TOP ROW ===== */
-.toprow{display:flex;align-items:center;justify-content:space-between;padding:6px 0 22px;gap:10px}
-.wx-top{display:flex;align-items:center;gap:8px;min-width:0;color:var(--ink2);font-size:.88rem;font-weight:500;position:relative}
+.toprow{display:flex;align-items:center;justify-content:space-between;padding:12px 0 30px;gap:16px}
+.wx-top{flex:1;display:flex;align-items:center;min-width:0;color:var(--ink2);font-size:.88rem;font-weight:500;position:relative}
 .wx-top svg{display:block;flex-shrink:0}
 .wx-top .wt{font-weight:800;color:var(--ink);font-size:.94rem}
 .wx-top .wd{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wx-tap{display:flex;align-items:center;gap:7px;min-width:0;padding:0;text-align:left}
+.wx-tap{display:flex;align-items:center;gap:8px;min-width:0;padding:0;text-align:left}
 /* Ampel-Punkt sitzt direkt neben der Gradzahl */
 .wx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:none}
 .wx-dot[data-level="0"]{background:var(--wxc0)}
 .wx-dot[data-level="1"]{background:var(--wxc1)}
 .wx-dot[data-level="2"]{background:var(--wxc2)}
 .wx-dot[data-level="3"]{background:var(--wxc3)}
-.tr-right{display:flex;align-items:center;gap:15px;flex-shrink:0}
+.tr-right{display:flex;align-items:center;gap:17px;flex-shrink:0}
 .streak{display:flex;align-items:center;gap:6px;font-weight:800;font-size:.92rem}
 .icbtn{color:var(--ink2);display:flex;transition:color .15s}
 .icbtn:active{color:var(--ink)}
@@ -84,8 +84,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .donechip{padding:6px 12px;background:var(--soft);border-radius:100px;font-size:.76rem;font-weight:600;color:var(--ink2)}
 
 /* ===== FEATURED ===== */
-.feat{background:var(--card);border-radius:24px;padding:24px 22px;margin-top:18px;transition:opacity .3s}
-.phone.vac .feat{opacity:.4;pointer-events:none}
+.feat{background:var(--card);border-radius:24px;padding:24px 22px;margin-top:18px}
+/* Würfeln & Elfmeterschießen bleiben auch im Urlaubsmodus nutzbar (nicht ausgegraut). */
 .feat .fl{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
 .feat .fq{font-size:1.18rem;font-weight:700;letter-spacing:-.025em;line-height:1.2;margin-bottom:18px}
 .pill-dark{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:var(--fill);color:var(--onfill);border-radius:100px;font-size:.9rem;font-weight:700}

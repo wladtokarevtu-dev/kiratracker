@@ -61,6 +61,23 @@ class WeatherServiceTest {
     }
 
     @org.junit.jupiter.api.Test
+    void buildForecast_amongTiedRiskLevels_picksCoolestSlotByFormula() {
+        // Alle Level 0 (mildes Wetter), aber unterschiedlich warm → das Fenster
+        // soll den nach der Formel kühlsten Slot treffen, nicht stur früh/spät.
+        List<ForecastPointDto> points = List.of(
+                new ForecastPointDto("06:00", 20, 60, 0),  // Score 68.0+60=128
+                new ForecastPointDto("09:00", 14, 55, 0),  // Score 57.2+55=112.2  ← kühlster Vormittag
+                new ForecastPointDto("18:00", 21, 50, 0),  // Score 69.8+50=119.8  ← kühlster Abend
+                new ForecastPointDto("21:00", 24, 52, 0)   // Score 75.2+52=127.2
+        );
+
+        WeatherForecastDto forecast = WeatherService.buildForecast(points);
+
+        assertThat(forecast.getMorningWindow().getStart()).isEqualTo("09:00");
+        assertThat(forecast.getEveningWindow().getStart()).isEqualTo("18:00");
+    }
+
+    @org.junit.jupiter.api.Test
     void buildForecast_dropsDegenerateEveningWindow_whenOnlySlotIsAt2300() {
         // Spätabends bleibt heute evtl. nur der 23:00-Slot übrig → +3h wird auf
         // 23:00 gekappt, das ergäbe „23:00–23:00" → soll null sein.

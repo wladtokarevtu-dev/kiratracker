@@ -109,13 +109,19 @@ public class WeatherService {
         return buildForecast(fetchDays().getOrDefault(today, List.of()));
     }
 
+    /** So viele Tage zeigt das Wetter-Panel (heute + morgen + übermorgen).
+     *  Weiter in die Zukunft ist die Vorhersage ohnehin unzuverlässig. */
+    private static final int FORECAST_DAYS = 3;
+
     /**
-     * Mehrtägige Vorhersage (OWM: 5 Tage / 3h) für den Tagesauswahl-Strip im
-     * Frontend — je Tag Kurve + Ampel je Slot + Gassi-Zeitfenster.
+     * Mehrtägige Vorhersage (OWM: 5 Tage / 3h, gekappt auf {@link #FORECAST_DAYS})
+     * für den Tagesauswahl-Strip im Frontend — je Tag Kurve + Ampel je Slot +
+     * Gassi-Zeitfenster.
      */
     public WeekForecastDto getWeekForecast() {
         List<DayForecastDto> days = new ArrayList<>();
         for (Map.Entry<LocalDate, List<ForecastPointDto>> e : fetchDays().entrySet()) {
+            if (days.size() >= FORECAST_DAYS) break;
             LocalDate d = e.getKey();
             WeatherForecastDto f = buildForecast(e.getValue());
             days.add(new DayForecastDto(
@@ -202,15 +208,26 @@ public class WeatherService {
         return Integer.parseInt(hm.split(":")[0]);
     }
 
+    /** Roher Hitze-Score der Formel (tempF + Feuchte) — je kleiner, desto besser. */
+    private static double heatScore(ForecastPointDto p) {
+        return p.getTemperature() * 9.0 / 5.0 + 32 + p.getHumidity();
+    }
+
     private static WeatherWindowDto bestWindow(List<ForecastPointDto> slots, boolean earliest) {
         if (slots.isEmpty()) return null;
         int min = slots.stream().mapToInt(ForecastPointDto::getRiskLevel).min().orElse(3);
         if (min >= 3) return null;
 
-        List<ForecastPointDto> candidates = slots.stream()
-                .filter(p -> p.getRiskLevel() == min)
-                .collect(java.util.stream.Collectors.toList());
-        ForecastPointDto chosen = earliest ? candidates.get(0) : candidates.get(candidates.size() - 1);
+        // Nicht stur den frühesten/spätesten Slot, sondern den nach der Formel
+        // tatsächlich KÜHLSTEN — so variiert das Fenster echt mit dem Wetter.
+        // Bei Gleichstand: morgens der frühere, abends der spätere Slot.
+        // (Slots sind chronologisch; earliest ersetzt nur bei echtem Minimum.)
+        ForecastPointDto chosen = slots.get(0);
+        double best = heatScore(chosen);
+        for (int i = 1; i < slots.size(); i++) {
+            double s = heatScore(slots.get(i));
+            if (earliest ? s < best : s <= best) { best = s; chosen = slots.get(i); }
+        }
 
         LocalTime start = LocalTime.parse(chosen.getTime());
         LocalTime end = start.plusHours(3);

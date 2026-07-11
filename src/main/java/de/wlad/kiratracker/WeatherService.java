@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,9 @@ public class WeatherService {
 
     private static final ZoneId BERLIN = ZoneId.of("Europe/Berlin");
     private static final DateTimeFormatter HM = DateTimeFormatter.ofPattern("HH:mm");
+    private static final String[] WEEKDAYS = {"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"};
+    /** Empfehlungen nie vor 6:00 und nie nach 23:00 (Fenster-Ende wird gekappt). */
+    private static final LocalTime DAY_END = LocalTime.of(23, 0);
 
     @Value("${weather.api.key}")
     private String apiKey;
@@ -98,11 +102,40 @@ public class WeatherService {
     }
 
     /**
-     * Holt die 3h-Vorhersage-Slots von heute (Europe/Berlin) und berechnet
-     * daraus die Ampel je Slot sowie die besten Gassi-Zeitfenster.
+     * Vorhersage nur für heute (Europe/Berlin) — genutzt vom 6-Uhr-Hitze-Push.
+     */
+    public WeatherForecastDto getTodayForecast() {
+        LocalDate today = LocalDate.now(BERLIN);
+        return buildForecast(fetchDays().getOrDefault(today, List.of()));
+    }
+
+    /**
+     * Mehrtägige Vorhersage (OWM: 5 Tage / 3h) für den Tagesauswahl-Strip im
+     * Frontend — je Tag Kurve + Ampel je Slot + Gassi-Zeitfenster.
+     */
+    public WeekForecastDto getWeekForecast() {
+        List<DayForecastDto> days = new ArrayList<>();
+        for (Map.Entry<LocalDate, List<ForecastPointDto>> e : fetchDays().entrySet()) {
+            LocalDate d = e.getKey();
+            WeatherForecastDto f = buildForecast(e.getValue());
+            days.add(new DayForecastDto(
+                    d.toString(),
+                    WEEKDAYS[d.getDayOfWeek().getValue() - 1],
+                    d.getDayOfMonth(),
+                    f.getPoints(), f.getMaxRiskLevel(),
+                    f.getMorningWindow(), f.getEveningWindow()));
+        }
+        return new WeekForecastDto(days);
+    }
+
+    /**
+     * Holt die 3h-Forecast-Slots und gruppiert sie chronologisch nach Tag
+     * (Europe/Berlin). Ein Netzabruf, von {@link #getTodayForecast()} und
+     * {@link #getWeekForecast()} geteilt. Bei Fehler: leere Map (kein Werfen).
      */
     @SuppressWarnings("unchecked")
-    public WeatherForecastDto getTodayForecast() {
+    private Map<LocalDate, List<ForecastPointDto>> fetchDays() {
+        Map<LocalDate, List<ForecastPointDto>> byDay = new LinkedHashMap<>();
         try {
             String url = String.format("%s?q=%s,%s&appid=%s&units=metric&lang=de",
                     forecastUrl(), city, country, apiKey);
@@ -110,33 +143,30 @@ public class WeatherService {
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             if (response == null) {
                 log.warn("Wetter-Forecast: leere Antwort von {}", forecastUrl());
-                return buildForecast(List.of());
+                return byDay;
             }
 
             List<Map<String, Object>> list = (List<Map<String, Object>>) response.get("list");
             if (list == null || list.isEmpty()) {
                 log.warn("Wetter-Forecast: keine 'list' im Payload von {}", forecastUrl());
-                return buildForecast(List.of());
+                return byDay;
             }
 
-            LocalDate today = LocalDate.now(BERLIN);
-            List<ForecastPointDto> points = new ArrayList<>();
             for (Map<String, Object> item : list) {
                 long dt = ((Number) item.get("dt")).longValue();
                 ZonedDateTime zdt = Instant.ofEpochSecond(dt).atZone(BERLIN);
-                if (!zdt.toLocalDate().equals(today)) continue;
 
                 Map<String, Object> main = (Map<String, Object>) item.get("main");
                 double temp = ((Number) main.get("temp")).doubleValue();
                 int humidity = ((Number) main.get("humidity")).intValue();
 
-                points.add(new ForecastPointDto(zdt.format(HM), temp, humidity, riskLevel(temp, humidity)));
+                byDay.computeIfAbsent(zdt.toLocalDate(), k -> new ArrayList<>())
+                     .add(new ForecastPointDto(zdt.format(HM), temp, humidity, riskLevel(temp, humidity)));
             }
-            return buildForecast(points);
         } catch (RestClientException | NullPointerException | ClassCastException e) {
             log.warn("Wetter-Forecast-Abruf fehlgeschlagen: {}", e.getMessage());
-            return buildForecast(List.of());
         }
+        return byDay;
     }
 
     private String forecastUrl() {
@@ -145,16 +175,18 @@ public class WeatherService {
 
     /**
      * Reine Berechnung aus bereits gemappten Punkten (kein Netzwerkzugriff,
-     * daher direkt testbar). Vormittag = Slots vor 12:00, Abend = Slots ab
+     * daher direkt testbar). Vormittag = Slots 6:00–12:00, Abend = Slots ab
      * 17:00. Gesucht wird je Bereich der Slot mit dem niedrigsten Risiko
      * (Vormittag: frühester Treffer, Abend: spätester Treffer). Bleibt das
      * Minimum im Bereich Level 3, gibt es kein sicheres Fenster (null).
+     * Es wird nie etwas vor 6:00 vorgeschlagen, das Fenster-Ende wird auf
+     * 23:00 gekappt (keine Runden mitten in der Nacht).
      */
     static WeatherForecastDto buildForecast(List<ForecastPointDto> points) {
         int maxRisk = points.stream().mapToInt(ForecastPointDto::getRiskLevel).max().orElse(0);
 
         List<ForecastPointDto> morning = points.stream()
-                .filter(p -> hour(p.getTime()) < 12)
+                .filter(p -> hour(p.getTime()) >= 6 && hour(p.getTime()) < 12)
                 .collect(java.util.stream.Collectors.toList());
         List<ForecastPointDto> evening = points.stream()
                 .filter(p -> hour(p.getTime()) >= 17)
@@ -182,6 +214,8 @@ public class WeatherService {
 
         LocalTime start = LocalTime.parse(chosen.getTime());
         LocalTime end = start.plusHours(3);
+        // Ende auf 23:00 kappen (auch wenn +3h über Mitternacht wrappt).
+        if (end.isBefore(start) || !end.isBefore(DAY_END)) end = DAY_END;
         return new WeatherWindowDto(chosen.getTime(), end.format(HM));
     }
 }

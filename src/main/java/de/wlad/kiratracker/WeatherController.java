@@ -17,4 +17,9 @@ public class WeatherController {
     public ResponseEntity<WeatherForecastDto> forecast() {
         return ResponseEntity.ok(weatherService.getTodayForecast());
     }
+
+    @GetMapping("/weather/week")
+    public ResponseEntity<WeekForecastDto> week() {
+        return ResponseEntity.ok(weatherService.getWeekForecast());
+    }
 }

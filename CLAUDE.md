@@ -8,7 +8,9 @@ Erinnerungen, Fairness-Rotation. Läuft im Haushalt auf dem Handy.
 - **Push:** ntfy.sh.
 - **Deployment:** Render (Free Tier → JVM-Kaltstart ~25 s nach Spin-down).
 - **Frontend:** statische Seiten unter `src/main/resources/static/`
-  (`index.html`, `admin.html`, `stats.html`, `nfc.html`, `weather.html`), vom Spring-Server ausgeliefert.
+  (`index.html`, `admin.html`, `stats.html`, `nfc.html`), vom Spring-Server ausgeliefert.
+  Das Wetter-/Hitze-Detail ist **kein eigenes HTML mehr**, sondern ein In-App-Panel
+  in `index.html` (Takeover) — schnellerer Aufruf, kein zweiter Seitenload.
 
 ## Wichtige Backend-Bausteine
 - `HelloController` / `NfcController` — REST-Endpunkte (`/walk`, `/food`, `/status`,
@@ -115,23 +117,38 @@ weißraumstarke Sprache der App **Stoic** angelehnt (eigene Inhalte/Assets —
 - Im Admin-Modus ist **jeder Eintrag löschbar** und die **Uhrzeit jedes Eintrags
   verstellbar** (in der Verlaufsliste).
 
-## 8. Hitze-Warnung (Ampel · Tagesverlauf · 6-Uhr-Push)
+## 8. Hitze-Warnung (Ampel · Wetter-Panel · 6-Uhr-Push)
 - **Formel:** `tempF + humidity%` (`tempF = tempC × 9/5 + 32`) →
   `<150` = 0 grün (unbedenklich) · `150–159` = 1 gelb (Vorsicht) ·
   `160–179` = 2 orange (gefährlich) · `≥180` = 3 rot (potenziell lebensgefährlich).
-- **Ampel-Punkt** neben dem Wetter auf Home (8px sichtbar, 32px Tap-Fläche);
-  Tap → Popover mit allen 4 Stufen, aktuelle hervorgehoben. Punkt **versteckt**,
-  wenn `weather.riskLevel == null` (API down — kein falsches Grün).
-- **Tap aufs Wetter** (Icon/Temp/Beschreibung) → `weather.html`: SVG-Tagesverlauf
-  (Temperaturkurve, Punkte in Ampel-Farben) + Empfehlungs-Pillen mit den besten
-  Zeitfenstern; sind beide Fenster `null`: „heute kein sicheres Fenster …".
-- **Zeitfenster:** Vormittag = Slots `< 12:00` (frühester Slot mit minimalem Risiko),
+- **Ampel-Punkt** sitzt **inline direkt neben der Gradzahl** im Wetter-Widget
+  (8px). Kein separates Tap-Target/Popover mehr. Punkt **versteckt**, wenn
+  `weather.riskLevel == null` (API down — kein falsches Grün).
+- **Tap aufs Wetter** (Icon/Temp/Punkt/Beschreibung) → **In-App-Wetter-Panel**
+  (Takeover in `index.html`, kein zweites HTML). Inhalt:
+  - **Tagesauswahl-Strip** (OWM liefert 5 Tage / 3h) — Wochentag + Datum, aktiver
+    Tag als gefüllte Pille, kleiner Ampel-Punkt (`maxRiskLevel`) je Tag.
+  - **Diagramm** je Tag: **kombiniert Temperatur (Linie, geglättet) + Luftfeuchtigkeit
+    (gestrichelt)**, Punkte in Ampel-Farben, X-Achse 0–24 Uhr, Jetzt-Marker (nur heute).
+    Die empfohlenen **Zeitfenster sind als grüne Bänder** markiert.
+  - **Empfehlungs-Pillen** (Vormittag/Abend); sind beide `null`: „kein sicheres Fenster …".
+- **Zeitfenster:** Vormittag = Slots `6:00–12:00` (frühester Slot mit minimalem Risiko),
   Abend = Slots `≥ 17:00` (spätester Slot mit minimalem Risiko), Fenster = Slot + 3h;
-  `null`, wenn das Minimum dort Level 3 ist. Akzeptierte Eigenheit: späte
-  Abendfenster können über Mitternacht laufen (z. B. „22:00–01:00").
+  `null`, wenn das Minimum dort Level 3 ist. **Nichts vor 6:00 vorschlagen; Fenster-Ende
+  auf 23:00 gekappt** (keine Runden mitten in der Nacht — ersetzt die alte
+  „über-Mitternacht"-Eigenheit).
 - **6-Uhr-Push** (Europe/Berlin): nur wenn `maxRiskLevel == 3` und kein Urlaub —
   nennt die besten Fenster, ohne Fenster: „nur kurze, schattige Runden".
   Forecast-API down um 6:00 → kein Push (keine Warnung ohne valide Daten), WARN im Log.
+
+## 9. Spaß-Modi auf Home (Featured-Karten)
+- **Würfeln** (`Am Zug`): ein zufälliger Name aus der Familie. Timer sind getrackt
+  und werden bei „Nochmal"/Schließen gestoppt (früher überlappten Intervalle →
+  Ergebnis sprang / manche Namen fehlten).
+- **Elfmeterschießen:** zwei Gassigänger (per Dropdown/`datalist` wählen **oder**
+  frei tippen) treten an — **animierte** Best-of-5-Schießerei (Torwart/Ball, Sudden
+  Death bei Gleichstand), Verlierer „geht mit Kira raus". Reine Client-Logik,
+  im Stoic-Design (monochrom, ein Akzent).
 
 ## Bekannte Altlast (erledigt)
 - ~~Das alte `index.html`-Frontend fällt bei API-Fehlern auf Mock-Daten zurück.~~
@@ -181,8 +198,9 @@ native `input[type=time]` für Uhrzeiten.
   Blockieren, Nachtragen, Würfeln, Admin-Uhrzeit.
 - **Segmented Control** (Rangliste 3/7/14/30)
 - **Fairness-Karte**, **Nachtrag-Stack** (leicht rot), **Urlaubs-Banner**, **Lock/Admin**
-- **Hitze-Ampel-Punkt + Popover** (Home) · **`weather.html`** (Stoic-Look wie `admin.html`,
-  nur in der Live-Datei — nicht im Mockup)
+- **Hitze-Ampel-Punkt** (inline neben der Gradzahl auf Home) · **Wetter-Panel**
+  (In-App-Takeover: Tagesauswahl + kombiniertes Temp/Feuchte-Diagramm + Fenster-Pillen)
+- **Featured-Karten** Würfeln & **Elfmeterschießen** (animiert, `datalist`-Namenswahl)
 
 ---
 
@@ -204,7 +222,8 @@ native `input[type=time]` für Uhrzeiten.
 | Urlaub setzen/beenden (admin) | `POST /admin/pause {index}` · `DELETE /admin/pause` | vorhanden |
 | **Fairness** (wer dran, Counts) | `GET /fairness` (14-Tage-Fenster, blockiert-aware) | vorhanden |
 | **Hitze-Ampel** (aktuelles Risiko 0–3) | `GET /status` → `weather.riskLevel` | vorhanden |
-| **Tagesverlauf + Zeitfenster** | `GET /weather/forecast` | vorhanden |
+| **Tagesverlauf heute + Zeitfenster** (6-Uhr-Push) | `GET /weather/forecast` → `WeatherForecastDto` | vorhanden |
+| **Mehrtages-Forecast** (Wetter-Panel/Diagramm) | `GET /weather/week` → `WeekForecastDto{days:[DayForecastDto]}` | vorhanden |
 | **Selbst-Blockieren** | `GET /blocks` · `POST /block {person,slots,note}` · `DELETE /block/{id}` (ungated, Notiz Pflicht) | vorhanden |
 | Verlauf zurücksetzen | `POST /admin/reset` (Basic-Auth + Client-Passwort-Gate) | vorhanden |
 | Erinnerungs-Push 11:00 / 22:00 | `ReminderService` Cron (Aaron-7-Uhr entfernt) | vorhanden |

@@ -34,22 +34,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wx-top svg{display:block;flex-shrink:0}
 .wx-top .wt{font-weight:800;color:var(--ink);font-size:.94rem}
 .wx-top .wd{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wx-tap{display:flex;align-items:center;gap:8px;min-width:0;padding:0;text-align:left}
-.wx-risk{width:32px;height:32px;margin:-12px -12px -12px -4px;border-radius:50%;padding:0;flex-shrink:0;display:none;background:none;position:relative}
-.wx-risk::after{content:'';position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%)}
-.wx-risk[data-level="0"]::after{background:var(--wxc0)}
-.wx-risk[data-level="1"]::after{background:var(--wxc1)}
-.wx-risk[data-level="2"]::after{background:var(--wxc2)}
-.wx-risk[data-level="3"]::after{background:var(--wxc3)}
-.wx-pop{display:none;position:absolute;top:26px;left:0;z-index:60;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-size:.76rem;font-weight:600;color:var(--ink2);width:230px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
-.wx-pop.open{display:block}
-.wx-pop .wpr{display:flex;align-items:center;gap:8px;padding:5px 0}
-.wx-pop .wpr i{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.wx-pop .wpr i.c0{background:var(--wxc0)}
-.wx-pop .wpr i.c1{background:var(--wxc1)}
-.wx-pop .wpr i.c2{background:var(--wxc2)}
-.wx-pop .wpr i.c3{background:var(--wxc3)}
-.wx-pop .wpr.cur{color:var(--ink);font-weight:800}
+.wx-tap{display:flex;align-items:center;gap:7px;min-width:0;padding:0;text-align:left}
+/* Ampel-Punkt sitzt direkt neben der Gradzahl */
+.wx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:none}
+.wx-dot[data-level="0"]{background:var(--wxc0)}
+.wx-dot[data-level="1"]{background:var(--wxc1)}
+.wx-dot[data-level="2"]{background:var(--wxc2)}
+.wx-dot[data-level="3"]{background:var(--wxc3)}
 .tr-right{display:flex;align-items:center;gap:15px;flex-shrink:0}
 .streak{display:flex;align-items:center;gap:6px;font-weight:800;font-size:.92rem}
 .icbtn{color:var(--ink2);display:flex;transition:color .15s}
@@ -226,6 +217,76 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ===== TOAST ===== */
 .toast{position:absolute;bottom:104px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--fill);color:var(--onfill);padding:12px 22px;border-radius:100px;font-size:.84rem;font-weight:700;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:330px;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== WETTER-PANEL (In-App, kein zweites HTML) ===== */
+.wxpanel{flex:1;min-height:0;overflow-y:auto;margin:0 -24px;padding:0 24px}
+.wxh{font-size:1.74rem;font-weight:800;letter-spacing:-.04em;margin:18px 0 2px}
+.wxsub{color:var(--ink2);font-size:.94rem;font-weight:500;margin-bottom:18px}
+.wxload,.wxempty{color:var(--ink3);font-weight:600;font-size:.9rem;padding:34px 2px;text-align:center}
+/* Tagesauswahl-Strip */
+.daysel{display:flex;gap:4px;justify-content:space-between}
+.dcell{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0}
+.dcell .dw{font-size:.66rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em}
+.dcell .dn{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.92rem;font-weight:700;color:var(--ink2);transition:background .15s,color .15s}
+.dcell.on .dn{background:var(--fill);color:var(--onfill)}
+.dcell .drisk{width:6px;height:6px;border-radius:50%;background:transparent}
+.dcell .drisk[data-level="0"]{background:var(--wxc0)}
+.dcell .drisk[data-level="1"]{background:var(--wxc1)}
+.dcell .drisk[data-level="2"]{background:var(--wxc2)}
+.dcell .drisk[data-level="3"]{background:var(--wxc3)}
+.wxdate{color:var(--ink2);font-weight:600;font-size:.9rem;text-align:center;margin:14px 0 4px}
+.chartcard{background:var(--card);border-radius:22px;padding:16px 12px 10px;margin-top:8px}
+.chartcard svg{display:block;width:100%;height:auto}
+.chart text{font-family:"Inter",sans-serif;font-weight:600;fill:var(--ink3)}
+.wxlegend{display:flex;flex-wrap:wrap;gap:10px 16px;margin:16px 4px 0;font-size:.72rem;font-weight:600;color:var(--ink2)}
+.wxlegend span{display:inline-flex;align-items:center;gap:6px}
+.wxlegend i{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.wxlegend i.ln{width:14px;height:2px;border-radius:2px;background:var(--ink2)}
+.wxlegend i.dsh{width:14px;height:0;border-radius:0;border-top:2px dashed var(--ink3)}
+.wxlegend i.win{width:12px;height:12px;border-radius:4px;background:var(--wxc0);opacity:.5}
+.wxrec{margin-top:20px}
+.wxrec .rl{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.wxpills{display:flex;flex-wrap:wrap;gap:8px}
+.wxpill{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:100px;background:var(--soft);font-weight:700;font-size:.86rem;color:var(--ink)}
+.wxpill i{width:8px;height:8px;border-radius:50%;background:var(--wxc0)}
+.wxpill .wl{font-size:.66rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em}
+.wxnone{color:var(--ink3);font-weight:600;font-size:.86rem;line-height:1.45}
+
+/* ===== ELFMETER-PICKER ===== */
+.pkwrap{display:flex;flex-direction:column;gap:14px;margin-top:4px}
+.pkfield{display:flex;flex-direction:column;gap:7px}
+.pkfield span{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3)}
+.pkfield input{font:inherit;font-size:1.15rem;font-weight:700;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:15px 16px;outline:none;transition:border-color .15s}
+.pkfield input:focus{border-color:var(--ink)}
+.pkvs{text-align:center;font-weight:800;color:var(--ink3);font-size:.9rem;letter-spacing:.05em}
+
+/* ===== ELFMETER-ARENA ===== */
+.pkscore{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+.pkscore .pkname{flex:1;font-weight:800;font-size:1.05rem;letter-spacing:-.02em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pkscore .pkname:last-child{text-align:right}
+.pkscore .pkgoals{display:flex;align-items:center;gap:8px;font-size:1.7rem;font-weight:800;font-variant-numeric:tabular-nums;flex-shrink:0}
+.pkscore .pkdash{color:var(--ink3);font-size:1.1rem}
+.pkrounds{display:flex;flex-direction:column;gap:5px;margin:12px 0 4px}
+.pkrline{display:flex;align-items:center;gap:6px;font-size:.68rem;font-weight:700;color:var(--ink3)}
+.pkrline .pkrn{width:52px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pkrline .pkdots{display:flex;gap:5px}
+.pkrline .pkdots i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--line);box-sizing:border-box}
+.pkrline .pkdots i.goal{background:var(--fill);border-color:var(--fill)}
+.pkrline .pkdots i.miss{background:transparent;border-color:var(--ink3);position:relative}
+.pkrline .pkdots i.miss::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--ink3);opacity:.35}
+.pkarena{position:relative;height:210px;margin:6px 0 2px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.pkgoal{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:210px;height:96px;border:3px solid var(--ink2);border-bottom:none;border-radius:6px 6px 0 0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:24px 24px;background-position:center}
+.pkkeeper{position:absolute;top:40px;left:50%;width:26px;height:52px;margin-left:-13px;border-radius:12px 12px 8px 8px;background:var(--ink);transition:transform .32s cubic-bezier(.3,1.4,.5,1);transform:translate(0,0)}
+.pkkeeper::before{content:'';position:absolute;top:-11px;left:50%;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;background:var(--ink)}
+.pkball{position:absolute;bottom:14px;left:50%;margin-left:-10px;width:20px;height:20px;border-radius:50%;background:var(--fill);border:2px solid var(--onfill);box-shadow:0 3px 8px rgba(0,0,0,.28);transition:transform .5s cubic-bezier(.4,.9,.5,1);transform:translate(0,0);z-index:3}
+.pkflash{position:absolute;top:44%;left:0;right:0;text-align:center;font-weight:800;font-size:1.5rem;letter-spacing:-.03em;pointer-events:none;opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s;z-index:5}
+.pkflash.show{opacity:1;transform:scale(1)}
+.pkflash.goal{color:var(--ink)}
+.pkflash.save{color:var(--ink3)}
+.pkshooter{text-align:center;font-weight:700;font-size:.92rem;color:var(--ink2);min-height:1.3em;margin-top:2px}
+.pkresult{text-align:center;font-weight:800;font-size:1.1rem;letter-spacing:-.02em;margin-top:6px}
+.pkbtns{display:flex;gap:10px;justify-content:center}
 </style>
 </head>
 <body>
@@ -235,12 +296,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div class="pad">
       <div class="toprow">
         <div class="wx-top">
-          <button class="wx-tap" onclick="location.href='/weather.html'" aria-label="Wetter-Details für Kira">
+          <button class="wx-tap" onclick="openWeather()" aria-label="Wetter & Hitze-Ampel für Kira">
             <svg width="22" height="16" viewBox="0 0 22 16" fill="none"><path d="M6 13h9a4 4 0 0 0 .5-7.97A5 5 0 0 0 6 6.5 3.25 3.25 0 0 0 6 13Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-            <span class="wt" id="wt">–°</span><span class="wd" id="wd">…</span>
+            <span class="wt" id="wt">–°</span><span class="wx-dot" id="wxRisk" data-level="0"></span><span class="wd" id="wd">…</span>
           </button>
-          <button class="wx-risk" id="wxRisk" data-level="0" onclick="toggleWxPop(event)" aria-label="Hitze-Ampel für Kira"></button>
-          <div class="wx-pop" id="wxPop"></div>
         </div>
         <div class="tr-right">
           <span class="streak">
@@ -275,6 +334,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         <div class="fl">Am Zug</div>
         <div class="fq">Wer dreht heute mit Kira die Runde?</div>
         <button class="pill-dark" onclick="startDice()">Würfeln</button>
+      </div>
+
+      <div class="feat">
+        <div class="fl">Elfmeterschießen</div>
+        <div class="fq">Zwei treten an — der Verlierer muss mit Kira raus.</div>
+        <button class="pill-dark" onclick="startPenalty()">Anpfiff</button>
       </div>
     </div>
   </div>
@@ -418,36 +483,18 @@ function paintAll(){
 }
 
 /* ============== HOME PAINT ============== */
-const WX_LEVELS=[
-  {label:'unbedenklich',desc:'Normale Runden ohne Einschränkung.'},
-  {label:'Vorsicht',desc:'Wasser mitnehmen, kürzere Runden im Schatten.'},
-  {label:'gefährlich',desc:'Nur kurze Runden, direkte Sonne meiden.'},
-  {label:'potenziell lebensgefährlich',desc:'Wenn möglich nur früh morgens oder spät abends raus.'}
-];
 function paintWeather(){
   const w=STATE.status&&STATE.status.weather;
   if(w){
     $('wt').textContent=Math.round(w.temperature)+'°';$('wd').textContent=w.description||'';
-    const valid=typeof w.riskLevel==='number';
-    if(valid){
-      $('wxRisk').style.display='block';$('wxRisk').dataset.level=w.riskLevel;
-      renderWxPop(w.riskLevel);
-    }else{$('wxRisk').style.display='none';closeWxPop();}
+    if(typeof w.riskLevel==='number'){
+      $('wxRisk').style.display='inline-block';$('wxRisk').dataset.level=w.riskLevel;
+    }else{$('wxRisk').style.display='none';}
   }else{
     $('wt').textContent='';$('wd').textContent='';
-    $('wxRisk').style.display='none';closeWxPop();
+    $('wxRisk').style.display='none';
   }
 }
-function renderWxPop(level){
-  $('wxPop').innerHTML=WX_LEVELS.map((l,i)=>
-    `<div class="wpr ${i===level?'cur':''}"><i class="c${i}"></i>${l.label} — ${l.desc}</div>`
-  ).join('');
-}
-function toggleWxPop(e){e.stopPropagation();$('wxPop').classList.toggle('open')}
-function closeWxPop(){$('wxPop').classList.remove('open')}
-document.addEventListener('click',e=>{
-  if(!e.target.closest('#wxPop')&&!e.target.closest('#wxRisk'))closeWxPop();
-});
 function paintGreet(){const h=new Date().getHours();$('greet-word').textContent=h<11?'guten morgen.':h>=18?'guten abend.':'guten tag.'}
 function paintGreetSub(){
   if(vacation){$('greet-sub').textContent='App inaktiv — Kira ist im Urlaub';return;}
@@ -658,7 +705,7 @@ function startLate(id){if(vacation)return;flow='late';step=0;state={lateId:id};o
 let flow=null,step=0,state={};
 function dots(n,cur){$('dots').innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('')}
 function openOver(){$('over').classList.add('open')}
-function closeOver(){$('over').classList.remove('open');flow=null}
+function closeOver(){$('over').classList.remove('open');flow=null;clearInterval(state._diceIv);clearTimeout(state._diceTo)}
 function overBack(){if(step<=0){closeOver();return}step--;render()}
 
 function startLog(){if(vacation)return toast('Urlaubsmodus aktiv — Kira braucht gerade keine Runden');flow='log';step=0;state={};openOver();render()}
@@ -690,6 +737,11 @@ function next(){
 }
 
 function render(){
+  if(flow==='weather'){return renderWeatherPanel()}
+  if(flow==='penalty'){
+    if(step===0)return penaltyPickStep();
+    return penaltyArena();
+  }
   if(flow==='log'){
     if(step===0){dots(3,0);return gridPicker('Wer war mit Kira draußen?','Tippe einen Namen.',NAMES,'who',false)}
     if(step===1){dots(3,1);return gridPicker('Wie war die Runde?','Optional — mehrere möglich.',FEEL,'feel',true)}
@@ -799,7 +851,234 @@ function diceStep(){
     <div class="over-foot"><span class="skip" onclick="spin()">Nochmal</span><button class="next" onclick="closeOver()">✓</button></div>`;
   spin();
 }
-function spin(){const o=$('diceOut');if(!o)return;let i=0;const iv=setInterval(()=>o.textContent=NAMES[i++%NAMES.length],80);setTimeout(()=>{clearInterval(iv);o.textContent=NAMES[Math.floor(Math.random()*NAMES.length)]},1000)}
+function spin(){
+  const o=$('diceOut');if(!o)return;
+  // Alte Timer stoppen (schnelles „Nochmal" erzeugte sonst überlappende Läufe,
+  // wodurch das Ergebnis zwischen zwei Namen sprang / manche fehlten).
+  clearInterval(state._diceIv);clearTimeout(state._diceTo);
+  let i=Math.floor(Math.random()*NAMES.length);
+  state._diceIv=setInterval(()=>{if(!$('diceOut'))return clearInterval(state._diceIv);$('diceOut').textContent=NAMES[i++%NAMES.length];},80);
+  state._diceTo=setTimeout(()=>{
+    clearInterval(state._diceIv);
+    const el=$('diceOut');if(el)el.textContent=NAMES[Math.floor(Math.random()*NAMES.length)];
+  },1000);
+}
+
+/* ============== WETTER-PANEL (In-App) ============== */
+const WD_LONG=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const MON_LONG=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+let WX_WEEK=null, wxDay=0;
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function openWeather(){flow='weather';step=0;state={};$('dots').innerHTML='';openOver();renderWeatherPanel();loadWeek();}
+async function loadWeek(){
+  try{
+    const w=await api('/weather/week');
+    WX_WEEK=w;
+    const idx=(w.days||[]).findIndex(d=>d.date===todayISO());
+    wxDay=idx>=0?idx:0;
+  }catch(e){WX_WEEK={error:1};}
+  if(flow==='weather')renderWeatherPanel();
+}
+function wxPick(i){wxDay=i;renderWeatherPanel();}
+function longDate(iso){const [y,mo,d]=iso.split('-').map(Number);const dt=new Date(y,mo-1,d);return WD_LONG[dt.getDay()]+', '+d+'. '+MON_LONG[mo-1];}
+function wxWin(lab,w){return `<span class="wxpill"><i></i><span class="wl">${lab}</span> ${w.start}–${w.end}</span>`;}
+function recPills(day){
+  const p=[];
+  if(day.morningWindow)p.push(wxWin('Vormittag',day.morningWindow));
+  if(day.eveningWindow)p.push(wxWin('Abend',day.eveningWindow));
+  if(!p.length)return '<div class="wxnone">Kein sicheres Zeitfenster an diesem Tag — wenn möglich nur kurze Runden im Schatten.</div>';
+  return '<div class="wxpills">'+p.join('')+'</div>';
+}
+function renderWeatherPanel(){
+  const body=$('overBody');
+  const head='<h2 class="wxh">wetter.</h2><div class="wxsub">gassi-fenster für kira</div>';
+  if(!WX_WEEK){body.innerHTML=head+'<div class="wxload">Lade Vorhersage …</div>';return;}
+  if(WX_WEEK.error||!WX_WEEK.days||!WX_WEEK.days.length){body.innerHTML=head+'<div class="wxempty">Vorhersage nicht verfügbar.</div>';return;}
+  const days=WX_WEEK.days;
+  if(wxDay>=days.length)wxDay=0;
+  const day=days[wxDay];
+  body.innerHTML=`
+    <div class="wxpanel">
+      ${head}
+      <div class="daysel">${days.map((d,i)=>`
+        <button class="dcell ${i===wxDay?'on':''}" onclick="wxPick(${i})">
+          <span class="dw">${d.weekday}</span>
+          <span class="dn">${d.dayNum}</span>
+          <span class="drisk" data-level="${d.maxRiskLevel}"></span>
+        </button>`).join('')}</div>
+      <div class="wxdate">${longDate(day.date)}</div>
+      <div class="chartcard">${chartSvg(day)}</div>
+      <div class="wxlegend">
+        <span><i class="ln"></i>Temperatur</span>
+        <span><i class="dsh"></i>Luftfeuchtigkeit</span>
+        <span><i class="win"></i>gutes Fenster</span>
+      </div>
+      <div class="wxrec"><div class="rl">Beste Zeiten für Kira</div>${recPills(day)}</div>
+    </div>`;
+}
+function toHour(t){const [h,m]=t.split(':').map(Number);return h+(m||0)/60;}
+function smoothPath(c){
+  if(!c.length)return '';
+  if(c.length<3)return 'M'+c.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L');
+  let d='M'+c[0][0].toFixed(1)+','+c[0][1].toFixed(1);
+  for(let i=0;i<c.length-1;i++){
+    const p0=c[i-1]||c[i],p1=c[i],p2=c[i+1],p3=c[i+2]||c[i+1];
+    const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6;
+    const c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+=' C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1);
+  }
+  return d;
+}
+function chartSvg(day){
+  const pts=day.points||[];
+  if(!pts.length)return '<div class="wxempty">Keine Vorhersagedaten für diesen Tag.</div>';
+  const W=340,H=190,L=26,R=30,T=18,B=28,pw=W-L-R,ph=H-T-B;
+  const temps=pts.map(p=>p.temperature);
+  let loT=Math.floor(Math.min(...temps)-1),hiT=Math.ceil(Math.max(...temps)+1);
+  if(hiT-loT<4)hiT=loT+4;
+  const x=h=>L+pw*(Math.max(0,Math.min(24,h))/24);
+  const yT=t=>T+ph*(1-(t-loT)/(hiT-loT));
+  const yH=v=>T+ph*(1-v/100);
+  const tc=pts.map(p=>[x(toHour(p.time)),yT(p.temperature)]);
+  const hc=pts.map(p=>[x(toHour(p.time)),yH(p.humidity)]);
+  const tLine=smoothPath(tc);
+  const tArea=tLine+` L${tc[tc.length-1][0].toFixed(1)},${(H-B).toFixed(1)} L${tc[0][0].toFixed(1)},${(H-B).toFixed(1)} Z`;
+  const hLine=smoothPath(hc);
+  const band=w=>{if(!w)return '';const x1=x(toHour(w.start)),x2=x(toHour(w.end));return `<rect x="${x1.toFixed(1)}" y="${T}" width="${Math.max(3,x2-x1).toFixed(1)}" height="${ph}" rx="6" fill="var(--wxc0)" opacity="0.14"/>`;};
+  const bands=band(day.morningWindow)+band(day.eveningWindow);
+  const xticks=[0,6,12,18,24].map(h=>`<line x1="${x(h).toFixed(1)}" y1="${T}" x2="${x(h).toFixed(1)}" y2="${H-B}" stroke="var(--line)" stroke-width="1"/><text x="${x(h).toFixed(1)}" y="${H-9}" text-anchor="middle" font-size="9">${pad2(h)}</text>`).join('');
+  const dots=pts.map((p,i)=>`<circle cx="${tc[i][0].toFixed(1)}" cy="${tc[i][1].toFixed(1)}" r="3.4" fill="var(--wxc${p.riskLevel})" stroke="var(--card)" stroke-width="1.3"/>`).join('');
+  const tempLabels=`<text x="2" y="${(yT(hiT)+3).toFixed(1)}" font-size="9">${hiT}°</text><text x="2" y="${(yT(loT)+3).toFixed(1)}" font-size="9">${loT}°</text>`;
+  const humLabels=`<text x="${W-2}" y="${(yH(100)+8).toFixed(1)}" text-anchor="end" font-size="9">100%</text><text x="${W-2}" y="${(yH(0)-2).toFixed(1)}" text-anchor="end" font-size="9">0%</text>`;
+  let now='';
+  if(day.date===todayISO()){
+    const nh=new Date().getHours()+new Date().getMinutes()/60;
+    const minH=toHour(pts[0].time),maxH=toHour(pts[pts.length-1].time);
+    if(nh>=minH&&nh<=maxH){
+      let ny=tc[0][1];
+      for(let i=0;i<pts.length-1;i++){const a=toHour(pts[i].time),b=toHour(pts[i+1].time);if(nh>=a&&nh<=b){const f=(nh-a)/((b-a)||1);ny=tc[i][1]+(tc[i+1][1]-tc[i][1])*f;break;}}
+      const nx=x(nh);
+      now=`<line x1="${nx.toFixed(1)}" y1="${T}" x2="${nx.toFixed(1)}" y2="${H-B}" stroke="var(--ink3)" stroke-width="1" stroke-dasharray="2 3"/><circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="4.5" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>`;
+    }
+  }
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    ${xticks}${bands}
+    <path d="${tArea}" fill="var(--soft)"/>
+    <path d="${hLine}" fill="none" stroke="var(--ink3)" stroke-width="1.6" stroke-dasharray="3 3" stroke-linecap="round"/>
+    <path d="${tLine}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}${now}${tempLabels}${humLabels}
+  </svg>`;
+}
+
+/* ============== ELFMETERSCHIESSEN ============== */
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function startPenalty(){flow='penalty';step=0;state={};$('dots').innerHTML='';openOver();render();}
+function penaltyPickStep(){
+  $('dots').innerHTML='';
+  const p1=state.p1||'',p2=state.p2||'';
+  const ready=p1.trim()&&p2.trim()&&p1.trim().toLowerCase()!==p2.trim().toLowerCase();
+  $('overBody').innerHTML=`
+    <h2>Elfmeterschießen</h2><div class="osub">Wer tritt an? Namen wählen oder tippen.</div>
+    <datalist id="pnames">${NAMES.map(n=>`<option value="${n}"></option>`).join('')}</datalist>
+    <div class="pkwrap">
+      <label class="pkfield"><span>Spieler 1</span><input id="pk1" list="pnames" autocomplete="off" placeholder="Name" value="${esc(p1)}" oninput="pkIn()"></label>
+      <div class="pkvs">gegen</div>
+      <label class="pkfield"><span>Spieler 2</span><input id="pk2" list="pnames" autocomplete="off" placeholder="Name" value="${esc(p2)}" oninput="pkIn()"></label>
+    </div>
+    <div class="over-foot"><span class="skip"></span><button class="next ${ready?'':'off'}" id="pknext" onclick="penaltyGo()">›</button></div>`;
+}
+function pkIn(){
+  state.p1=$('pk1').value;state.p2=$('pk2').value;
+  const r=state.p1.trim()&&state.p2.trim()&&state.p1.trim().toLowerCase()!==state.p2.trim().toLowerCase();
+  $('pknext').classList.toggle('off',!r);
+}
+function penaltyGo(){
+  const p1=(state.p1||'').trim(),p2=(state.p2||'').trim();
+  if(!p1||!p2||p1.toLowerCase()===p2.toLowerCase())return;
+  state.p1=p1;state.p2=p2;step=1;render();
+}
+const PK_ZONES=['tl','tr','c','bl','br'];
+const PK_BALL={tl:[-78,-150],tr:[78,-150],c:[0,-118],bl:[-78,-98],br:[78,-98]};
+const PK_KEEP={tl:[-74,-30,-24],tr:[74,-30,24],c:[0,4,0],bl:[-74,18,-24],br:[74,18,24]};
+function penaltyArena(){
+  $('dots').innerHTML='';
+  $('overBody').innerHTML=`
+    <div class="pkscore">
+      <div class="pkname">${esc(state.p1)}</div>
+      <div class="pkgoals"><span id="pkg1">0</span><span class="pkdash">–</span><span id="pkg2">0</span></div>
+      <div class="pkname">${esc(state.p2)}</div>
+    </div>
+    <div class="pkrounds" id="pkrounds"></div>
+    <div class="pkarena">
+      <div class="pkgoal"><div class="pkkeeper" id="pkkeeper"></div></div>
+      <div class="pkball" id="pkball"></div>
+      <div class="pkflash" id="pkflash"></div>
+    </div>
+    <div class="pkshooter" id="pkshooter">Anpfiff …</div>
+    <div class="over-foot" id="pkfoot" style="justify-content:center"></div>`;
+  state.pk={s1:0,s2:0,shot:0,hist:[],done:false};
+  updateRounds();
+  setTimeout(()=>{if(flow==='penalty'&&$('pkball'))penaltyNext();},650);
+}
+function penaltyNext(){
+  const pk=state.pk;
+  if(!pk||flow!=='penalty'||!$('pkball'))return;
+  if(pk.shot>=10 && pk.shot%2===0 && pk.s1!==pk.s2){penaltyFinish();return;}
+  const player=pk.shot%2===0?1:2;
+  const name=player===1?state.p1:state.p2;
+  $('pkshooter').textContent=name+' läuft an …';
+  const target=PK_ZONES[Math.floor(Math.random()*5)];
+  const dive=PK_ZONES[Math.floor(Math.random()*5)];
+  const scored=target!==dive;
+  const ball=$('pkball'),keeper=$('pkkeeper'),flash=$('pkflash');
+  ball.style.transition='none';ball.style.transform='translate(0,0)';
+  keeper.style.transition='none';keeper.style.transform='translate(0,0)';
+  flash.className='pkflash';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(!$('pkball'))return;
+    ball.style.transition='';keeper.style.transition='';
+    const b=PK_BALL[target];ball.style.transform=`translate(${b[0]}px,${b[1]}px)`;
+    const k=PK_KEEP[dive];keeper.style.transform=`translate(${k[0]}px,${k[1]}px) rotate(${k[2]}deg)`;
+  }));
+  setTimeout(()=>{
+    if(flow!=='penalty'||!$('pkflash'))return;
+    flash.textContent=scored?'TOR!':'GEHALTEN!';
+    flash.className='pkflash show '+(scored?'goal':'save');
+    if(scored){if(player===1)pk.s1++;else pk.s2++;}
+    pk.hist.push({player,scored});
+    pk.shot++;
+    updateScore();updateRounds();
+  },560);
+  setTimeout(()=>{if(flow==='penalty'&&$('pkball'))penaltyNext();},1500);
+}
+function updateScore(){const pk=state.pk;const a=$('pkg1'),b=$('pkg2');if(a)a.textContent=pk.s1;if(b)b.textContent=pk.s2;}
+function updateRounds(){
+  const pk=state.pk;const box=$('pkrounds');if(!box)return;
+  box.innerHTML=[[state.p1,1],[state.p2,2]].map(([nm,pl])=>{
+    const kicks=pk.hist.filter(h=>h.player===pl);
+    const n=Math.max(5,kicks.length);
+    let dots='';
+    for(let i=0;i<n;i++)dots+=i<kicks.length?`<i class="${kicks[i].scored?'goal':'miss'}"></i>`:'<i></i>';
+    return `<div class="pkrline"><span class="pkrn">${esc(nm)}</span><span class="pkdots">${dots}</span></div>`;
+  }).join('');
+}
+function penaltyFinish(){
+  const pk=state.pk;pk.done=true;
+  const p1win=pk.s1>pk.s2;
+  const winner=p1win?state.p1:state.p2,loser=p1win?state.p2:state.p1;
+  const sh=$('pkshooter');if(sh)sh.textContent='';
+  const flash=$('pkflash');if(flash){flash.textContent='ABPFIFF';flash.className='pkflash show save';}
+  const foot=$('pkfoot');if(!foot)return;
+  foot.innerHTML=`
+    <div style="width:100%">
+      <div class="pkresult">🏆 ${esc(winner)} gewinnt</div>
+      <div class="pkshooter" style="margin:2px 0 14px">${esc(loser)} geht mit Kira raus 🐕</div>
+      <div class="pkbtns">
+        <button class="btn-outline" onclick="penaltyArena()">Nochmal</button>
+        <button class="pill-dark" onclick="finishDone('penalty')">Fertig</button>
+      </div>
+    </div>`;
+}
 
 function doneStep(title,sub,streak){
   $('dots').innerHTML='';const f=flow;

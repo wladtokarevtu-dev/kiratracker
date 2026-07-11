@@ -42,7 +42,22 @@ class WeatherServiceTest {
         assertThat(forecast.getMorningWindow().getStart()).isEqualTo("07:00");
         assertThat(forecast.getMorningWindow().getEnd()).isEqualTo("10:00");
         assertThat(forecast.getEveningWindow().getStart()).isEqualTo("22:00");
-        assertThat(forecast.getEveningWindow().getEnd()).isEqualTo("01:00");
+        assertThat(forecast.getEveningWindow().getEnd()).isEqualTo("23:00");
+    }
+
+    @org.junit.jupiter.api.Test
+    void buildForecast_ignoresSlotsBeforeSix_andCapsEveningEndAt2300() {
+        List<ForecastPointDto> points = List.of(
+                new ForecastPointDto("03:00", 16, 55, 0),   // vor 6:00 → nicht vorschlagen
+                new ForecastPointDto("09:00", 26, 60, 1),
+                new ForecastPointDto("21:00", 22, 60, 0)    // +3h = 00:00 → auf 23:00 kappen
+        );
+
+        WeatherForecastDto forecast = WeatherService.buildForecast(points);
+
+        assertThat(forecast.getMorningWindow().getStart()).isEqualTo("09:00");
+        assertThat(forecast.getEveningWindow().getStart()).isEqualTo("21:00");
+        assertThat(forecast.getEveningWindow().getEnd()).isEqualTo("23:00");
     }
 
     @org.junit.jupiter.api.Test

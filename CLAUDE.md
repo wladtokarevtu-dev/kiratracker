@@ -115,6 +115,24 @@ weißraumstarke Sprache der App **Stoic** angelehnt (eigene Inhalte/Assets —
 - Im Admin-Modus ist **jeder Eintrag löschbar** und die **Uhrzeit jedes Eintrags
   verstellbar** (in der Verlaufsliste).
 
+## 8. Hitze-Warnung (Ampel · Tagesverlauf · 6-Uhr-Push)
+- **Formel:** `tempF + humidity%` (`tempF = tempC × 9/5 + 32`) →
+  `<150` = 0 grün (unbedenklich) · `150–159` = 1 gelb (Vorsicht) ·
+  `160–179` = 2 orange (gefährlich) · `≥180` = 3 rot (potenziell lebensgefährlich).
+- **Ampel-Punkt** neben dem Wetter auf Home (8px sichtbar, 32px Tap-Fläche);
+  Tap → Popover mit allen 4 Stufen, aktuelle hervorgehoben. Punkt **versteckt**,
+  wenn `weather.riskLevel == null` (API down — kein falsches Grün).
+- **Tap aufs Wetter** (Icon/Temp/Beschreibung) → `weather.html`: SVG-Tagesverlauf
+  (Temperaturkurve, Punkte in Ampel-Farben) + Empfehlungs-Pillen mit den besten
+  Zeitfenstern; sind beide Fenster `null`: „heute kein sicheres Fenster …".
+- **Zeitfenster:** Vormittag = Slots `< 12:00` (frühester Slot mit minimalem Risiko),
+  Abend = Slots `≥ 17:00` (spätester Slot mit minimalem Risiko), Fenster = Slot + 3h;
+  `null`, wenn das Minimum dort Level 3 ist. Akzeptierte Eigenheit: späte
+  Abendfenster können über Mitternacht laufen (z. B. „22:00–01:00").
+- **6-Uhr-Push** (Europe/Berlin): nur wenn `maxRiskLevel == 3` und kein Urlaub —
+  nennt die besten Fenster, ohne Fenster: „nur kurze, schattige Runden".
+  Forecast-API down um 6:00 → kein Push (keine Warnung ohne valide Daten), WARN im Log.
+
 ## Bekannte Altlast (erledigt)
 - ~~Das alte `index.html`-Frontend fällt bei API-Fehlern auf Mock-Daten zurück.~~
   Im Redesign behoben: echte Fehlerzustände (ruhiger Inline-Hinweis), keine Mocks.
@@ -141,7 +159,11 @@ als Wahrheit nehmen, das Mockup als Stil-Referenz.
 --onfill   #ffffff          #0d0d0f
 --soft     #f4f4f6          #1d1d20
 Nachtrag (leicht rot): bg #fdecec / Text #9a3636   ·  Dark: bg #291616 / Text #e6a5a5
+Hitze-Ampel (--wxc0..3): #3c8a5c / #c9a227 / #c97a27 / #9a3636
+                   Dark: #5fae7f / #e0c157 / #e0a157 / #e6a5a5
 ```
+> Die Ampel-Farben sind (wie das Nachtrag-Rot) eine bewusste Ausnahme vom
+> Ein-Akzent-Prinzip: funktionales Sicherheitssignal, kein Deko-Akzent.
 **Typo:** Inter. Begrüßung & Screen-Titel **lowercase**, fett, `letter-spacing≈-.045em`.
 Eyebrow-Labels: 0.7rem, 700, uppercase, `--ink3`.
 
@@ -159,6 +181,8 @@ native `input[type=time]` für Uhrzeiten.
   Blockieren, Nachtragen, Würfeln, Admin-Uhrzeit.
 - **Segmented Control** (Rangliste 3/7/14/30)
 - **Fairness-Karte**, **Nachtrag-Stack** (leicht rot), **Urlaubs-Banner**, **Lock/Admin**
+- **Hitze-Ampel-Punkt + Popover** (Home) · **`weather.html`** (Stoic-Look wie `admin.html`,
+  nur in der Live-Datei — nicht im Mockup)
 
 ---
 
@@ -211,5 +235,11 @@ native `input[type=time]` für Uhrzeiten.
 - **D6 Frontend-Umfang:** zuerst neues `index.html` (Home + Verlauf + Flows).
   `stats.html` / `admin.html` / `nfc.html` bleiben funktional verlinkt, Restyling später.
   **Mock-Fallback raus**, echte Fehlerzustände zeigen.
+- **D7 Hitze-Warnung:** Risiko-Level als reine Funktion `WeatherService.riskLevel()`,
+  Fenster-Logik netzwerkfrei in `buildForecast()` (direkt testbar, kein HTTP-Mocking).
+  `WeatherDto.riskLevel` ist `Integer` — `null` = API down (Frontend versteckt den Punkt).
+  Forecast-URL wird aus `WEATHER_API_URL` abgeleitet (`/weather` → `/forecast`);
+  **die Env-Var muss auf `/weather` enden**, sonst bleibt der Forecast leer (WARN im Log).
+  Spec: `docs/superpowers/specs/2026-07-08-hitze-warnung-design.md`.
 
 **Implementierungsplan:** `docs/IMPLEMENTATION-PLAN.md` (autonom abarbeitbar).
